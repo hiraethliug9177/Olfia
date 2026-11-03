@@ -1,0 +1,146 @@
+@import "tailwindcss";
+
+/* Font family names as loaded by the Google Fonts stylesheet in app/layout.tsx */
+:root {
+  --font-lora: "Lora";
+  --font-newsreader: "Newsreader";
+  --font-source-sans: "Source Sans 3";
+}
+
+/*
+  Olfia design tokens — the single source of truth for colour, type, radii and motion.
+  Mirrors docs/DESIGN-SPEC.md §2. Change both together.
+*/
+@theme {
+  /* Brand palette */
+  --color-ivory: #f8f6f0;
+  --color-charcoal: #292a31;
+  --color-periwinkle: #a0a6c8;        /* signature: frames/decorative only, never text */
+  --color-periwinkle-deep: #4c527a;   /* interactive, 6.95:1 on ivory */
+  --color-apricot: #e7b49f;           /* decorative only */
+
+  /* Semantic */
+  --color-surface-0: #f8f6f0;
+  --color-surface-1: #ffffff;
+  --color-surface-2: #eeedf5;         /* lilac mist */
+  --color-hairline: #d5d7e6;
+  --color-ink: #292a31;
+  --color-ink-2: #5c5e6b;             /* 5.95:1 on ivory */
+  --color-interactive: #4c527a;
+  --color-interactive-hover: #3e4366;
+  --color-success: #3e6a49;
+  --color-danger: #9a4b3f;
+
+  /* Type */
+  --font-display: var(--font-lora), Georgia, "Times New Roman", serif;
+  --font-body: var(--font-newsreader), Georgia, "Times New Roman", serif;
+  --font-ui: var(--font-source-sans), system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* Radii */
+  --radius-chip: 4px;
+  --radius-control: 8px;
+  --radius-card: 16px;
+  --radius-stage: 24px;
+  --radius-scene-card: 12px;
+
+  /* Motion */
+  --ease-olfia: cubic-bezier(0.2, 0, 0, 1);
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --duration-swap: 320ms;
+  --duration-light: 600ms;
+
+  /* Elevation */
+  --shadow-sheet: 0 8px 24px rgba(41, 42, 49, 0.12);
+  --shadow-toast: 0 4px 12px rgba(41, 42, 49, 0.14);
+  --shadow-front-plane: 0 6px 14px rgba(41, 42, 49, 0.18);
+}
+
+@layer base {
+  html {
+    background-color: var(--color-ivory);
+    color: var(--color-charcoal);
+    font-family: var(--font-body);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    min-height: 100dvh;
+    background-color: var(--color-ivory);
+    font-size: 1.0625rem; /* 17px body per DESIGN-SPEC */
+  }
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    line-height: 1.15;
+    letter-spacing: -0.005em;
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
+  }
+  a {
+    color: var(--color-interactive);
+    text-underline-offset: 3px;
+  }
+  a:hover {
+    color: var(--color-interactive-hover);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-interactive);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+  button, input, select, textarea {
+    font-family: var(--font-ui);
+    font-size: 0.9375rem;
+  }
+  ::selection {
+    background: var(--color-periwinkle);
+    color: var(--color-charcoal);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  /* Signature double frame: 2px periwinkle, 6px ivory gap, 1px periwinkle. Rooms stage + Scene Card only. */
+  .frame-signature {
+    border: 2px solid var(--color-periwinkle);
+    box-shadow: inset 0 0 0 6px var(--color-ivory), inset 0 0 0 7px var(--color-periwinkle);
+  }
+  .eyebrow {
+    font-family: var(--font-ui);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-ink-2);
+  }
+  .ui {
+    font-family: var(--font-ui);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+  }
+  .caption {
+    font-family: var(--font-ui);
+    font-size: 0.8125rem;
+    letter-spacing: 0.01em;
+    color: var(--color-ink-2);
+  }
+  /* Afterimage wash: translucent layered blur used on the landing hero and Capture cards */
+  .afterimage {
+    background:
+      radial-gradient(60% 50% at 30% 35%, rgba(160, 166, 200, 0.55) 0%, rgba(160, 166, 200, 0) 70%),
+      radial-gradient(50% 45% at 72% 60%, rgba(231, 180, 159, 0.5) 0%, rgba(231, 180, 159, 0) 70%),
+      radial-gradient(70% 60% at 55% 85%, rgba(238, 237, 245, 0.9) 0%, rgba(238, 237, 245, 0) 70%),
+      var(--color-ivory);
+  }
+}

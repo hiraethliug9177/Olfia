@@ -1,0 +1,90 @@
+{
+  "version": 1,
+  "_note": "PROPOSAL. Scene names, lines, labels and descriptors are Tiffany's to write; ids stay stable once assets exist. Asset paths follow public/scenes/<sceneId>/<slotId>/<optionId>.webp.",
+  "scenes": [
+    {
+      "id": "reading-corner",
+      "name": "Reading Corner",
+      "line": "TODO(Tiffany): one line about the atmosphere of this corner.",
+      "background": "/scenes/reading-corner/background.webp",
+      "defaults": {
+        "seat": "armchair",
+        "lamp": "paper-lantern",
+        "scent": "pillar-candle",
+        "botanical": "eucalyptus",
+        "textile": "wool-throw",
+        "tabletop": "book-stack"
+      },
+      "defaultLight": "morning",
+      "slots": [
+        {
+          "id": "seat", "label": "Seat", "plane": "mid",
+          "anchor": { "x": 42, "y": 82 }, "width": 46, "z": 20, "allowNone": false,
+          "options": [
+            { "id": "armchair", "label": "Armchair", "descriptor": "", "asset": "/scenes/reading-corner/seat/armchair.webp", "alt": "Armchair" },
+            { "id": "floor-cushion", "label": "Floor cushion", "descriptor": "", "asset": "/scenes/reading-corner/seat/floor-cushion.webp", "alt": "Floor cushion" },
+            { "id": "window-seat", "label": "Window seat", "descriptor": "", "asset": "/scenes/reading-corner/seat/window-seat.webp", "alt": "Window seat" }
+          ]
+        },
+        {
+          "id": "lamp", "label": "Light", "plane": "mid",
+          "anchor": { "x": 78, "y": 70 }, "width": 18, "z": 22, "allowNone": false,
+          "options": [
+            { "id": "paper-lantern", "label": "Paper lantern", "descriptor": "", "asset": "/scenes/reading-corner/lamp/paper-lantern.webp", "emitsLight": true, "alt": "Paper lantern floor lamp" },
+            { "id": "brass-lamp", "label": "Brass reading lamp", "descriptor": "", "asset": "/scenes/reading-corner/lamp/brass-lamp.webp", "emitsLight": true, "alt": "Brass reading lamp" },
+            { "id": "candle-cluster", "label": "Candle cluster", "descriptor": "", "asset": "/scenes/reading-corner/lamp/candle-cluster.webp", "emitsLight": true, "alt": "Cluster of small candles" }
+          ]
+        },
+        {
+          "id": "scent", "label": "Scent", "plane": "front",
+          "anchor": { "x": 70, "y": 88 }, "width": 12, "z": 32, "allowNone": true,
+          "options": [
+            { "id": "pillar-candle", "label": "Pillar candle", "descriptor": "", "asset": "/scenes/reading-corner/scent/pillar-candle.webp", "emitsLight": true, "alt": "Pillar candle" },
+            { "id": "reed-diffuser", "label": "Reed diffuser", "descriptor": "", "asset": "/scenes/reading-corner/scent/reed-diffuser.webp", "alt": "Reed diffuser" },
+            { "id": "incense", "label": "Incense holder", "descriptor": "", "asset": "/scenes/reading-corner/scent/incense.webp", "alt": "Incense holder with a lit stick" },
+            { "id": "fresh-air", "label": "Fresh air", "descriptor": "Fragrance-free; an open window", "asset": null, "alt": "" }
+          ]
+        },
+        {
+          "id": "botanical", "label": "Botanical", "plane": "front",
+          "anchor": { "x": 14, "y": 86 }, "width": 20, "z": 30, "allowNone": true,
+          "options": [
+            { "id": "eucalyptus", "label": "Eucalyptus bunch", "descriptor": "", "asset": "/scenes/reading-corner/botanical/eucalyptus.webp", "alt": "Bunch of eucalyptus in a vase" },
+            { "id": "dried-flowers", "label": "Dried flowers", "descriptor": "", "asset": "/scenes/reading-corner/botanical/dried-flowers.webp", "alt": "Dried flowers in a vase" },
+            { "id": "fern", "label": "Potted fern", "descriptor": "", "asset": "/scenes/reading-corner/botanical/fern.webp", "alt": "Potted fern" },
+            { "id": "none", "label": "None", "descriptor": "", "asset": null, "alt": "" }
+          ]
+        },
+        {
+          "id": "textile", "label": "Textile", "plane": "mid",
+          "anchor": { "x": 42, "y": 74 }, "width": 30, "z": 24, "allowNone": false,
+          "options": [
+            { "id": "wool-throw", "label": "Wool throw", "descriptor": "", "asset": "/scenes/reading-corner/textile/wool-throw.webp", "alt": "Wool throw over the seat" },
+            { "id": "linen-blanket", "label": "Linen blanket", "descriptor": "", "asset": "/scenes/reading-corner/textile/linen-blanket.webp", "alt": "Linen blanket over the seat" },
+            { "id": "knit-cushion", "label": "Knit cushion", "descriptor": "", "asset": "/scenes/reading-corner/textile/knit-cushion.webp", "alt": "Knit cushion on the seat" }
+          ]
+        },
+        {
+          "id": "tabletop", "label": "On the table", "plane": "front",
+          "anchor": { "x": 84, "y": 90 }, "width": 12, "z": 34, "allowNone": true,
+          "options": [
+            { "id": "book-stack", "label": "Book stack", "descriptor": "", "asset": "/scenes/reading-corner/tabletop/book-stack.webp", "alt": "Stack of books" },
+            { "id": "tea-cup", "label": "Tea cup", "descriptor": "", "asset": "/scenes/reading-corner/tabletop/tea-cup.webp", "alt": "Cup of tea" },
+            { "id": "vinyl", "label": "Vinyl record", "descriptor": "", "asset": "/scenes/reading-corner/tabletop/vinyl.webp", "alt": "Vinyl record" },
+            { "id": "none", "label": "None", "descriptor": "", "asset": null, "alt": "" }
+          ]
+        }
+      ],
+      "lights": [
+        { "id": "morning", "name": "Morning", "wash": "#EAF0F5", "blend": "soft-light", "opacity": 0.6, "shadowTint": "rgba(143,155,179,0.25)", "glow": null },
+        { "id": "golden-hour", "name": "Golden hour", "wash": "#F3D9B8", "blend": "multiply", "opacity": 0.35, "shadowTint": "rgba(184,138,92,0.3)", "glow": { "color": "#E7B49F", "opacity": 0.4 } },
+        { "id": "lamp-night", "name": "Lamp-lit night", "wash": "#2B2A3A", "blend": "multiply", "opacity": 0.45, "shadowTint": "rgba(30,30,42,0.5)", "glow": { "color": "#E7B49F", "opacity": 0.7 } }
+      ],
+      "moods": [
+        { "id": "wind-down", "name": "Wind down", "line": "TODO", "selections": { "seat": "armchair", "lamp": "paper-lantern", "scent": "pillar-candle", "botanical": "eucalyptus", "textile": "wool-throw", "tabletop": "tea-cup" }, "light": "lamp-night" },
+        { "id": "focus", "name": "Focus", "line": "TODO", "selections": { "seat": "window-seat", "lamp": "brass-lamp", "scent": "fresh-air", "botanical": "fern", "textile": "linen-blanket", "tabletop": "book-stack" }, "light": "morning" },
+        { "id": "rainy-afternoon", "name": "Rainy afternoon", "line": "TODO", "selections": { "seat": "floor-cushion", "lamp": "candle-cluster", "scent": "incense", "botanical": "dried-flowers", "textile": "knit-cushion", "tabletop": "vinyl" }, "light": "golden-hour" }
+      ]
+    }
+  ]
+}

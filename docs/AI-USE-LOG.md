@@ -1,0 +1,12 @@
+# AI-use log
+
+The DSM596 syllabus requires a closing paragraph on every assignment that used AI, explaining how and why it was used and the prompts involved. This log is the source for that paragraph. One row per session or asset batch. Prompts: paste the key prompt or a faithful summary.
+
+| Date | Tool | Purpose | Key prompt(s) | What was kept / changed by Tiffany |
+| --- | --- | --- | --- | --- |
+| 2026-11-02 | Claude (claude.ai, Fable 5.1) | Evaluated existing project materials, syllabus, and business plan; produced the MVP evaluation and development plan; drafted PRD, DESIGN-SPEC, ARCHITECTURE v0.9 and the repository scaffold | "评估整体内容，分析哪些可取哪些不可取，告诉我接下来应该做的事情 step by step… scope: PRD, UI/UX spec, architecture, Figma, backend/data, testing, GitHub deployment" | Decisions confirmed by Tiffany: Next.js stack; collage-style scenes with single view + preset slots; preset suggestions; Figma after 11/10; localStorage saving. Content and copy remain Tiffany's |
+| | lovart.ai (planned) | Scene cut-out generation with one locked style prompt | see DESIGN-SPEC §5.1 | Selection, art direction, and all labels by Tiffany |
+
+## Statement template (for Brightspace)
+
+"AI tools were used in building this product as follows. Claude (Anthropic) was used to evaluate project materials, draft planning documents (PRD, design specification, architecture) from my business plan, and generate and refactor website code under my direction; representative prompts included: [list]. [Image tool] was used to generate cut-out illustrations for the Rooms scenes from a style prompt I wrote: [prompt]; I selected, edited, and arranged all assets. All product concepts, brand copy, scene content, notes, and this statement were written by me. A full prompt log is kept in the repository (docs/AI-USE-LOG.md)."
