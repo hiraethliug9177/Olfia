@@ -1,14 +1,16 @@
 import type { Metadata } from "next";
-import ComingSoon from "@/components/ComingSoon";
+import { Suspense } from "react";
+import { RoomEditor } from "@/components/rooms/RoomEditor";
 
 export const metadata: Metadata = { title: "Rooms" };
 
 export default function RoomsPage() {
   return (
-    <ComingSoon
-      eyebrow="Explore & Play"
-      title="Imagine a room, down to its scent"
-      line="Rooms opens this week: compose a reading corner from prepared elements, change the light, and save the concept to your Scent Atlas."
-    />
+    <div className="wrap page">
+      <h1 className="sr-only">Rooms</h1>
+      <Suspense fallback={null}>
+        <RoomEditor />
+      </Suspense>
+    </div>
   );
 }

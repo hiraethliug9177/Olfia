@@ -1,14 +1,16 @@
 import type { Metadata } from "next";
-import ComingSoon from "@/components/ComingSoon";
+import { CaptureForm } from "@/components/capture/CaptureForm";
+import { strings } from "@/lib/strings";
 
 export const metadata: Metadata = { title: "Capture" };
 
 export default function CapturePage() {
   return (
-    <ComingSoon
-      eyebrow="Capture"
-      title="That scent you loved? Save it for later"
-      line="Capture opens this week: the room, the scent source, and one sentence worth keeping. Fragrance-free counts too."
-    />
+    <div className="wrap page">
+      <h1 className="h-page" style={{ maxWidth: "14em", marginBottom: 36, fontSize: "clamp(40px, 5vw, 64px)" }}>
+        {strings.brand.capture.replace(/later$/, "")}<em>later</em>.
+      </h1>
+      <CaptureForm />
+    </div>
   );
 }

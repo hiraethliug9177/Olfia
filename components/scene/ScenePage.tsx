@@ -5,6 +5,7 @@ import { familyById, findMaterial, itemById } from "@/lib/catalog";
 import type { FamilyId, PlacedItem, TimeOfDay } from "@/lib/types";
 import { dayName, dotDate } from "@/lib/dates";
 import { ItemArt } from "@/components/scene/Cutout";
+import { useMounted } from "@/lib/store";
 
 export interface ScenePageProps {
   items: PlacedItem[];
@@ -31,9 +32,9 @@ export interface ScenePageProps {
 }
 
 const TINTS: Record<TimeOfDay, string> = {
-  morning: "rgba(255, 226, 170, 0.16)",
+  morning: "rgba(255, 214, 150, 0.14)",
   afternoon: "rgba(255, 255, 255, 0)",
-  night: "rgba(38, 42, 78, 0.24)",
+  night: "rgba(70, 74, 120, 0.13)",
 };
 
 /** Stage aspect: width / height of the area items live in. */
@@ -75,7 +76,8 @@ export function ScenePage({
       }
     : null;
   const lamp = items.find((i) => i.kind === "arc-lamp");
-  const d = date ?? new Date();
+  const mounted = useMounted();
+  const d = date ?? (mounted ? new Date() : null);
   const sorted = [...items].sort((a, b) => a.z - b.z);
 
   return (
@@ -83,8 +85,8 @@ export function ScenePage({
       <div className="scene-sheet__paper">
         <div className="scene-sheet__grain" aria-hidden="true" />
         <div className="scene-sheet__head">
-          <span>{dayName(d)}</span>
-          <span>{dotDate(d)}</span>
+          <span>{d ? dayName(d) : "\u00a0"}</span>
+          <span>{d ? dotDate(d) : ""}</span>
         </div>
         <div className="scene-sheet__title">{title}</div>
 
@@ -160,7 +162,6 @@ export function ScenePage({
               style={{ left: `${(lamp.x + 0.12 * lamp.flip) * 100}%`, top: `${(lamp.y - 0.52) * 100}%` }}
             />
           ) : null}
-          <div className="scene-tint" aria-hidden="true" style={{ background: TINTS[time] }} />
         </div>
 
         <div className="scene-sheet__foot">
@@ -172,6 +173,7 @@ export function ScenePage({
           </span>
           {note || nickname ? <span className="scene-sheet__note">{note || nickname}</span> : null}
         </div>
+        <div className="scene-tint" aria-hidden="true" style={{ background: TINTS[time] }} />
       </div>
     </div>
   );
