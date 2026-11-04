@@ -4,6 +4,15 @@ One line per decision: date · decision · why. Newest first. Proposals are not 
 
 | Date | Decision | Why |
 | --- | --- | --- |
+| 2026-11-03 | Basic v3 build ships on branch `v3-design` as a Vercel preview only; production stays on the 11/2 build until Tiffany approves | Presentation safety; canvas remains backup |
+| 2026-11-03 | Visual direction v3: near-white Ivory ground, periwinkle interface, earthy photo cut-outs with white die-cut edge on cream paper; drawn SVG stand-ins until lovart assets arrive | Tiffany's review of the v2 mockup ("过头了", prefers whiter background) |
+| 2026-11-03 | Free drag placement in Rooms is allowed (replaces preset slots); still one fixed front view per scene, no true 3D | Tiffany's request after the mockup review |
+| 2026-11-03 | "Scene Card" is renamed **Scent Card**; share ratios 9:16 and portrait 3:4 | Tiffany's spec |
+| 2026-11-03 | Seven scent families (floral, gourmand, spicy, woody, green, citrus, fresh) in wheel order with a colour each; scent aura + material stickers in scope for 11/10 | Research on fragrance-wheel families; Tiffany approved |
+| 2026-11-03 | Home order: hero → 7 families → Capture invite → Rooms gallery → Scent Card gallery → footer; Home icon kept in nav; mobile header = Capture, Rooms, account icon + menu | Tiffany's answers on the canvas |
+| 2026-11-03 | Selected nav state uses Periwinkle deep #4C527A, not charcoal | Tiffany: keeps the overall style consistent |
+| 2026-11-03 | localStorage key moves to `olfia.atlas.v2` (schemaVersion 2) for the new Capture/Rooms shapes; v1 entries are not migrated in the preview | No real user data yet |
+| 2026-11-03 | Scent Library is public; Instagram and 小红书 are icon placeholders until accounts exist | Tiffany's answers |
 | 2026-11-02 | Fonts via the Google Fonts stylesheet link, not `next/font/google`, until the build is verified locally | First Vercel build failed inside the next/font loader (font-file URL parse error) |
 | 2026-11-02 | Stack: Next.js (App Router) + TypeScript + Tailwind v4; GitHub → Vercel | Vercel-native, serverless route for AI, SEO/OG, accounts later without re-architecture |
 | 2026-11-02 | Rooms scenes in 2D scrapbook/collage style; one fixed view per scene; preset slots; no free placement or multiple angles in 2026 | Collage tolerates mixed AI-generated assets; free placement and extra angles double assets and add drag/positioning complexity; the plan already deferred free movement |
