@@ -8,7 +8,18 @@ export type FamilyId = "floral" | "gourmand" | "spicy" | "woody" | "green" | "ci
 
 export type SourceKind = "candle" | "diffuser" | "incense" | "spray" | "oil" | "fragrance-free" | "other";
 
-export type RoomKind = "bedroom" | "living" | "kitchen" | "bathroom" | "study" | "entryway" | "other";
+export type RoomKind =
+  | "bedroom" | "living" | "kitchen" | "bathroom" | "study" | "reading" | "entryway"
+  | "closet" | "balcony" | "car" | "office" | "other";
+
+/** Capture context (added 2026-11-09 from the 11/4 feedback). */
+export type Season = "spring" | "summer" | "autumn" | "winter";
+export type Daypart = "morning" | "afternoon" | "evening" | "night";
+export type Occasion =
+  | "everyday" | "date" | "party" | "meditation" | "bath" | "sleep" | "work" | "guests" | "cleaning" | "holiday";
+export type EmotionId =
+  | "calm" | "cozy" | "focused" | "nostalgic" | "energized" | "romantic"
+  | "melancholy" | "playful" | "grounded" | "fresh-start" | "restless" | "safe";
 
 export type TimeOfDay = "morning" | "afternoon" | "night";
 
@@ -36,6 +47,13 @@ export interface CaptureEntry extends EntryBase {
   feeling: "loved" | "not-for-me";
   what: CaptureWhat;
   sentence: string;
+  /* Added 2026-11-09; optional so entries saved before then still read. */
+  season?: Season;
+  daypart?: Daypart;
+  occasion?: Occasion;
+  emotions?: EmotionId[];
+  momentName?: string;
+  tags?: string[];
 }
 
 /** One thing placed on a Rooms page. x/y are 0–1 of the stage; the anchor is the item's bottom centre. */

@@ -5,6 +5,7 @@ import { familyById, findMaterial, itemById } from "@/lib/catalog";
 import type { FamilyId, PlacedItem, TimeOfDay } from "@/lib/types";
 import { dayName, dotDate } from "@/lib/dates";
 import { ItemArt } from "@/components/scene/Cutout";
+import { Atmosphere } from "@/components/scene/Atmosphere";
 import { useMounted } from "@/lib/store";
 
 export interface ScenePageProps {
@@ -29,6 +30,8 @@ export interface ScenePageProps {
   onStageBackgroundDown?: () => void;
   className?: string;
   style?: CSSProperties;
+  /** ambient motion layer for the first two families (default on) */
+  atmosphere?: boolean;
 }
 
 const TINTS: Record<TimeOfDay, string> = {
@@ -62,6 +65,7 @@ export function ScenePage({
   onStageBackgroundDown,
   className,
   style,
+  atmosphere = true,
 }: ScenePageProps) {
   const fams = families.slice(0, 3).map(familyById);
   const source = [...items].reverse().find((i) => itemById(i.kind)?.category === "source");
@@ -84,6 +88,7 @@ export function ScenePage({
     <div className={`scene-sheet ${className ?? ""}`} style={style}>
       <div className="scene-sheet__paper">
         <div className="scene-sheet__grain" aria-hidden="true" />
+        {atmosphere ? <Atmosphere families={families} intensity={0.35 + (strength / 100) * 0.65} /> : null}
         <div className="scene-sheet__head">
           <span>{d ? dayName(d) : "\u00a0"}</span>
           <span>{d ? dotDate(d) : ""}</span>
