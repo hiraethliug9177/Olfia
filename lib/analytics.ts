@@ -9,6 +9,8 @@ type EventMap = {
   creation_complete: { mode: Mode; scene_id?: string };
   scent_card_export: { mode: Mode | "none"; method: "download" | "share"; ratio: "9:16" | "3:4" };
   entry_deleted: { mode: Mode };
+  quiz_complete: { code: string; family: string };
+  quiz_share: { method: "download" | "share" };
 };
 
 const enabled = typeof process !== "undefined" && Boolean(process.env.NEXT_PUBLIC_GA_ID);

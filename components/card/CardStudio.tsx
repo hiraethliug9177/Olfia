@@ -10,6 +10,8 @@ import { track } from "@/lib/analytics";
 import { hourStamp } from "@/lib/dates";
 import { CutDefs } from "@/components/scene/Cutout";
 import { ScenePage } from "@/components/scene/ScenePage";
+import { Atmosphere } from "@/components/scene/Atmosphere";
+import { Stamp } from "@/components/scene/Stamp";
 import type { Entry, FamilyId } from "@/lib/types";
 
 type Shape = "circle" | "star" | "drop" | "spiral";
@@ -112,6 +114,8 @@ export function CardStudio() {
   const [stickers, setStickers] = useState<Sticker[]>(() => defaultStickers(["woody", "spicy"]));
   const [selected, setSelected] = useState<string | null>(null);
   const [stamp, setStamp] = useState("");
+  const [showStamp, setShowStamp] = useState(true);
+  const [showAtmosphere, setShowAtmosphere] = useState(true);
   const [busy, setBusy] = useState(false);
   const loaded = useRef(false);
   const photoRef = useRef<HTMLDivElement>(null);
@@ -248,6 +252,10 @@ export function CardStudio() {
                 style={{ width: 36, height: 36, borderRadius: "50%", border: 0, background: f.hex, boxShadow: base === f.id ? "0 0 0 3px #fff, 0 0 0 5px #4C527A" : "0 0 0 1px rgba(41,42,49,0.1)" }} />
             ))}
           </div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 14, marginTop: 6 }}>
+            <Toggle label="Stamp" on={showStamp} onChange={setShowStamp} />
+            <Toggle label="Atmosphere" on={showAtmosphere} onChange={setShowAtmosphere} />
+          </div>
           <span className="legend" style={{ marginBottom: 0, marginTop: 6 }}>Families</span>
           <div className="chips">
             {FAMILIES.map((f) => (
@@ -287,6 +295,12 @@ export function CardStudio() {
               style={{ flex: `0 0 ${photoH * 100}%`, background: `radial-gradient(circle at 30% 20%, ${fam.glow}, rgba(255,255,255,0) 60%), ${fam.hex}`, borderRadius: 2 }}
             >
               <div className="polaroid__film" />
+              {showAtmosphere ? <Atmosphere families={[base, ...families.filter((f) => f !== base)].slice(0, 2)} intensity={0.85} /> : null}
+              {showStamp ? (
+                <div style={{ position: "absolute", right: "6%", top: "5%", pointerEvents: "none" }}>
+                  <Stamp family={base} size={Math.round(CARD_W * 0.22)} rot={9} date={stamp.slice(5, 10).replace("/", " · ")} />
+                </div>
+              ) : null}
               {showPhoto && roomEntry ? (
                 <div style={{ position: "absolute", left: "12%", right: "12%", top: "7%", rotate: "-3deg", pointerEvents: "none" }}>
                   <ScenePage items={roomEntry.items} families={roomEntry.families} title="Reading Corner" note={roomEntry.nickname} date={new Date(roomEntry.updatedAt)} time={roomEntry.time} strength={roomEntry.strength} windowOpen={roomEntry.windowOpen} showLabels={false} prefix="card" />
