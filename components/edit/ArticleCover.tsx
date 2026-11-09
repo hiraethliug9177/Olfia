@@ -19,7 +19,7 @@ export function ArticleCover({ families, big = false }: { families: FamilyId[]; 
       </div>
       {b ? (
         <div aria-hidden="true" style={{ position: "absolute", left: big ? "30%" : "42%", bottom: "16%", width: big ? "14%" : "26%", aspectRatio: "1", rotate: "7deg" }}>
-          <ItemArt kind={b.materials[1].id} prefix="ed" />
+          <ItemArt kind={(b.materials.filter((m) => m.asset)[1] ?? b.materials.find((m) => m.asset) ?? b.materials[1]).id} prefix="ed" />
         </div>
       ) : null}
       <div style={{ position: "absolute", right: "6%", top: "8%" }}>

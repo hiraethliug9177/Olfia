@@ -368,7 +368,7 @@ export function CaptureForm() {
                 borderRadius: "50%",
                 background: `radial-gradient(circle, ${fam.glow} 0%, rgba(255,255,255,0) 68%)`,
                 filter: "blur(16px)",
-                mixBlendMode: "multiply",
+                opacity: 0.85,
                 transition: "left 1.1s var(--ease), top 1.1s var(--ease)",
               };
               return <div key={`${f}-${blendKey}`} className="anim-bloom" aria-hidden="true" style={style} />;
@@ -376,7 +376,7 @@ export function CaptureForm() {
             {/* material stickers */}
             {chosen.map((f, i) => {
               const m = familyById(f).materials[0];
-              const spots = [{ l: "12%", t: "50%", r: -8 }, { l: "58%", t: "44%", r: 7 }];
+              const spots = [{ l: "10%", t: "48%", r: -8 }, { l: "56%", t: "34%", r: 7 }];
               const s = spots[i];
               return (
                 <div key={`${m.id}-${i}`} className="anim-pin" aria-hidden="true" style={{ position: "absolute", left: s.l, top: s.t, width: "28%", aspectRatio: "1", rotate: `${s.r}deg` }}>
@@ -387,7 +387,7 @@ export function CaptureForm() {
             })}
             {/* scent source */}
             {source && sourceDef ? (
-              <div className="anim-rise" aria-hidden="true" style={{ position: "absolute", left: "70%", bottom: "20%", width: `${Math.max(12, sourceDef.w * 130)}%`, aspectRatio: `${1 / sourceDef.aspect}` }}>
+              <div className="anim-rise" aria-hidden="true" style={{ position: "absolute", left: "76%", bottom: "17%", width: `${Math.max(11, sourceDef.w * 120)}%`, aspectRatio: `${1 / sourceDef.aspect}` }}>
                 <ItemArt kind={sourceDef.id} prefix="cap" />
               </div>
             ) : null}

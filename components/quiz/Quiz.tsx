@@ -15,7 +15,7 @@ import { dotDate } from "@/lib/dates";
 /** Result card: archetype headline, family by colour + stamp + materials, Tiffany's line. Exported as a 1080-wide PNG. */
 export function ResultCard({ r, cardRef }: { r: QuizResult; cardRef?: Ref<HTMLDivElement> }) {
   const f = familyById(r.family);
-  const mats = f.materials;
+  const mats = f.materials.filter((m) => m.asset);
   return (
     <div ref={cardRef} className="scene-sheet" style={{ width: "100%", maxWidth: 420, aspectRatio: "3 / 4", position: "relative", borderRadius: 18, overflow: "hidden", background: "#fff", boxShadow: "0 18px 40px rgba(41,42,49,0.16)" }}>
       <div style={{ position: "absolute", inset: 0, background: `linear-gradient(180deg, ${f.hex}33 0%, #F5EEE1 60%)` }} />
