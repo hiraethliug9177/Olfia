@@ -8,6 +8,7 @@ import { useToast } from "@/lib/toast";
 import { partOfDay } from "@/lib/dates";
 import { sampleEntries } from "@/lib/sample";
 import type { Entry, FamilyId, SourceKind } from "@/lib/types";
+import { ScentProfile } from "@/components/account/ScentProfile";
 
 const PREFS_KEY = "olfia.prefs.v1";
 interface Prefs { families: FamilyId[]; sources: SourceKind[] }
@@ -78,6 +79,8 @@ export function AccountView() {
           <span className="callout">{mounted ? captures : "–"} CAPTURES</span>
         </div>
       </section>
+
+      <ScentProfile />
 
       <section className="card" style={{ display: "flex", flexDirection: "column", gap: 18 }}>
         <h2 className="h-section" style={{ fontSize: 30 }}>My <em>preferences</em></h2>

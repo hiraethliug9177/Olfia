@@ -5,6 +5,10 @@ import { ScenePage } from "@/components/scene/ScenePage";
 import { PolaroidMini } from "@/components/card/PolaroidMini";
 import { MOODS, baseLayout, stickersFor } from "@/lib/catalog";
 import { strings } from "@/lib/strings";
+import { QuizInvite } from "@/components/home/QuizInvite";
+import { ARTICLES } from "@/lib/edit";
+import { ArticleCover } from "@/components/edit/ArticleCover";
+import { familyById } from "@/lib/catalog";
 
 const galleryRooms = [
   { mood: MOODS[0], rot: -1.2, name: "Reading Corner", nick: "rain, chapter three", desc: "Cedar candle on the side table, the arc lamp on low." },
@@ -28,6 +32,10 @@ export default function HomePage() {
   return (
     <div style={{ overflowX: "hidden" }}>
       <Hero />
+
+      <section className="wrap" style={{ paddingTop: 24 }}>
+        <QuizInvite />
+      </section>
 
       <section className="wrap section">
         <h2 className="h-section" style={{ marginBottom: 12 }}>Seven families, one <em>shared</em> language</h2>
@@ -67,6 +75,25 @@ export default function HomePage() {
                 <span className="hand" style={{ fontSize: 22, color: "var(--deep)" }}>{r.nick}</span>
                 <span className="muted" style={{ fontSize: 17 }}>{r.desc}</span>
               </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <section className="wrap section">
+        <div className="section__head">
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <h2 className="h-section">The Olfia <em>Edit</em></h2>
+            <p className="lead">Scent in films, hotels and seasons.</p>
+          </div>
+          <Link href="/edit" style={{ fontSize: 18, fontWeight: 600 }}>Read the Edit →</Link>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 28 }}>
+          {ARTICLES.map((a) => (
+            <Link key={a.slug} href={`/edit/${a.slug}`} className="edit-card">
+              <ArticleCover families={a.families} />
+              <span className="label-mono" style={{ fontSize: 13 }}>{a.families.map((f) => familyById(f).label).join(" + ")}</span>
+              <span className="edit-card__title">{a.title}</span>
             </Link>
           ))}
         </div>

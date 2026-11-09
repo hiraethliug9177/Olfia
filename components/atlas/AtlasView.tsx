@@ -11,6 +11,9 @@ import { PIECE_H, PIECE_W, monthPieces } from "@/lib/jigsaw";
 import { sampleEntries } from "@/lib/sample";
 import type { CaptureEntry, Entry, FamilyId, RoomsEntry } from "@/lib/types";
 import { ScenePage } from "@/components/scene/ScenePage";
+import { ScentProfile } from "@/components/account/ScentProfile";
+import { Stamp } from "@/components/scene/Stamp";
+import { useSearchParams } from "next/navigation";
 
 function entryTitle(e: Entry): string {
   if (e.type === "rooms") return e.nickname ? `Reading Corner · ${e.nickname}` : "Reading Corner";
@@ -41,7 +44,9 @@ export function AtlasView() {
   const add = useAtlas((s) => s.add);
   const show = useToast((s) => s.show);
 
-  const [tab, setTab] = useState<0 | 1>(0);
+  const params = useSearchParams();
+  const [tab, setTab] = useState<0 | 1 | 2>(params.get("tag") ? 2 : 0);
+  const [tag, setTag] = useState<string | null>(params.get("tag"));
   const [fav, setFav] = useState<0 | 1>(0);
   const [ym, setYm] = useState<{ y: number; m: number } | null>(null);
   const [day, setDay] = useState<number>(1);
@@ -126,6 +131,7 @@ export function AtlasView() {
       <div role="tablist" aria-label="Atlas views" className="folder-tabs">
         <button type="button" role="tab" aria-selected={tab === 0} className="folder-tab" onClick={() => setTab(0)}>CALENDAR</button>
         <button type="button" role="tab" aria-selected={tab === 1} className="folder-tab" onClick={() => setTab(1)}>FAVORITES</button>
+        <button type="button" role="tab" aria-selected={tab === 2} className="folder-tab" onClick={() => setTab(2)}>TAGS &amp; PROFILE</button>
       </div>
 
       <div className="card" style={{ padding: 0, borderRadius: 28 }}>
@@ -248,6 +254,46 @@ export function AtlasView() {
               </div>
             </div>
           </>
+        ) : tab === 2 ? (
+          <div style={{ display: "flex", flexDirection: "column", gap: 24, padding: "32px 28px" }}>
+            {(() => {
+              const caps = entries.filter((e): e is CaptureEntry => e.type === "capture");
+              const counts = new Map<string, number>();
+              caps.forEach((c) => (c.tags ?? []).forEach((t) => counts.set(t, (counts.get(t) ?? 0) + 1)));
+              const allTags = [...counts.entries()].sort((a, b) => b[1] - a[1]);
+              const list = tag ? caps.filter((c) => (c.tags ?? []).includes(tag)) : [];
+              return (
+                <>
+                  {allTags.length ? (
+                    <div className="chips">
+                      {allTags.map(([t, n]) => (
+                        <button key={t} type="button" className={`tag${tag === t ? " tag--on" : ""}`} onClick={() => setTag(tag === t ? null : t)} style={{ border: 0, cursor: "pointer" }}>#{t} <span style={{ marginLeft: 6, opacity: 0.7 }}>{n}</span></button>
+                      ))}
+                    </div>
+                  ) : <span className="muted">Tags appear once you capture a scent.</span>}
+                  {tag ? (
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 16 }}>
+                      {list.map((e) => (
+                        <div key={e.id} style={{ display: "flex", flexDirection: "column", gap: 8, padding: 16, borderRadius: 18, background: "var(--ivory)" }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                            {e.families[0] ? <Stamp family={e.families[0]} size={48} /> : null}
+                            <span style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                              <span style={{ fontSize: 17, fontWeight: 600 }}>{entryTitle(e)}</span>
+                              <span className="mono muted" style={{ fontSize: 13 }}>{roomLabel(e.room).toUpperCase()} · {hourOnly(new Date(e.createdAt))}</span>
+                            </span>
+                          </div>
+                          {e.momentName || e.situation ? <span className="hand" style={{ fontSize: 21 }}>{e.momentName || e.situation}</span> : null}
+                          <div className="chips">{(e.tags ?? []).map((t) => <span key={t} className="tag" style={{ minHeight: 26, fontSize: 12 }}>#{t}</span>)}</div>
+                          <Link href={`/card?from=${e.id}`} className="btn btn--ghost btn--sm" style={{ height: 36, alignSelf: "flex-start" }}>Scent Card</Link>
+                        </div>
+                      ))}
+                    </div>
+                  ) : null}
+                  <ScentProfile compact />
+                </>
+              );
+            })()}
+          </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 24, padding: "32px 28px" }}>
             <div role="tablist" aria-label="Favorites" className="seg" style={{ width: 340, maxWidth: "100%" }}>

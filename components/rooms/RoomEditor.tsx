@@ -24,6 +24,7 @@ import { shortDate } from "@/lib/dates";
 import type { FamilyId, PlacedItem, RoomsEntry, TimeOfDay } from "@/lib/types";
 import { ScenePage } from "@/components/scene/ScenePage";
 import { ItemArt } from "@/components/scene/Cutout";
+import { ProductCards } from "@/components/products/ProductCards";
 
 const DEFAULT_FAMS: FamilyId[] = ["woody", "spicy"];
 const TIMES: Array<{ id: TimeOfDay; label: string }> = [
@@ -47,6 +48,7 @@ export function RoomEditor() {
   const router = useRouter();
   const params = useSearchParams();
   const editId = params.get("id");
+  const famParam = params.get("family");
   const entries = useAtlas((s) => s.entries);
   const hydrated = useAtlas((s) => s.hydrated);
   const replace = useAtlas((s) => s.replace);
@@ -77,9 +79,12 @@ export function RoomEditor() {
     if (loadedFor === key) return;
     setLoadedFor(key);
     if (!editId) {
+      // Opened from the quiz result or a family window: start with that family applied.
+      const fromParam = FAMILIES.find((f) => f.id === famParam);
+      const start: FamilyId[] = fromParam ? [fromParam.id] : DEFAULT_FAMS;
       setEntryId(null); setCreatedAt(null); setNickname("");
-      setItems([...baseLayout("candle"), ...stickersFor(DEFAULT_FAMS)]);
-      setFamilies(DEFAULT_FAMS); setStrength(70); setTime("afternoon"); setWindowOpen(false);
+      setItems([...baseLayout("candle"), ...stickersFor(start)]);
+      setFamilies(start); setStrength(70); setTime("afternoon"); setWindowOpen(false);
       setPast([]); setFuture([]); setSelected(null);
       return;
     }
@@ -89,7 +94,7 @@ export function RoomEditor() {
       setItems(e.items); setFamilies(e.families); setStrength(e.strength); setTime(e.time); setWindowOpen(e.windowOpen);
       setPast([]); setFuture([]); setSelected(null);
     }
-  }, [hydrated, editId, entries, loadedFor]);
+  }, [hydrated, editId, famParam, entries, loadedFor]);
 
   const commit = (next: PlacedItem[]) => {
     setPast((p) => [...p.slice(-40), items]);
@@ -368,6 +373,10 @@ export function RoomEditor() {
             <button type="button" className="btn btn--ghost btn--block" onClick={() => save(true)}>Make a Scent Card from this</button>
           </div>
         </div>
+      </section>
+
+      <section className="card" style={{ marginTop: 32 }}>
+        <ProductCards families={families} title="Matches this room" />
       </section>
     </div>
   );

@@ -53,6 +53,7 @@ export function Header() {
           <Link href="/capture" className="hd__link" aria-current={cur("/capture")}>Capture</Link>
           <Link href="/rooms" className="hd__link" aria-current={cur("/rooms")}>Rooms</Link>
           <Link href="/atlas" className="hd__link" aria-current={cur("/atlas")}>Scent Atlas</Link>
+          <Link href="/edit" className="hd__link" aria-current={cur("/edit")}>The Edit</Link>
           <Link href="/account" className="hd__link hd__link--icon" aria-label="My account" aria-current={cur("/account")}><AccountIcon /></Link>
         </nav>
 
@@ -74,6 +75,8 @@ export function Header() {
         <div className="hd__menu hd__mob">
           <Link href="/" aria-current={cur("/")}>Home</Link>
           <Link href="/atlas" aria-current={cur("/atlas")}>Scent Atlas</Link>
+          <Link href="/quiz" aria-current={cur("/quiz")}>Scent quiz</Link>
+          <Link href="/edit" aria-current={cur("/edit")}>The Olfia Edit</Link>
           <Link href="/card" aria-current={cur("/card")}>Make a Scent Card</Link>
         </div>
       ) : null}
@@ -97,9 +100,11 @@ export function Footer() {
           <Link href="/rooms">Rooms</Link>
           <Link href="/atlas">Scent Atlas</Link>
           <Link href="/card">Scent Card</Link>
+          <Link href="/quiz">Scent quiz</Link>
         </nav>
         <nav aria-label="More" className="ft__col">
           <span className="label-mono" style={{ fontSize: 13 }}>MORE</span>
+          <Link href="/edit">The Olfia Edit</Link>
           <Link href="/library">Scent Library</Link>
           <Link href="/about">About Olfia</Link>
           <Link href="/account">My account</Link>

@@ -1,8 +1,27 @@
 # Olfia — Product Requirements (MVP, v0.9)
 
-**Status:** v0.9 — enough to build from. Owner: Tiffany Liu. Last updated 2026-11-02.
+**Status:** v0.9 — enough to build from. Owner: Tiffany Liu. Last updated 2026-11-09 (addendum §0).
 **Source of truth for product intent:** `Submitted_Items/04_Business_Plan.pdf` (Parts 01, 05, 06, 09). This PRD translates it into buildable requirements; where they differ, the plan's intent wins and this file gets fixed.
 **Companion docs:** `DESIGN-SPEC.md` (tokens, components, scene spec, copy rules), `ARCHITECTURE.md` (stack, data model, deployment), `ACCEPTANCE.md` (release checklist), `DECISIONS.md` (log).
+
+## 0. Addendum 2026-11-09 — response to the 11/4 feedback (supersedes §4–§7 where they conflict)
+
+Design v3 (2026-11-03) already replaced slots with free drag, renamed Scene Card → Scent Card and added Account, Scent Library and About. This addendum adds what the 11/4 progress-report feedback asked for. Tiers: **A** works by 11/10; **B** is clickable with sample data; **C** after 11/10. Full map: `claude/olfia-feedback-plan.md` in the Capstone project.
+
+| Area | Requirement | Tier |
+| --- | --- | --- |
+| Atmosphere | One reusable layer per scent family (colour wash + one slow ambient motion: dust motes, sun spots, petals, leaf shadows, steam, ember glow, water light) behind Rooms scenes, the Capture preview, quiz result and article covers. Stops under `prefers-reduced-motion`. Ambient sound: C | A |
+| Capture | One question per screen with a progress bar: season · time of day · room/space · occasion (optional) · scent source · product or method · 1–2 families · up to 2 emotions · keep/let go + moment name (suggested, editable) + optional line + tags. Season and time pre-selected from the clock. The preview reacts to every answer (paper tint, light, source cut-out, material stickers, emotion word, stamp); two families play a colour-blend. Hashtags are generated from the choices plus up to 3 custom tags | A |
+| Stamps | Seven SVG postmarks (ring with family name, material silhouette, optional date) on the Capture preview, quiz result, article covers, Atlas tag cards and the scent profile | A |
+| Scent quiz | `/quiz`: 20 questions in two layers (12 personality → 16 archetypes; 8 scent → family). Result card (archetype name, Tiffany's line, family colour, stamp, three materials, second note) saved in `olfia.quiz.v1`; Save image / Share via html-to-image; "Open a room with this scent" → `/rooms?family=`. Home shows the invite or the saved result | A |
+| The Olfia Edit | `/edit` and `/edit/[slug]`: article list and pages with atmosphere covers, notes & sources, a Rooms link and "Recreate this at home" product cards. Three articles for 11/10 (film × fragrance; hotel signature scents; Christmas 2026). Body text is Tiffany's; TODO box until written | A page · B content |
+| Recommended products | Cards from an approved candidate list (`lib/products.ts`): brand, name, type, families, price tier, notes, outbound link. Filters: season, time of day, matches this room (families), similar to this. Shown under Rooms, under articles and in the scent profile. No photos, no affiliate codes yet | B |
+| Scent profile | Family share, how it felt (emotions), time of day, product types, your tags, "try next" (wheel neighbours not yet used + a fixed pairing) and three matching products. Sample-data switch when the browser is empty. In Account and the Atlas "Tags & profile" tab | B |
+| Atlas tags | Tag chips with counts; filter captures by tag; `/atlas?tag=` deep link | A |
+| Photo cut-outs | 34 lovart test images in `public/assets` (4 chairs, 5 sources, 18 materials, 7 textures); drawn stand-ins remain for missing items | A |
+| Rooms | New tray items: lounge, rocking and slipper chairs; `?family=` start parameter | A |
+| Monetization (shown, not live) | Outbound product links; the Edit page as the future home for sponsored stories; premium templates/stamp packs as later options. Explained in the final presentation | B/C |
+| Later | Photo upload and product recognition; ambient sound; the other four atmosphere refinements; affiliate links; CMS for the Edit page | C |
 
 ## 1. What Olfia is
 
