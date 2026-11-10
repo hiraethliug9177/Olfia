@@ -24,7 +24,12 @@ export default function LibraryPage() {
               <div style={{ display: "flex", flexWrap: "wrap", gap: 14, marginTop: 4 }}>
                 {f.materials.map((m) => (
                   <span key={m.id} style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 15 }}>
-                    <span aria-hidden="true" style={{ width: 30, height: 30, borderRadius: "50%", background: texture(m.colors), boxShadow: "0 0 0 2.5px #fff, 0 2px 6px rgba(41,42,49,0.2)" }} />
+                    {m.asset ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={m.asset} alt="" width={44} height={44} style={{ objectFit: "contain" }} />
+                    ) : (
+                      <span aria-hidden="true" style={{ width: 30, height: 30, borderRadius: "50%", background: texture(m.colors), boxShadow: "0 0 0 2.5px #fff, 0 2px 6px rgba(41,42,49,0.2)" }} />
+                    )}
                     {m.label}
                   </span>
                 ))}
