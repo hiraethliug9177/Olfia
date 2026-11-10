@@ -253,7 +253,7 @@ textarea.input { padding: 14px 16px; min-height: 96px; resize: vertical; }
 .section { padding-top: 96px; padding-bottom: 0; }
 .section__head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 36px; }
 .dial-wrap { display: grid; grid-template-columns: minmax(0, 420px) minmax(0, 1fr); align-items: center; gap: 40px; }
-.rotary { --hole-r: 37%; position: relative; width: 100%; max-width: 440px; aspect-ratio: 1; margin: 0 auto; filter: drop-shadow(0 18px 26px rgba(41,42,49,0.22)); }
+.rotary { --hole-r: 34.5cqw; container-type: inline-size; position: relative; width: 100%; max-width: 440px; aspect-ratio: 1; margin: 0 auto; filter: drop-shadow(0 18px 26px rgba(41,42,49,0.22)); }
 .rotary__plate { position: absolute; inset: 0; border-radius: 50%;
   background:
     radial-gradient(circle at 32% 26%, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0) 38%),
