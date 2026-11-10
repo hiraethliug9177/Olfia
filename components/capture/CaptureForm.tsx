@@ -421,7 +421,7 @@ export function CaptureForm() {
             <Atmosphere key={blendKey} families={chosen} intensity={0.9} />
             <Setting room={room} daypart={daypart} />
             <div className="scene-sheet__head">
-              <span>{room ? roomLabel(room).toUpperCase() : season ? season.toUpperCase() : " "}</span>
+              <span>{room ? roomLabel(room) : season ? season[0].toUpperCase() + season.slice(1) : " "}</span>
               <span>{mounted ? dotDate(new Date()) : ""}</span>
             </div>
             {/* blend: two aura clouds drift together */}

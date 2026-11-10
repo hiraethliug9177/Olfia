@@ -265,7 +265,7 @@ export function Hero() {
 
           {/* kraft tag: the scent this reference stands for */}
           <g transform="translate(40 404) rotate(-3)" filter="url(#hb-shadow)">
-            <path d="M0 14 L16 0 H236 V40 H16 Z" fill="#E9D7B5" />
+            <path d="M0 14 L16 0 H286 V40 H16 Z" fill="#E9D7B5" />
             <circle cx="16" cy="20" r="4" fill="#C79F74" />
           </g>
           <text x="66" y="430" transform="rotate(-3 40 404)" style={{ fontFamily: "var(--font-hand)", fontWeight: 700 }} fontSize="22" fill={PENCIL}>
