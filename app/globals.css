@@ -432,3 +432,12 @@ a.pcard:hover { color: var(--ink); transform: translateY(-3px); }
 .ico-morph[data-open="true"] line:nth-child(1) { transform: translateY(6px) rotate(45deg); }
 .ico-morph[data-open="true"] line:nth-child(2) { opacity: 0; transform: scaleX(0.2); }
 .ico-morph[data-open="true"] line:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+@media (max-width: 560px) {
+  .folder-tabs { padding-left: 8px; gap: 4px; }
+  .folder-tab { height: 46px; padding: 0 14px; font-size: 14px; white-space: nowrap; }
+  .cal-scroll { padding: 20px 12px 24px; }
+  .card { padding: 20px; }
+  .dial-panel { padding: 22px; }
+  .article__try { padding: 22px; }
+}
