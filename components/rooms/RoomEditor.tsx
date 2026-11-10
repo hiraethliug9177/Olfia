@@ -259,7 +259,7 @@ export function RoomEditor() {
           <div role="tablist" aria-label="Items" className="seg">
             <span className="seg__thumb" aria-hidden="true" style={{ left: `calc(5px + (100% - 10px) * ${tray / 3})`, width: "calc((100% - 10px) / 3)" }} />
             {TRAY.map((t, j) => (
-              <button key={t} type="button" role="tab" aria-selected={tray === j} className="seg__opt" style={{ fontSize: 14, padding: 0 }} onClick={() => setTray(j)}>{t}</button>
+              <button key={t} type="button" role="tab" aria-selected={tray === j} className="seg__opt" style={{ fontSize: 13, padding: 0, letterSpacing: "-0.02em" }} onClick={() => setTray(j)}>{t}</button>
             ))}
           </div>
           {(() => {
