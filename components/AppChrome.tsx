@@ -52,7 +52,7 @@ export function Header() {
         </nav>
 
         <Link href="/account" className="hd__profile hd__full" aria-current={cur("/account")}>
-          <Icon name="user" />
+          <Icon name="user" size={24} />
           My profile
         </Link>
 

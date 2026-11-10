@@ -27,6 +27,7 @@ import type { CaptureEntry, Daypart, EmotionId, FamilyId, MethodId, Occasion, Ro
 import { dotDate } from "@/lib/dates";
 import { Atmosphere } from "@/components/scene/Atmosphere";
 import { ItemArt } from "@/components/scene/Cutout";
+import { Icon } from "@/components/ui/Icon";
 
 /**
  * Capture as a step-by-step flow (11/4 feedback): one question per screen, a progress bar,
@@ -366,11 +367,11 @@ export function CaptureForm() {
               <h2 className="flow__q">Keep it or <em>let it go</em>?</h2>
               <div role="radiogroup" aria-label="Feelings" className="chips">
                 <button type="button" role="radio" aria-checked={feeling === "loved"} className="chip" onClick={() => setFeeling("loved")} style={{ minHeight: 56, borderRadius: 16, fontSize: 18 }}>
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4C527A" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7" /></svg>
+                  <Icon name="check" />
                   Loved it
                 </button>
                 <button type="button" role="radio" aria-checked={feeling === "not-for-me"} className="chip" onClick={() => setFeeling("not-for-me")} style={{ minHeight: 56, borderRadius: 16, fontSize: 18 }}>
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#5C5E6B" strokeWidth="2.4" strokeLinecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
+                  <Icon name="x" />
                   Not for me
                 </button>
               </div>

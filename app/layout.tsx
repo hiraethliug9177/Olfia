@@ -7,7 +7,7 @@ import { strings } from "@/lib/strings";
 
 /* Fonts load from the Google Fonts stylesheet; next/font failed on Vercel's loader earlier. */
 const fontsHref =
-  "https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&display=swap";
+  "https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&display=swap";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 

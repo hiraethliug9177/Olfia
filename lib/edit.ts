@@ -118,7 +118,7 @@ export const ARTICLES: Article[] = [
       },
       {
         "t": "p",
-        "text": "Its aptly named *VACATION* Eau de Toilette includes coconut water, banana, pineapple, and bergamot, alongside more eccentric notes: pool water and swimsuit fabric."
+        "text": "Its aptly named *VACATION* Eau de Toilette includes coconut, banana, pineapple, and orange blossom, alongside more eccentric notes: pool water and swimsuit fabric."
       },
       {
         "t": "p",
@@ -172,7 +172,7 @@ export const ARTICLES: Article[] = [
     "takeHome": {
       "name": "Vacation — \"VACATION\" Eau de Toilette",
       "paras": [
-        "A surprisingly sophisticated interpretation of poolside nostalgia, with coconut, banana, solar musk, sea salt, and the wonderfully peculiar suggestion of swimsuit fabric.",
+        "A surprisingly sophisticated interpretation of poolside nostalgia, with coconut, banana, pineapple, orange blossom, a pool toy, and the wonderfully peculiar suggestion of swimsuit fabric.",
         "It's not Barbie's official perfume. It's a scent that understands the appeal of her world.",
         "And unlike the Dreamhouse swimming pool, this one actually exists."
       ]
@@ -214,7 +214,11 @@ export const ARTICLES: Article[] = [
     ],
     "fallback": "lobby",
     "date": "2026-11-10",
-    "image": null,
+    "image": {
+      "src": "/assets/edit/hotel-courtyard.webp",
+      "alt": "A hotel courtyard of plaster arches around a still reflecting pool",
+      "credit": "Image supplied by the author for this prototype"
+    },
     "objectImage": {
       "src": "https://shop.marriott.com/dw/image/v2/BLCS_PRD/on/demandware.static/-/Sites-productCatalog_MBB/default/dwa74e7f1a/images/main/edition-candle-6.7oz-lit-0020_fondant.jpg?sh=1062&sw=840",
       "alt": "EDITION Signature Black Tea Candle",

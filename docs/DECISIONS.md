@@ -4,6 +4,11 @@ One line per decision: date · decision · why. Newest first. Proposals are not 
 
 | Date | Decision | Why |
 | --- | --- | --- |
+| 2026-11-10 | Body and interface font is **IBM Plex Mono** (follows the advice sheet as written); Newsreader for titles, Caveat Bold for notes | Tiffany 11/10 |
+| 2026-11-10 | **Lucide** (`lucide-react`) is the only icon library: 20px controls, 24px primary navigation, stroke 1.5; conventions in `AGENTS.md` | Tiffany 11/10 |
+| 2026-11-10 | Analog finish: film grain over every page, soft-focus edge and a warm light leak on the hero board, glass panels; the family dial becomes an old rotary telephone dial with material photos in the finger holes | Tiffany's references (rotary dial, defocused film photos) |
+| 2026-11-10 | 71 of Tiffany's furniture and object cut-outs (seating, tables, lighting, shelves, beds, paper & books, objects) and the pear join the Rooms tray, grouped by type; presets now include a bedroom, a study and a living room | Tiffany's export folder 11/10 |
+| 2026-11-10 | Article 01 body corrected to the notes the Vacation product page confirms (orange blossom, pool toy; not bergamot, solar musk, sea salt) | Tiffany 11/10 |
 | 2026-11-09 | **"Scent is an afterimage."** is the centre of the site and the Home headline; the hero is a drawn cork scent-design board where a pinned reference prints onto a room sketch and the previous print lingers (afterimage). "There's more to a room than what you see." stays as the line under it | Tiffany 11/9: more recognisable than the old headline and it gives the visual rule — same room, another scent, the light/material/air change |
 | 2026-11-09 | Three typefaces only: Newsreader (titles, work names), IBM Plex Sans (navigation, body, questions, buttons, dates, charts), Caveat Bold (notes, quick handwriting). No monospace, no all-caps labels, no single italic word inside headings. The advice sheet named "IBM Plex Mono" for body and also asked to remove monospace from working areas; the sans cut of the same family resolves both | Reviewer advice 11/9; reference screenshot uses a sans in the nav |
 | 2026-11-09 | Type scale: Home title 52–80px, page titles 40–56px, article-card titles 26px, body 17–18px, secondary 14–15px; headings left-aligned; article column ≈ 66 characters | Reviewer advice 11/9 |

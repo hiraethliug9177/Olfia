@@ -11,6 +11,7 @@ import {
   SOURCES,
   baseLayout,
   areNeighbours,
+  FURNITURE_GROUPS,
   familyById,
   findMaterial,
   itemById,
@@ -24,6 +25,7 @@ import { shortDate } from "@/lib/dates";
 import type { FamilyId, PlacedItem, RoomsEntry, TimeOfDay } from "@/lib/types";
 import { ScenePage } from "@/components/scene/ScenePage";
 import { ItemArt } from "@/components/scene/Cutout";
+import { Icon } from "@/components/ui/Icon";
 import { ProductCards } from "@/components/products/ProductCards";
 
 const DEFAULT_FAMS: FamilyId[] = ["woody", "spicy"];
@@ -36,13 +38,6 @@ const TRAY = ["Furniture", "Scent", "Materials"] as const;
 
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
 
-function Icon({ d }: { d: string }) {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d={d} />
-    </svg>
-  );
-}
 
 export function RoomEditor() {
   const router = useRouter();
@@ -229,9 +224,9 @@ export function RoomEditor() {
     .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
     .slice(0, 6);
 
-  const trayItems: Array<{ id: string; label: string }> =
+  const trayItems: Array<{ id: string; label: string; group?: string }> =
     tray === 0
-      ? FURNITURE.map((d) => ({ id: d.id, label: d.label }))
+      ? FURNITURE.map((d) => ({ id: d.id, label: d.label, group: d.group }))
       : tray === 1
         ? SOURCES.map((d) => ({ id: d.id, label: d.label }))
         : FAMILIES.flatMap((f) => f.materials.map((m) => ({ id: m.id, label: m.label })));
@@ -254,7 +249,7 @@ export function RoomEditor() {
           </Link>
         ))}
         <Link href="/rooms" className="tray-item" style={{ flex: "none", width: 200, minHeight: 150, justifyContent: "center", border: "1.5px dashed rgba(76,82,122,0.45)", background: "transparent", color: "var(--deep)", fontSize: 17, textDecoration: "none" }}>
-          <Icon d="M12 5v14M5 12h14" />
+          <Icon name="plus" />
           New room
         </Link>
       </section>
@@ -267,8 +262,8 @@ export function RoomEditor() {
               <button key={t} type="button" role="tab" aria-selected={tray === j} className="seg__opt" style={{ fontSize: 14, padding: 0 }} onClick={() => setTray(j)}>{t}</button>
             ))}
           </div>
-          <div className="tray-grid" style={tray === 2 ? { gridTemplateColumns: "repeat(3, minmax(0, 1fr))" } : undefined}>
-            {trayItems.map((it) => (
+          {(() => {
+            const btn = (it: (typeof trayItems)[number]) => (
               <button key={it.id} type="button" className="tray-item" onClick={() => addItem(it.id)} aria-label={`Add ${it.label}`}>
                 <span className="tray-item__art" style={tray === 2 ? { width: 44, height: 44 } : undefined}>
                   <span style={{ display: "block", width: tray === 0 ? "100%" : tray === 1 ? "56%" : "100%", height: "100%" }}>
@@ -277,16 +272,32 @@ export function RoomEditor() {
                 </span>
                 <span style={{ fontSize: tray === 2 ? 13 : 14 }}>{it.label}</span>
               </button>
-            ))}
-          </div>
+            );
+            if (tray !== 0) {
+              return <div className="tray-grid" style={tray === 2 ? { gridTemplateColumns: "repeat(3, minmax(0, 1fr))" } : undefined}>{trayItems.map(btn)}</div>;
+            }
+            return (
+              <div className="tray-groups">
+                {FURNITURE_GROUPS.map((g) => {
+                  const list = trayItems.filter((it) => (it.group ?? "Objects") === g);
+                  return list.length ? (
+                    <div key={g} style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                      <span className="tray-group__h">{g}</span>
+                      <div className="tray-grid">{list.map(btn)}</div>
+                    </div>
+                  ) : null;
+                })}
+              </div>
+            );
+          })()}
           <span className="muted" style={{ fontSize: 15 }}>Tap to add, then drag it into place.</span>
         </div>
 
         <div className="editor__stage">
           <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
             <div style={{ display: "flex", gap: 8 }}>
-              <button type="button" className="tool" aria-label="Undo" onClick={undo} disabled={!past.length}><Icon d="M9 7L4 12l5 5M4 12h10a5 5 0 0 1 0 10h-2" /></button>
-              <button type="button" className="tool" aria-label="Redo" onClick={redo} disabled={!future.length}><Icon d="M15 7l5 5-5 5M20 12H10a5 5 0 0 0 0 10h2" /></button>
+              <button type="button" className="tool" aria-label="Undo" onClick={undo} disabled={!past.length}><Icon name="undo" /></button>
+              <button type="button" className="tool" aria-label="Redo" onClick={redo} disabled={!future.length}><Icon name="redo" /></button>
             </div>
             <button type="button" role="switch" aria-checked={snap} className="switch" style={{ width: "auto", fontSize: 15, background: "#fff", borderRadius: 999, padding: "0 16px", minHeight: 44 }} onClick={() => setSnap((v) => !v)}>
               <span className="switch__track" aria-hidden="true"><span className="switch__knob" /></span>
@@ -314,13 +325,13 @@ export function RoomEditor() {
             />
             <div role="toolbar" aria-label="Selected item" className="glass-pill" style={{ position: "absolute", left: 16, bottom: 16, flexWrap: "wrap", maxWidth: "calc(100% - 32px)", opacity: selItem ? 1 : 0.5 }}>
               <span className="mono" style={{ fontSize: 13, padding: "0 10px" }}>{selItem ? (itemById(selItem.kind)?.label ?? findMaterial(selItem.kind)?.label ?? "") : "select an item"}</span>
-              <button type="button" className="tool" aria-label="Rotate" disabled={!selItem} onClick={() => patchSel((it) => ({ ...it, rot: (it.rot + 15) % 360 }))}><Icon d="M20 12a8 8 0 1 1-2.3-5.6M20 4v5h-5" /></button>
-              <button type="button" className="tool" aria-label="Flip" disabled={!selItem} onClick={() => patchSel((it) => ({ ...it, flip: it.flip === 1 ? -1 : 1 }))}><Icon d="M12 3v18M8 7L3 12l5 5V7zM16 7l5 5-5 5V7z" /></button>
-              <button type="button" className="tool" aria-label="Bigger" disabled={!selItem} onClick={() => patchSel((it) => ({ ...it, scale: Math.min(2, +(it.scale + 0.1).toFixed(2)) }))}><Icon d="M12 5v14M5 12h14" /></button>
-              <button type="button" className="tool" aria-label="Smaller" disabled={!selItem} onClick={() => patchSel((it) => ({ ...it, scale: Math.max(0.4, +(it.scale - 0.1).toFixed(2)) }))}><Icon d="M5 12h14" /></button>
-              <button type="button" className="tool" aria-label="Bring to front" disabled={!selItem} onClick={() => patchSel((it) => ({ ...it, z: topZ() + 1 }))}><Icon d="M8 8h12v12H8zM4 16V4h12" /></button>
-              <button type="button" className="tool" aria-label="Send to back" disabled={!selItem} onClick={() => patchSel((it) => ({ ...it, z: lowZ() - 1 }))}><Icon d="M4 4h12v12H4zM8 20h12V8" /></button>
-              <button type="button" className="tool" aria-label="Delete" disabled={!selItem} onClick={() => patchSel(() => null)}><Icon d="M5 7h14M10 7V4h4v3M7 7l1 13h8l1-13" /></button>
+              <button type="button" className="tool" aria-label="Rotate" disabled={!selItem} onClick={() => patchSel((it) => ({ ...it, rot: (it.rot + 15) % 360 }))}><Icon name="rotateCw" /></button>
+              <button type="button" className="tool" aria-label="Flip" disabled={!selItem} onClick={() => patchSel((it) => ({ ...it, flip: it.flip === 1 ? -1 : 1 }))}><Icon name="flip" /></button>
+              <button type="button" className="tool" aria-label="Bigger" disabled={!selItem} onClick={() => patchSel((it) => ({ ...it, scale: Math.min(2, +(it.scale + 0.1).toFixed(2)) }))}><Icon name="plus" /></button>
+              <button type="button" className="tool" aria-label="Smaller" disabled={!selItem} onClick={() => patchSel((it) => ({ ...it, scale: Math.max(0.4, +(it.scale - 0.1).toFixed(2)) }))}><Icon name="minus" /></button>
+              <button type="button" className="tool" aria-label="Bring to front" disabled={!selItem} onClick={() => patchSel((it) => ({ ...it, z: topZ() + 1 }))}><Icon name="front" /></button>
+              <button type="button" className="tool" aria-label="Send to back" disabled={!selItem} onClick={() => patchSel((it) => ({ ...it, z: lowZ() - 1 }))}><Icon name="back" /></button>
+              <button type="button" className="tool" aria-label="Delete" disabled={!selItem} onClick={() => patchSel(() => null)}><Icon name="trash" /></button>
             </div>
           </div>
         </div>

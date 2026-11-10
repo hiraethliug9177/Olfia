@@ -36,7 +36,7 @@ export default function HomePage() {
             <Link key={r.id} href={`/rooms?family=${r.families.join(",")}`} className="preset">
               <ScenePage items={r.items} families={r.families} title={r.name} time={r.time} showLabels={false} prefix={`pre-${r.id}`} />
               <span className="preset__name">{r.name}</span>
-              <span className="muted" style={{ fontSize: 15 }}>{r.line}</span>
+              {r.line.startsWith("TODO(") ? null : <span className="muted" style={{ fontSize: 15 }}>{r.line}</span>}
             </Link>
           ))}
         </div>

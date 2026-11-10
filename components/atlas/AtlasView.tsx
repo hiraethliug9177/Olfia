@@ -9,6 +9,8 @@ import { track } from "@/lib/analytics";
 import { hourOnly, monthLabel, partOfDay, sameDay } from "@/lib/dates";
 import { PIECE_H, PIECE_W, monthPieces } from "@/lib/jigsaw";
 import { FitWidth } from "@/components/ui/FitWidth";
+import { Icon } from "@/components/ui/Icon";
+import { Star as StarIcon } from "lucide-react";
 import { sampleEntries } from "@/lib/sample";
 import type { CaptureEntry, Entry, FamilyId, RoomsEntry } from "@/lib/types";
 import { ScenePage } from "@/components/scene/ScenePage";
@@ -29,11 +31,7 @@ function entryKind(e: Entry): string {
 }
 
 function Star({ on }: { on: boolean }) {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M12 3.5l2.6 5.3 5.8.8-4.2 4.1 1 5.8L12 16.8l-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" fill={on ? "#E2A23B" : "none"} stroke={on ? "#E2A23B" : "#5C5E6B"} strokeWidth="1.6" strokeLinejoin="round" />
-    </svg>
-  );
+  return <StarIcon size={20} strokeWidth={1.5} absoluteStrokeWidth color={on ? "#E2A23B" : "#5C5E6B"} fill={on ? "#E2A23B" : "none"} aria-hidden="true" />;
 }
 
 export function AtlasView() {
@@ -119,11 +117,11 @@ export function AtlasView() {
         {tab === 0 ? (
           <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 18, fontWeight: 600 }}>
             <button type="button" className="tool" aria-label="Previous month" onClick={() => shift(-1)} style={{ borderRadius: "50%" }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6" /></svg>
+              <Icon name="chevronLeft" />
             </button>
             <span style={{ minWidth: 200, textAlign: "center" }} aria-live="polite">{monthLabel(ym.y, ym.m)}</span>
             <button type="button" className="tool" aria-label="Next month" onClick={() => shift(1)} style={{ borderRadius: "50%" }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6" /></svg>
+              <Icon name="chevronRight" />
             </button>
           </div>
         ) : null}

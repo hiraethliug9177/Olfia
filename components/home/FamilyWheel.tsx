@@ -7,15 +7,16 @@ import { ItemArt } from "@/components/scene/Cutout";
 import { Atmosphere } from "@/components/scene/Atmosphere";
 
 /**
- * Seven families as a dial (11/9 feedback 03): seven plain colour circles on a ring.
- * Picking one turns the ring until that colour sits at the reading position (3 o'clock),
- * where it grows; the name stays upright in the middle. The panel beside it shows the
+ * Seven families as an old rotary telephone dial (11/10, Tiffany's reference): a brushed
+ * metal plate, a finger wheel with seven holes that each show the family's material photo,
+ * a cream paper label in the middle and a finger stop. Picking a family turns the wheel until
+ * that hole rests against the stop; the label reads the name. The panel beside it shows the
  * real materials, what it smells like, and one action: take it into Rooms.
  */
 export function FamilyWheel() {
   const n = FAMILIES.length;
   const [k, setK] = useState(3);
-  const [turn, setTurn] = useState(-3 * (360 / n));
+  const [turn, setTurn] = useState(60 - 3 * (360 / n));
   const sel = FAMILIES[k];
   const prev = FAMILIES[(k + n - 1) % n];
   const next = FAMILIES[(k + 1) % n];
@@ -30,10 +31,12 @@ export function FamilyWheel() {
     setK(j);
   };
 
+  const step = 360 / n;
   return (
     <div className="dial-wrap">
-      <div className="dial" role="radiogroup" aria-label="Scent families">
-        <div className="dial__ring" style={{ transform: `rotate(${turn}deg)` }}>
+      <div className="rotary" role="radiogroup" aria-label="Scent families">
+        <div className="rotary__plate" aria-hidden="true" />
+        <div className="rotary__wheel" style={{ transform: `rotate(${turn}deg)` }}>
           {FAMILIES.map((f, j) => (
             <button
               key={f.id}
@@ -41,14 +44,27 @@ export function FamilyWheel() {
               role="radio"
               aria-checked={j === k}
               aria-label={f.label}
-              className="dial__btn"
+              className="rotary__hole"
               onClick={() => pick(j)}
-              style={{ transform: `rotate(${j * (360 / n)}deg) translateX(var(--dial-r)) scale(${j === k ? 1.28 : 1})`, background: f.hex }}
-            />
+              style={{ transform: `rotate(${j * step}deg) translateX(var(--hole-r)) rotate(${-(j * step) - turn}deg)` }}
+            >
+              <span className="rotary__photo" style={{ backgroundImage: `url(${f.texture})`, backgroundColor: f.hex }} />
+              <span className="rotary__tint" style={{ background: f.hex }} />
+            </button>
           ))}
         </div>
-        <span className="dial__mark" aria-hidden="true" />
-        <span className="dial__name">{sel.label}</span>
+        <div className="rotary__label">
+          <span className="rotary__name">{sel.label}</span>
+          <span className="rotary__dot" style={{ background: sel.hex }} />
+        </div>
+        <svg className="rotary__stop" viewBox="0 0 60 90" aria-hidden="true">
+          <defs>
+            <linearGradient id="stop-metal" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stopColor="#f2f2ef" /><stop offset="0.5" stopColor="#b5b5b0" /><stop offset="1" stopColor="#7d7d78" />
+            </linearGradient>
+          </defs>
+          <path d="M14 6 C 40 18, 50 46, 46 84 L 34 84 C 36 52, 28 30, 6 18 Z" fill="url(#stop-metal)" stroke="#6d6d68" strokeWidth="1.2" />
+        </svg>
       </div>
 
       <div className="dial-panel">
