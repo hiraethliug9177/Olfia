@@ -1,77 +1,88 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { DAYPART_OPTIONS, SEASON_OPTIONS, familyById, sourceLabel } from "@/lib/catalog";
+import { familyById, sourceLabel } from "@/lib/catalog";
 import { matchProducts, type Product } from "@/lib/products";
 import type { Daypart, FamilyId, Season } from "@/lib/types";
+import { Icon } from "@/components/ui/Icon";
 
 /**
- * Recommended products (11/4 feedback, B tier): sample data from lib/products.ts.
- * Filters: season · time of day · "matches this room" (the families passed in) · similar to one product.
+ * Recommended products (B tier). 11/9 feedback 10: larger cards, less text, one line saying why
+ * it fits this room, one combined "when" filter. Product photographs are not in yet; the card
+ * shows the family's material texture until Tiffany supplies product images.
  */
 
-export function ProductCard({ p, onSimilar }: { p: Product; onSimilar?: (id: string) => void }) {
+type When = "any" | "mornings" | "evenings" | "warm" | "cold";
+const WHEN: Array<{ id: When; label: string }> = [
+  { id: "any", label: "Any time" },
+  { id: "mornings", label: "Mornings" },
+  { id: "evenings", label: "Evenings" },
+  { id: "warm", label: "Warm months" },
+  { id: "cold", label: "Cold months" },
+];
+const WHEN_FILTER: Record<When, { season?: Season; daypart?: Daypart }> = {
+  any: {},
+  mornings: { daypart: "morning" },
+  evenings: { daypart: "evening" },
+  warm: { season: "summer" },
+  cold: { season: "winter" },
+};
+
+export function ProductCard({ p, match, onSimilar }: { p: Product; match?: FamilyId[]; onSimilar?: (id: string) => void }) {
   const f = familyById(p.families[0]);
-  const inner = (
+  const shared = (match ?? []).filter((id) => p.families.includes(id));
+  const why = shared.length ? `Shares ${shared.map((id) => familyById(id).label).join(" and ")} with this room` : p.families.map((id) => familyById(id).label).join(" and ");
+  const body = (
     <>
-      <span className="pcard__band" style={{ background: `linear-gradient(90deg, ${p.families.map((id) => familyById(id).hex).join(", ")})` }} />
-      <span className="pcard__brand">{p.brand}</span>
-      <span className="pcard__name">{p.name}</span>
-      <span className="muted" style={{ fontSize: 16 }}>{p.notes}</span>
-      <span className="pcard__meta">
-        <span className="chip__dot" style={{ background: f.hex }} />
-        {p.families.map((id) => familyById(id).label).join(" · ")}
-        <span>·</span>
-        <span>{sourceLabel(p.type)}</span>
-        <span>·</span>
-        <span className="mono">{p.tier}</span>
+      <span className="pcard__visual" style={{ backgroundImage: `url(${f.texture})`, backgroundColor: f.hex }} aria-hidden="true" />
+      <span className="pcard__body">
+        <span className="pcard__brand">{p.brand} · {sourceLabel(p.type)} · {p.tier}</span>
+        <span className="pcard__name">{p.name}</span>
+        <span className="pcard__why"><span className="chip__dot" style={{ background: f.hex }} />{why}</span>
+        <span className="muted" style={{ fontSize: 15 }}>{p.notes}</span>
       </span>
     </>
   );
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
       {p.url ? (
-        <a className="pcard" href={p.url} target="_blank" rel="noopener noreferrer">{inner}</a>
+        <a className="pcard" href={p.url} target="_blank" rel="noopener noreferrer" aria-label={`${p.brand} ${p.name}, opens the brand's site`}>
+          {body}
+          <span className="pcard__out"><Icon name="external" size={18} /></span>
+        </a>
       ) : (
-        <div className="pcard">{inner}</div>
+        <div className="pcard">{body}</div>
       )}
-      {onSimilar ? (
-        <button type="button" className="btn btn--ghost btn--sm" onClick={() => onSimilar(p.id)} style={{ alignSelf: "flex-start", height: 36, fontSize: 14 }}>Similar to this</button>
-      ) : null}
+      {onSimilar ? <button type="button" className="hero__link" onClick={() => onSimilar(p.id)} style={{ alignSelf: "flex-start", border: 0, background: "transparent", padding: 0, fontSize: 15 }}>More like this</button> : null}
     </div>
   );
 }
 
 export function ProductCards({ families, title = "Recreate this at home", limit = 6, compact = false }: { families: FamilyId[]; title?: string; limit?: number; compact?: boolean }) {
-  const [season, setSeason] = useState<Season | null>(null);
-  const [daypart, setDaypart] = useState<Daypart | null>(null);
+  const [when, setWhen] = useState<When>("any");
   const [similar, setSimilar] = useState<string | null>(null);
 
   const list = useMemo(
-    () => matchProducts({ families, season: season ?? undefined, daypart: daypart ?? undefined, similarTo: similar ?? undefined }, limit),
-    [families, season, daypart, similar, limit],
+    () => matchProducts({ families, ...WHEN_FILTER[when], similarTo: similar ?? undefined }, limit),
+    [families, when, similar, limit],
   );
 
   return (
-    <section aria-label={title} style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "baseline", justifyContent: "space-between", gap: 12 }}>
-        <h3 style={{ fontFamily: "var(--font-display)", fontSize: compact ? 26 : 32 }}>{title}</h3>
-        {similar ? <button type="button" className="chip" onClick={() => setSimilar(null)}>Back to this room ×</button> : null}
+    <section aria-label={title} style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+        <h2 style={{ fontSize: compact ? 26 : 30 }}>{title}</h2>
+        {similar ? <button type="button" className="chip" onClick={() => setSimilar(null)}>Back to this room</button> : null}
       </div>
       {!compact ? (
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-          {SEASON_OPTIONS.map((s) => (
-            <button key={s.id} type="button" className="chip" aria-pressed={season === s.id} onClick={() => setSeason(season === s.id ? null : s.id)}>{s.label}</button>
-          ))}
-          <span style={{ width: 8 }} />
-          {DAYPART_OPTIONS.map((d) => (
-            <button key={d.id} type="button" className="chip" aria-pressed={daypart === d.id} onClick={() => setDaypart(daypart === d.id ? null : d.id)}>{d.label}</button>
+        <div className="chips" role="group" aria-label="When">
+          {WHEN.map((w) => (
+            <button key={w.id} type="button" className="chip chip--solid" aria-pressed={when === w.id} onClick={() => setWhen(w.id)}>{w.label}</button>
           ))}
         </div>
       ) : null}
       {list.length ? (
-        <div style={{ display: "grid", gridTemplateColumns: `repeat(auto-fill, minmax(${compact ? 220 : 250}px, 1fr))`, gap: 18 }}>
-          {list.map((p) => <ProductCard key={p.id} p={p} onSimilar={compact ? undefined : setSimilar} />)}
+        <div className="pcard-grid">
+          {list.map((p) => <ProductCard key={p.id} p={p} match={families} onSimilar={compact ? undefined : setSimilar} />)}
         </div>
       ) : (
         <p className="muted">Nothing matches that combination yet.</p>

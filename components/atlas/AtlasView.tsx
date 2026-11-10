@@ -8,6 +8,7 @@ import { useToast } from "@/lib/toast";
 import { track } from "@/lib/analytics";
 import { hourOnly, monthLabel, partOfDay, sameDay } from "@/lib/dates";
 import { PIECE_H, PIECE_W, monthPieces } from "@/lib/jigsaw";
+import { FitWidth } from "@/components/ui/FitWidth";
 import { sampleEntries } from "@/lib/sample";
 import type { CaptureEntry, Entry, FamilyId, RoomsEntry } from "@/lib/types";
 import { ScenePage } from "@/components/scene/ScenePage";
@@ -112,11 +113,11 @@ export function AtlasView() {
     <div>
       <div style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-end", justifyContent: "space-between", gap: 20, marginBottom: 26 }}>
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          <h1 className="h-page">Scent <em>Atlas</em></h1>
+          <h1 className="h-page">Scent Atlas</h1>
           <p className="lead" style={{ fontSize: 18 }}>Your rooms, ideas, and scent notes, all in one place.</p>
         </div>
         {tab === 0 ? (
-          <div className="mono" style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 18, fontWeight: 600, letterSpacing: "0.06em" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 18, fontWeight: 600 }}>
             <button type="button" className="tool" aria-label="Previous month" onClick={() => shift(-1)} style={{ borderRadius: "50%" }}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6" /></svg>
             </button>
@@ -129,9 +130,9 @@ export function AtlasView() {
       </div>
 
       <div role="tablist" aria-label="Atlas views" className="folder-tabs">
-        <button type="button" role="tab" aria-selected={tab === 0} className="folder-tab" onClick={() => setTab(0)}>CALENDAR</button>
-        <button type="button" role="tab" aria-selected={tab === 1} className="folder-tab" onClick={() => setTab(1)}>FAVORITES</button>
-        <button type="button" role="tab" aria-selected={tab === 2} className="folder-tab" onClick={() => setTab(2)}>TAGS &amp; PROFILE</button>
+        <button type="button" role="tab" aria-selected={tab === 0} className="folder-tab" onClick={() => setTab(0)}>Calendar</button>
+        <button type="button" role="tab" aria-selected={tab === 1} className="folder-tab" onClick={() => setTab(1)}>Favorites</button>
+        <button type="button" role="tab" aria-selected={tab === 2} className="folder-tab" onClick={() => setTab(2)}>Tags &amp; profile</button>
       </div>
 
       <div className="card" style={{ padding: 0, borderRadius: 28 }}>
@@ -148,9 +149,10 @@ export function AtlasView() {
         ) : tab === 0 ? (
           <>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "8px 28px", alignItems: "flex-start", paddingTop: 8 }}>
-              <div className="cal-scroll" style={{ flex: "3 1 640px", minWidth: 0 }}>
-                <div className="mono" style={{ display: "grid", gridTemplateColumns: `repeat(7, ${PIECE_W}px)`, marginBottom: 18, fontSize: 13, letterSpacing: "0.1em", color: "var(--slate)" }}>
-                  {["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"].map((d) => <span key={d}>{d}</span>)}
+              <div className="cal-scroll" style={{ flex: "1 1 100%", minWidth: 0 }}>
+                <FitWidth width={PIECE_W * 7 + 12} height={rows * PIECE_H + 44}>
+                <div style={{ display: "grid", gridTemplateColumns: `repeat(7, ${PIECE_W}px)`, marginBottom: 18, fontSize: 15, fontWeight: 600, color: "var(--slate)" }}>
+                  {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => <span key={d} style={{ paddingLeft: 16 }}>{d}</span>)}
                 </div>
                 <div style={{ position: "relative", width: PIECE_W * 7, height: rows * PIECE_H }}>
                   {pieces.map((p) => {
@@ -180,14 +182,15 @@ export function AtlasView() {
                     );
                   })}
                 </div>
+                </FitWidth>
               </div>
 
-              <aside style={{ flex: "1 1 280px", minWidth: 0, display: "flex", flexDirection: "column", gap: 14, padding: "28px 28px 28px 4px" }}>
+              <aside style={{ flex: "1 1 100%", minWidth: 0, display: "flex", flexDirection: "column", gap: 14, padding: "0 28px 28px" }}>
                 <span className="label-mono">{monthName} {day}</span>
                 {dayEntries.length === 0 ? (
                   <>
                     <span className="hand muted" style={{ fontSize: 24 }}>nothing pinned this day</span>
-                    <Link href="/capture" style={{ fontSize: 17, fontWeight: 600 }}>Capture a scent →</Link>
+                    <Link href="/capture" className="hero__link">Capture a scent</Link>
                   </>
                 ) : (
                   dayEntries.map((e) => (
@@ -196,7 +199,7 @@ export function AtlasView() {
                         <span aria-hidden="true" className="window" style={{ flex: "none", width: 44, height: 44, background: e.families[0] ? familyById(e.families[0]).hex : "#C9CBD6", boxShadow: "0 0 0 3px #fff" }} />
                         <span style={{ display: "flex", flexDirection: "column", gap: 2, minWidth: 0, flex: 1 }}>
                           <span style={{ fontSize: 17, fontWeight: 600 }}>{entryTitle(e)}</span>
-                          <span className="mono muted" style={{ fontSize: 13 }}>{e.type === "rooms" ? "ROOMS" : "CAPTURE"} · {hourOnly(new Date(e.createdAt))}{e.type === "capture" ? ` · ${roomLabel(e.room).toUpperCase()}` : ""}</span>
+                          <span className="mono muted" style={{ fontSize: 13 }}>{e.type === "rooms" ? "Rooms" : "Capture"} · {hourOnly(new Date(e.createdAt))}{e.type === "capture" ? ` · ${roomLabel(e.room)}` : ""}</span>
                         </span>
                         <button type="button" className="tool" aria-label={e.starred ? "Unstar" : "Star"} aria-pressed={e.starred} onClick={() => toggleStar(e.id)} style={{ boxShadow: "none", background: "transparent" }}><Star on={e.starred} /></button>
                       </div>
@@ -215,7 +218,7 @@ export function AtlasView() {
             <div style={{ display: "flex", flexWrap: "wrap", gap: 20, padding: "8px 28px 32px" }}>
               <div className="stat" style={{ flex: "2 1 420px" }}>
                 <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 12 }}>
-                  <span className="label-mono">FAMILIES THIS MONTH</span>
+                  <span className="label-mono">Families this month</span>
                   <span className="callout">{byDay.size} DAYS RECORDED</span>
                 </div>
                 {share.length ? (
@@ -233,7 +236,7 @@ export function AtlasView() {
                 ) : <span className="muted">Nothing this month yet.</span>}
               </div>
               <div className="stat" style={{ flex: "1 1 240px" }}>
-                <span className="label-mono">TIME OF DAY</span>
+                <span className="label-mono">Time of day</span>
                 {(["morning", "afternoon", "night"] as const).map((k) => (
                   <div key={k} style={{ display: "flex", alignItems: "center", gap: 10 }}>
                     <span className="mono" style={{ width: 92, fontSize: 14, textTransform: "capitalize" }}>{k}</span>
@@ -243,7 +246,7 @@ export function AtlasView() {
                 ))}
               </div>
               <div className="stat" style={{ flex: "1 1 240px" }}>
-                <span className="label-mono">SCENT SOURCES</span>
+                <span className="label-mono">Scent sources</span>
                 {kindRows.length ? kindRows.map(([k, n]) => (
                   <div key={k} style={{ display: "flex", alignItems: "center", gap: 10 }}>
                     <span className="mono" style={{ width: 92, fontSize: 14 }}>{k}</span>
@@ -279,7 +282,7 @@ export function AtlasView() {
                             {e.families[0] ? <Stamp family={e.families[0]} size={48} /> : null}
                             <span style={{ display: "flex", flexDirection: "column", gap: 2 }}>
                               <span style={{ fontSize: 17, fontWeight: 600 }}>{entryTitle(e)}</span>
-                              <span className="mono muted" style={{ fontSize: 13 }}>{roomLabel(e.room).toUpperCase()} · {hourOnly(new Date(e.createdAt))}</span>
+                              <span className="mono muted" style={{ fontSize: 13 }}>{roomLabel(e.room)} · {hourOnly(new Date(e.createdAt))}</span>
                             </span>
                           </div>
                           {e.momentName || e.situation ? <span className="hand" style={{ fontSize: 21 }}>{e.momentName || e.situation}</span> : null}
@@ -321,7 +324,7 @@ export function AtlasView() {
                         <span style={{ fontSize: 17, fontWeight: 600 }}><span className="hl" style={{ "--hl": f ? `${f.hex}66` : undefined } as CSSProperties}>{p.what.mode === "product" ? (p.what.productName || p.what.scentName || "Unnamed") : ""}</span></span>
                         <button type="button" className="tool" aria-label={p.starred ? "Unstar" : "Star"} aria-pressed={p.starred} onClick={() => toggleStar(p.id)} style={{ boxShadow: "none", background: "transparent", width: 36, height: 36 }}><Star on={p.starred} /></button>
                       </div>
-                      <span className="muted" style={{ fontSize: 14 }}>{sourceLabel(p.source).toUpperCase()} · {f ? f.label.toUpperCase() : "—"}</span>
+                      <span className="muted" style={{ fontSize: 14 }}>{sourceLabel(p.source)} · {f ? f.label : "—"}</span>
                       {p.situation ? <span className="hand" style={{ fontSize: 22 }}>{p.situation}</span> : null}
                     </div>
                   );

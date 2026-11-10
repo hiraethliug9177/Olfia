@@ -10,7 +10,7 @@ import {
   FURNITURE,
   SOURCES,
   baseLayout,
-  blendHint,
+  areNeighbours,
   familyById,
   findMaterial,
   itemById,
@@ -80,8 +80,8 @@ export function RoomEditor() {
     setLoadedFor(key);
     if (!editId) {
       // Opened from the quiz result or a family window: start with that family applied.
-      const fromParam = FAMILIES.find((f) => f.id === famParam);
-      const start: FamilyId[] = fromParam ? [fromParam.id] : DEFAULT_FAMS;
+      const fromParam = (famParam ?? "").split(",").map((id) => FAMILIES.find((f) => f.id === id)?.id).filter((id): id is FamilyId => !!id).slice(0, 3);
+      const start: FamilyId[] = fromParam.length ? fromParam : DEFAULT_FAMS;
       setEntryId(null); setCreatedAt(null); setNickname("");
       setItems([...baseLayout("candle"), ...stickersFor(start)]);
       setFamilies(start); setStrength(70); setTime("afternoon"); setWindowOpen(false);
@@ -365,12 +365,25 @@ export function RoomEditor() {
                 </button>
               ))}
             </div>
-            <span className="hand" style={{ fontSize: 22, color: "var(--deep)" }}>{blendHint(families)}</span>
+            {(() => {
+              const near = FAMILIES.filter((f) => !families.includes(f.id) && families.some((id) => areNeighbours(id, f.id))).slice(0, 2);
+              return near.length && families.length < 3 ? (
+                <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 8, fontSize: 15 }}>
+                  <span className="muted">Try adding</span>
+                  {near.map((f) => (
+                    <button key={f.id} type="button" className="chip" style={{ minHeight: 36, padding: "0 12px 0 8px", fontSize: 14, borderStyle: "dashed" }} onClick={() => toggleFamily(f.id)}>
+                      <span className="chip__dot" style={{ background: f.hex, width: 13, height: 13 }} />
+                      {f.label}
+                    </button>
+                  ))}
+                </div>
+              ) : null;
+            })()}
           </div>
 
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            <button type="button" className="btn btn--primary btn--block" onClick={() => save(false)}>{entryId ? "Save changes" : "Save to Scent Atlas"}</button>
-            <button type="button" className="btn btn--ghost btn--block" onClick={() => save(true)}>Make a Scent Card from this</button>
+            <button type="button" className="btn btn--primary btn--block" onClick={() => save(false)}>{entryId ? "Save changes" : "Save room"}</button>
+            <button type="button" className="btn btn--ghost btn--block" onClick={() => save(true)}>Make a card</button>
           </div>
         </div>
       </section>

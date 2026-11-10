@@ -70,7 +70,7 @@ export function AccountView() {
       <section className="card" style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 24 }}>
         <span aria-hidden="true" style={{ width: 88, height: 88, borderRadius: "50%", background: "radial-gradient(circle at 35% 30%, #DADDF0, #A0A6C8)", boxShadow: "0 0 0 5px #fff" }} />
         <div style={{ flex: "1 1 240px", display: "flex", flexDirection: "column", gap: 4 }}>
-          <h1 className="h-page" style={{ fontSize: "clamp(32px, 4vw, 48px)" }}>My <em>account</em></h1>
+          <h1 className="h-page" style={{ fontSize: "clamp(32px, 4vw, 48px)" }}>My profile</h1>
           <span className="muted">Accounts come later. For now, everything lives in this browser.</span>
         </div>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
@@ -84,7 +84,7 @@ export function AccountView() {
 
       <section className="card" style={{ display: "flex", flexDirection: "column", gap: 18 }}>
         <h2 className="h-section" style={{ fontSize: 30 }}>My <em>preferences</em></h2>
-        <span className="label-mono">PREFERRED SCENT STYLES</span>
+        <span className="label-mono">Preferred scent styles</span>
         <div className="chips">
           {FAMILIES.map((f) => (
             <button key={f.id} type="button" className="chip" aria-pressed={prefs.families.includes(f.id)} onClick={() => savePrefs({ ...prefs, families: flip(prefs.families, f.id) })}>
@@ -92,7 +92,7 @@ export function AccountView() {
             </button>
           ))}
         </div>
-        <span className="label-mono">PREFERRED PRODUCTS</span>
+        <span className="label-mono">Preferred products</span>
         <div className="chips">
           {SOURCE_OPTIONS.filter((s) => s.id !== "other").map((s) => (
             <button key={s.id} type="button" className="chip" aria-pressed={prefs.sources.includes(s.id)} onClick={() => savePrefs({ ...prefs, sources: flip(prefs.sources, s.id) })}>{s.label}</button>

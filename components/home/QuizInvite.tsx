@@ -2,31 +2,39 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { familyById } from "@/lib/catalog";
-import { loadQuiz, type QuizResult } from "@/lib/quiz";
+import { ARCHETYPES, loadQuiz, type QuizResult } from "@/lib/quiz";
 import { useMounted } from "@/lib/store";
-import { Stamp } from "@/components/scene/Stamp";
-import { Atmosphere } from "@/components/scene/Atmosphere";
+import { ResultCard } from "@/components/quiz/Quiz";
 
-/** Home hook (11/4 feedback): the scent quiz, or the saved result if one exists in this browser. */
+/** What the quiz gives you, shown before you take it (11/9 feedback 02). */
+const SAMPLE: QuizResult = {
+  code: "ISTJ",
+  archetype: ARCHETYPES.find((a) => a.code === "ISTJ") ?? ARCHETYPES[0],
+  family: "woody",
+  second: "spicy",
+  scores: { floral: 0, gourmand: 2, spicy: 6, woody: 11, green: 3, citrus: 1, fresh: 2 },
+  takenAt: "2026-11-09T18:00:00.000Z",
+};
+
 export function QuizInvite() {
   const mounted = useMounted();
   const [r, setR] = useState<QuizResult | null>(null);
   useEffect(() => { if (mounted) setR(loadQuiz()); }, [mounted]);
-  const fam = r ? familyById(r.family) : null;
+  const shown = r ?? SAMPLE;
   return (
-    <div className="invite" style={{ position: "relative", overflow: "hidden" }}>
-      {fam ? <Atmosphere families={[r!.family]} intensity={0.6} /> : null}
-      <div style={{ position: "relative", display: "flex", flexDirection: "column", gap: 10, maxWidth: "22em" }}>
-        <span className="hand" style={{ fontSize: 24, color: "var(--deep)" }}>{r ? "your result, saved here" : "twenty questions, one scent"}</span>
-        <p style={{ fontFamily: "var(--font-display)", fontSize: "clamp(32px, 3.6vw, 46px)", lineHeight: 1.1 }}>
-          {r ? <>You are <em>{r.archetype.name}</em>.</> : <>Which scent is <em>you</em>?</>}
-        </p>
-        {r ? <span className="hand" style={{ fontSize: 22 }}>{r.archetype.voice}</span> : null}
+    <div className="quiz-invite">
+      <div className="quiz-invite__card">
+        <ResultCard r={shown} />
       </div>
-      <div style={{ position: "relative", display: "flex", alignItems: "center", gap: 20 }}>
-        {fam ? <Stamp family={fam.id} size={96} rot={8} /> : null}
-        <Link href="/quiz" className="btn btn--primary">{r ? "See your result" : "Take the scent quiz"}</Link>
+      <div style={{ display: "flex", flexDirection: "column", gap: 16, flex: "1 1 340px", minWidth: 0 }}>
+        <h2 className="h-section">{r ? `You are ${r.archetype.name}.` : "Which scent is you?"}</h2>
+        <p className="lead">
+          {r ? r.archetype.voice : "Twenty questions about how you live. You get one of sixteen characters, the scent family that fits, and a room to start from."}
+        </p>
+        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "12px 24px", paddingTop: 4 }}>
+          <Link href="/quiz" className="btn btn--primary">{r ? "See your result" : "Take the quiz"}</Link>
+          {r ? <Link href={`/rooms?family=${r.family}`} className="hero__link">Design a room in this style</Link> : <span className="muted" style={{ fontSize: 15 }}>About three minutes</span>}
+        </div>
       </div>
     </div>
   );

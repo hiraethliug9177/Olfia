@@ -6,35 +6,32 @@ import { useEffect, useState } from "react";
 import { useRehydrateAtlas } from "@/lib/store";
 import { useToast } from "@/lib/toast";
 import { strings } from "@/lib/strings";
-
-function HomeIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M4 11l8-6 8 6v9H4z" />
-      <path d="M10 20v-5h4v5" />
-    </svg>
-  );
-}
-
-function AccountIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <circle cx="12" cy="8.5" r="3.8" />
-      <path d="M4.5 20c1.4-3.6 4.2-5.4 7.5-5.4s6.1 1.8 7.5 5.4" />
-    </svg>
-  );
-}
-
-function CardIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <rect x="5" y="3.5" width="14" height="17" rx="1.5" />
-      <path d="M5 15.5h14" />
-    </svg>
-  );
-}
+import { Icon, MenuMorph } from "@/components/ui/Icon";
 
 const isActive = (path: string, href: string) => (href === "/" ? path === "/" : path === href || path.startsWith(`${href}/`));
+
+const NAV = [
+  { href: "/", label: "Home" },
+  { href: "/capture", label: "Capture" },
+  { href: "/rooms", label: "Rooms" },
+  { href: "/atlas", label: "Scent Atlas" },
+  { href: "/edit", label: "The Edit" },
+];
+
+/** Pages that are mostly white work surfaces get a quieter backdrop. */
+const SOFT = ["/capture", "/rooms", "/card", "/atlas"];
+
+export function Backdrop() {
+  const path = usePathname() ?? "/";
+  const soft = SOFT.some((p) => path === p || path.startsWith(`${p}/`)) || path.startsWith("/edit/");
+  return (
+    <div className={`backdrop${soft ? " backdrop--soft" : ""}`} aria-hidden="true">
+      <span className="backdrop__a" />
+      <span className="backdrop__b" />
+      <span className="backdrop__c" />
+    </div>
+  );
+}
 
 export function Header() {
   const path = usePathname() ?? "/";
@@ -46,39 +43,32 @@ export function Header() {
   return (
     <header className="hd">
       <div className="wrap hd__row">
-        <Link href="/" className="hd__logo">Olfia</Link>
+        <Link href="/" className="hd__logo" aria-label="Olfia, home">Olfia</Link>
 
         <nav aria-label="Main" className="glass-pill hd__full">
-          <Link href="/" className="hd__link hd__link--icon" aria-label="Home" aria-current={cur("/")}><HomeIcon /></Link>
-          <Link href="/capture" className="hd__link" aria-current={cur("/capture")}>Capture</Link>
-          <Link href="/rooms" className="hd__link" aria-current={cur("/rooms")}>Rooms</Link>
-          <Link href="/atlas" className="hd__link" aria-current={cur("/atlas")}>Scent Atlas</Link>
-          <Link href="/edit" className="hd__link" aria-current={cur("/edit")}>The Edit</Link>
-          <Link href="/account" className="hd__link hd__link--icon" aria-label="My account" aria-current={cur("/account")}><AccountIcon /></Link>
+          {NAV.map((n) => (
+            <Link key={n.href} href={n.href} className="hd__link" aria-current={cur(n.href)}>{n.label}</Link>
+          ))}
         </nav>
 
-        <Link href="/card" className="btn btn--primary btn--sm hd__full" aria-current={cur("/card")}>
-          <CardIcon />
-          Make a Scent Card
+        <Link href="/account" className="hd__profile hd__full" aria-current={cur("/account")}>
+          <Icon name="user" />
+          My profile
         </Link>
 
-        <div className="glass-pill hd__mob">
-          <Link href="/capture" className="hd__link" aria-current={cur("/capture")}>Capture</Link>
-          <Link href="/rooms" className="hd__link" aria-current={cur("/rooms")}>Rooms</Link>
-          <Link href="/account" className="hd__link hd__link--icon" aria-label="My account" aria-current={cur("/account")}><AccountIcon /></Link>
-          <button type="button" className="hd__link hd__link--icon" aria-label="More pages" aria-expanded={open} onClick={() => setOpen((o) => !o)} style={{ border: 0, background: "transparent" }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M5 8h14M5 16h14" /></svg>
-          </button>
-        </div>
+        <button type="button" className="hd__burger hd__mob" aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} onClick={() => setOpen((o) => !o)}>
+          <MenuMorph open={open} />
+        </button>
       </div>
       {open ? (
-        <div className="hd__menu hd__mob">
-          <Link href="/" aria-current={cur("/")}>Home</Link>
-          <Link href="/atlas" aria-current={cur("/atlas")}>Scent Atlas</Link>
+        <nav aria-label="Menu" className="hd__menu hd__mob">
+          {NAV.map((n) => (
+            <Link key={n.href} href={n.href} aria-current={cur(n.href)}>{n.label}</Link>
+          ))}
           <Link href="/quiz" aria-current={cur("/quiz")}>Scent quiz</Link>
-          <Link href="/edit" aria-current={cur("/edit")}>The Olfia Edit</Link>
-          <Link href="/card" aria-current={cur("/card")}>Make a Scent Card</Link>
-        </div>
+          <Link href="/library" aria-current={cur("/library")}>Scent Library</Link>
+          <Link href="/account" aria-current={cur("/account")}>My profile</Link>
+        </nav>
       ) : null}
     </header>
   );
@@ -89,38 +79,32 @@ export function Footer() {
     <footer className="ft">
       <div className="wrap ft__grid">
         <div className="ft__col" style={{ flex: "2 1 280px", gap: 12 }}>
-          <span style={{ fontFamily: "var(--font-display)", fontStyle: "italic", fontSize: 36, lineHeight: 1 }}>Olfia</span>
-          <span className="muted" style={{ fontSize: 18, maxWidth: "22em" }}>{strings.brand.invitation}</span>
-          <span className="muted" style={{ fontSize: 15 }}>{strings.common.persistenceNotice}</span>
+          <Link href="/" style={{ fontFamily: "var(--font-display)", fontStyle: "italic", fontSize: 34, lineHeight: 1 }}>Olfia</Link>
+          <span className="muted" style={{ maxWidth: "24em" }}>{strings.brand.invitation}</span>
+          <span className="muted" style={{ fontSize: 14 }}>{strings.common.persistenceNotice}</span>
         </div>
-        <nav aria-label="Explore" className="ft__col">
-          <span className="label-mono" style={{ fontSize: 13 }}>EXPLORE</span>
-          <Link href="/">Home</Link>
+        <nav aria-label="Make" className="ft__col">
+          <span className="ft__h">Make</span>
           <Link href="/capture">Capture</Link>
           <Link href="/rooms">Rooms</Link>
           <Link href="/atlas">Scent Atlas</Link>
           <Link href="/card">Scent Card</Link>
-          <Link href="/quiz">Scent quiz</Link>
         </nav>
-        <nav aria-label="More" className="ft__col">
-          <span className="label-mono" style={{ fontSize: 13 }}>MORE</span>
+        <nav aria-label="Read" className="ft__col">
+          <span className="ft__h">Read</span>
+          <Link href="/quiz">Scent quiz</Link>
           <Link href="/edit">The Olfia Edit</Link>
           <Link href="/library">Scent Library</Link>
           <Link href="/about">About Olfia</Link>
-          <Link href="/account">My account</Link>
           <Link href="/privacy">Privacy</Link>
         </nav>
         <div className="ft__col" style={{ flex: "1 1 200px" }}>
-          <span className="label-mono" style={{ fontSize: 13 }}>CONTACT</span>
-          <div style={{ display: "flex", gap: 10 }}>
-            <a href="#" className="ft__icon" aria-label="Instagram (coming soon)">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.3" cy="6.7" r="1" fill="currentColor" stroke="none" /></svg>
-            </a>
-            <a href="#" className="ft__icon" aria-label="小红书 (coming soon)">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M6 3.5h9l3 3v14H6z" /><path d="M9 10h6M9 14h6M9 18h3" /></svg>
-            </a>
-          </div>
+          <span className="ft__h">Contact</span>
           <a href="mailto:tliu3694@usc.edu">tliu3694@usc.edu</a>
+          <div style={{ display: "flex", gap: 10 }}>
+            <a href="#" className="ft__icon" aria-label="Instagram (coming soon)"><Icon name="instagram" /></a>
+            <a href="#" className="ft__icon" aria-label="小红书 (coming soon)"><Icon name="bookOpen" /></a>
+          </div>
         </div>
       </div>
       <div className="wrap ft__base">

@@ -27,7 +27,6 @@ import type { CaptureEntry, Daypart, EmotionId, FamilyId, MethodId, Occasion, Ro
 import { dotDate } from "@/lib/dates";
 import { Atmosphere } from "@/components/scene/Atmosphere";
 import { ItemArt } from "@/components/scene/Cutout";
-import { Stamp } from "@/components/scene/Stamp";
 
 /**
  * Capture as a step-by-step flow (11/4 feedback): one question per screen, a progress bar,
@@ -51,6 +50,75 @@ function Opt({ on, onClick, children, dot }: { on: boolean; onClick: () => void;
       {dot ? <span className="opt__sw" style={{ background: dot }} /> : null}
       {children}
     </button>
+  );
+}
+
+/**
+ * The place and the light of the moment, drawn (11/9 feedback 11: each answer has to show).
+ * Room decides the surface the scent sits on; time of day decides where the light comes from.
+ */
+const SURFACE: Record<RoomKind, "table" | "tiles" | "desk" | "rail" | "ledge"> = {
+  living: "table", bedroom: "table", reading: "table", other: "table",
+  kitchen: "tiles", bathroom: "tiles",
+  study: "desk", office: "desk",
+  closet: "rail", entryway: "rail",
+  balcony: "ledge", car: "ledge",
+};
+
+function Setting({ room, daypart }: { room: RoomKind | null; daypart: Daypart | null }) {
+  const kind = room ? SURFACE[room] : null;
+  const ink = "#5a4a3a";
+  return (
+    <svg viewBox="0 0 340 490" preserveAspectRatio="none" aria-hidden="true" style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}>
+      <defs>
+        <linearGradient id="cap-am" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#FFE9B8" stopOpacity="0.9" /><stop offset="1" stopColor="#FFE9B8" stopOpacity="0" /></linearGradient>
+        <linearGradient id="cap-noon" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#FFFFFF" stopOpacity="0.85" /><stop offset="1" stopColor="#FFFFFF" stopOpacity="0" /></linearGradient>
+        <linearGradient id="cap-pm" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#F2A45A" stopOpacity="0.85" /><stop offset="1" stopColor="#F2A45A" stopOpacity="0" /></linearGradient>
+        <radialGradient id="cap-lamp" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stopColor="#F6D58A" stopOpacity="0.95" /><stop offset="1" stopColor="#F6D58A" stopOpacity="0" /></radialGradient>
+      </defs>
+      {/* light */}
+      <polygon points="0,40 150,40 340,360 150,360" fill="url(#cap-am)" style={{ opacity: daypart === "morning" ? 1 : 0, transition: "opacity 0.9s ease" }} />
+      <polygon points="110,40 230,40 300,360 40,360" fill="url(#cap-noon)" style={{ opacity: daypart === "afternoon" ? 1 : 0, transition: "opacity 0.9s ease" }} />
+      <polygon points="340,90 340,220 0,360 0,300" fill="url(#cap-pm)" style={{ opacity: daypart === "evening" ? 1 : 0, transition: "opacity 0.9s ease" }} />
+      <g style={{ opacity: daypart === "night" ? 1 : 0, transition: "opacity 0.9s ease" }}>
+        <rect width="340" height="490" fill="#2c2f4a" opacity="0.34" />
+        <circle cx="240" cy="300" r="120" fill="url(#cap-lamp)" />
+      </g>
+      {/* surface */}
+      {kind === "table" ? (
+        <g key="table" className="anim-rise">
+          <rect x="24" y="360" width="292" height="12" rx="3" fill="#8A5A33" />
+          <path d="M40 362 h260" stroke="#b98a5c" strokeWidth="2" />
+          <rect x="52" y="372" width="10" height="70" fill="#6f4627" /><rect x="278" y="372" width="10" height="70" fill="#6f4627" />
+        </g>
+      ) : null}
+      {kind === "tiles" ? (
+        <g key="tiles" className="anim-rise">
+          <g stroke="#c9d3d6" strokeWidth="1.5" fill="none">{[0, 1, 2, 3, 4, 5, 6].map((i) => <path key={i} d={`M${i * 50 + 20} 250 V360`} />)}<path d="M0 285 H340 M0 322 H340" /></g>
+          <rect x="0" y="360" width="340" height="16" fill="#E8EEF0" /><rect x="0" y="376" width="340" height="4" fill="#b9c6ca" />
+        </g>
+      ) : null}
+      {kind === "desk" ? (
+        <g key="desk" className="anim-rise">
+          <rect x="0" y="360" width="340" height="14" fill="#C7A27A" /><rect x="0" y="374" width="340" height="5" fill="#9c7a55" />
+          <path d="M40 358 l70 -6 6 8 -70 6 Z" fill="#FBFAF6" stroke={ink} strokeWidth="1" />
+          <path d="M150 356 l48 -10" stroke="#4C527A" strokeWidth="5" strokeLinecap="round" />
+        </g>
+      ) : null}
+      {kind === "rail" ? (
+        <g key="rail" className="anim-rise">
+          <path d="M20 86 H320" stroke={ink} strokeWidth="5" strokeLinecap="round" />
+          <g fill="none" stroke={ink} strokeWidth="2.5" strokeLinecap="round"><path d="M92 86 q0 14 10 14 M102 100 l-44 26 h88 Z" /><path d="M214 86 q0 14 10 14 M224 100 l-44 26 h88 Z" /></g>
+          <rect x="24" y="360" width="292" height="10" rx="3" fill="#8A5A33" />
+        </g>
+      ) : null}
+      {kind === "ledge" ? (
+        <g key="ledge" className="anim-rise">
+          <g stroke={ink} strokeWidth="3" strokeLinecap="round">{[30, 80, 130, 180, 230, 280].map((x) => <path key={x} d={`M${x} 250 V360`} />)}<path d="M10 250 H330" strokeWidth="5" /></g>
+          <rect x="0" y="360" width="340" height="12" fill="#b9b3a6" />
+        </g>
+      ) : null}
+    </svg>
   );
 }
 
@@ -209,7 +277,7 @@ export function CaptureForm() {
 
           {current === "room" ? (
             <>
-              <h2 className="flow__q">Where <em>are</em> you?</h2>
+              <h2 className="flow__q">Where did you notice it?</h2>
               <div className="opts">
                 {ROOM_OPTIONS.map((o) => <Opt key={o.id} on={room === o.id} onClick={() => setRoom(o.id)}>{o.label}</Opt>)}
               </div>
@@ -351,6 +419,7 @@ export function CaptureForm() {
           <div className="scene-sheet__paper" style={{ background: paper, transition: "background 0.8s var(--ease)" }}>
             <div className="scene-sheet__grain" aria-hidden="true" />
             <Atmosphere key={blendKey} families={chosen} intensity={0.9} />
+            <Setting room={room} daypart={daypart} />
             <div className="scene-sheet__head">
               <span>{room ? roomLabel(room).toUpperCase() : season ? season.toUpperCase() : " "}</span>
               <span>{mounted ? dotDate(new Date()) : ""}</span>
@@ -362,7 +431,7 @@ export function CaptureForm() {
               const style: CSSProperties = {
                 position: "absolute",
                 left: two ? (i === 0 ? "4%" : "38%") : "18%",
-                top: two ? (i === 0 ? "22%" : "34%") : "26%",
+                top: two ? (i === 0 ? "12%" : "24%") : "16%",
                 width: "62%",
                 aspectRatio: "1",
                 borderRadius: "50%",
@@ -376,7 +445,7 @@ export function CaptureForm() {
             {/* material stickers */}
             {chosen.map((f, i) => {
               const m = familyById(f).materials[0];
-              const spots = [{ l: "10%", t: "48%", r: -8 }, { l: "56%", t: "34%", r: 7 }];
+              const spots = [{ l: "8%", t: "30%", r: -8 }, { l: "40%", t: "22%", r: 7 }];
               const s = spots[i];
               return (
                 <div key={`${m.id}-${i}`} className="anim-pin" aria-hidden="true" style={{ position: "absolute", left: s.l, top: s.t, width: "28%", aspectRatio: "1", rotate: `${s.r}deg` }}>
@@ -387,20 +456,15 @@ export function CaptureForm() {
             })}
             {/* scent source */}
             {source && sourceDef ? (
-              <div className="anim-rise" aria-hidden="true" style={{ position: "absolute", left: "76%", bottom: "17%", width: `${Math.max(11, sourceDef.w * 120)}%`, aspectRatio: `${1 / sourceDef.aspect}` }}>
+              <div className="anim-rise" aria-hidden="true" style={{ position: "absolute", left: "64%", bottom: "26.5%", width: `${Math.max(13, sourceDef.w * 150)}%`, aspectRatio: `${1 / sourceDef.aspect}` }}>
                 <ItemArt kind={sourceDef.id} prefix="cap" />
               </div>
             ) : null}
             {/* emotion word */}
             {emotions[0] ? (
-              <span className="hand anim-rise" style={{ position: "absolute", left: "8%", top: "16%", fontSize: "max(20px, 9cqw)", color: "var(--deep)", rotate: "-6deg" }}>
+              <span className="hand anim-rise" style={{ position: "absolute", left: "8%", top: "9%", fontSize: "max(20px, 9cqw)", color: "var(--deep)", rotate: "-6deg" }}>
                 {EMOTION_OPTIONS.find((e) => e.id === emotions[0])?.label.toLowerCase()}
               </span>
-            ) : null}
-            {chosen[0] ? (
-              <div style={{ position: "absolute", right: "6%", top: "12%" }}>
-                <Stamp family={chosen[0]} size={64} rot={10} />
-              </div>
             ) : null}
             <div style={{ position: "absolute", left: "6%", right: "6%", bottom: "5%", display: "flex", flexDirection: "column", gap: 4 }}>
               <span style={{ fontFamily: "var(--font-display)", fontStyle: "italic", fontSize: "max(18px, 7cqw)", lineHeight: 1.05 }}>
@@ -408,7 +472,6 @@ export function CaptureForm() {
               </span>
               <span className="hand muted" style={{ fontSize: "max(15px, 6cqw)" }}>{momentName || " "}</span>
             </div>
-            <div aria-hidden="true" style={{ position: "absolute", inset: 0, pointerEvents: "none", background: daypart ? LIGHT[daypart] : "transparent", transition: "background 0.8s var(--ease)" }} />
           </div>
         </div>
       </aside>

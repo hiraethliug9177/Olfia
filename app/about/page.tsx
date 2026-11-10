@@ -44,9 +44,9 @@ export default function AboutPage() {
         <span className="hand" style={{ fontSize: 26, color: "var(--deep)" }}>the founder</span>
         <h2 className="h-section" style={{ fontSize: 32 }}>Tiffany Liu</h2>
         <p style={{ margin: 0 }}>Olfia started as a DSM596 capstone at USC, built from interviews and a survey of people who shape the scent of their homes. TODO(Tiffany): a few lines in your own words.</p>
-        <a href="mailto:tliu3694@usc.edu" style={{ fontWeight: 600 }}>Say hello →</a>
+        <a href="mailto:tliu3694@usc.edu" style={{ fontWeight: 600 }}>Say hello</a>
       </section>
-      <p><Link href="/library">Scent Library →</Link></p>
+      <p><Link href="/library" className="hero__link">Scent Library</Link></p>
     </div>
   );
 }

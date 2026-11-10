@@ -86,7 +86,7 @@ export function ScentProfile({ compact = false }: { compact?: boolean }) {
 
       <div style={{ display: "flex", flexWrap: "wrap", gap: 18 }}>
         <div className="stat" style={{ flex: "2 1 360px" }}>
-          <span className="label-mono">FAMILIES, ALL TIME</span>
+          <span className="label-mono">Families, all time</span>
           <div style={{ display: "flex", height: 22, borderRadius: 999, overflow: "hidden", gap: 3 }}>
             {famRows.map(([f, n]) => <span key={f} title={familyById(f).label} style={{ flex: `${n} 1 0`, background: familyById(f).hex }} />)}
           </div>
@@ -105,16 +105,16 @@ export function ScentProfile({ compact = false }: { compact?: boolean }) {
           ) : null}
         </div>
         <div className="stat" style={{ flex: "1 1 220px" }}>
-          <span className="label-mono">HOW IT FELT</span>
+          <span className="label-mono">How it felt</span>
           {emotionRows.length ? <Bars rows={emotionRows.slice(0, 5)} color="#A0A6C8" labelOf={(k) => EMOTION_OPTIONS.find((e) => e.id === k)?.label ?? k} /> : <span className="muted">No emotions recorded yet.</span>}
         </div>
         <div className="stat" style={{ flex: "1 1 220px" }}>
-          <span className="label-mono">TIME OF DAY</span>
+          <span className="label-mono">Time of day</span>
           {dayRows.length ? <Bars rows={dayRows} color="#E7B49F" /> : <span className="muted">—</span>}
         </div>
         {!compact ? (
           <div className="stat" style={{ flex: "1 1 220px" }}>
-            <span className="label-mono">PRODUCT TYPES</span>
+            <span className="label-mono">Product types</span>
             {typeRows.length ? <Bars rows={typeRows} color="#8FB5B8" labelOf={(k) => sourceLabel(k as Parameters<typeof sourceLabel>[0])} /> : <span className="muted">—</span>}
           </div>
         ) : null}
@@ -122,7 +122,7 @@ export function ScentProfile({ compact = false }: { compact?: boolean }) {
 
       {tagRows.length ? (
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          <span className="label-mono">YOUR TAGS</span>
+          <span className="label-mono">Your tags</span>
           <div className="chips">
             {tagRows.map(([t, n]) => <Link key={t} href={`/atlas?tag=${t}`} className="tag" style={{ textDecoration: "none" }}>#{t} <span className="muted" style={{ marginLeft: 6 }}>{n}</span></Link>)}
           </div>
@@ -131,7 +131,7 @@ export function ScentProfile({ compact = false }: { compact?: boolean }) {
 
       {top ? (
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          <span className="label-mono">TRY NEXT</span>
+          <span className="label-mono">Try next</span>
           <div className="chips">
             {tryNext.map((f) => (
               <Link key={f} href={`/rooms?family=${f}`} className="chip" style={{ textDecoration: "none" }}><span className="chip__dot" style={{ background: familyById(f).hex }} />{familyById(f).label} · next to {familyById(top).label.split(" ")[0]} on the wheel</Link>

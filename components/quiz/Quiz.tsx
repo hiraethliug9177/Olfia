@@ -11,6 +11,7 @@ import { Atmosphere } from "@/components/scene/Atmosphere";
 import { ItemArt } from "@/components/scene/Cutout";
 import { Stamp } from "@/components/scene/Stamp";
 import { dotDate } from "@/lib/dates";
+import { Icon } from "@/components/ui/Icon";
 
 /** Result card: archetype headline, family by colour + stamp + materials, Tiffany's line. Exported as a 1080-wide PNG. */
 export function ResultCard({ r, cardRef }: { r: QuizResult; cardRef?: Ref<HTMLDivElement> }) {
@@ -23,7 +24,7 @@ export function ResultCard({ r, cardRef }: { r: QuizResult; cardRef?: Ref<HTMLDi
       <div className="scene-sheet__grain" aria-hidden="true" />
       <div style={{ position: "absolute", inset: 0, padding: "7% 8%", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-          <span className="label-mono" style={{ fontSize: "max(10px, 3cqw)", letterSpacing: "0.16em" }}>OLFIA · {dotDate(new Date(r.takenAt))}</span>
+          <span className="label-mono" style={{ fontSize: "max(10px, 3cqw)", }}>Olfia · {dotDate(new Date(r.takenAt))}</span>
           <Stamp family={r.family} size={82} rot={9} />
         </div>
         <div style={{ position: "relative", height: "34%" }}>
@@ -40,10 +41,10 @@ export function ResultCard({ r, cardRef }: { r: QuizResult; cardRef?: Ref<HTMLDi
         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
           <span style={{ fontFamily: "var(--font-display)", fontStyle: "italic", fontSize: "max(26px, 10.5cqw)", lineHeight: 1 }}>{r.archetype.name}</span>
           <span className="hand" style={{ fontSize: "max(16px, 6cqw)", lineHeight: 1.2, color: "var(--ink)" }}>{r.archetype.voice}</span>
-          <span style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 6, fontFamily: "var(--font-mono)", fontSize: "max(10px, 3.2cqw)", letterSpacing: "0.08em", color: "var(--slate)" }}>
+          <span style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 6, fontFamily: "var(--font-mono)", fontSize: "max(10px, 3.2cqw)", color: "var(--slate)" }}>
             <span className="chip__dot" style={{ background: f.hex, width: 12, height: 12 }} />
-            {f.label.toUpperCase()}
-            {r.second ? <><span>·</span><span className="chip__dot" style={{ background: familyById(r.second).hex, width: 12, height: 12 }} />{familyById(r.second).label.toUpperCase()}</> : null}
+            {f.label}
+            {r.second ? <><span>·</span><span className="chip__dot" style={{ background: familyById(r.second).hex, width: 12, height: 12 }} />{familyById(r.second).label}</> : null}
           </span>
         </div>
       </div>
@@ -125,33 +126,24 @@ export function Quiz() {
   };
 
   if (result) {
-    const f = familyById(result.family);
     const neighbours = blendsWith(result.family).map(familyById);
     return (
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 40, alignItems: "flex-start" }}>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 48, alignItems: "center" }}>
         <div style={{ flex: "1 1 320px", minWidth: 0, display: "flex", justifyContent: "center" }}>
           <ResultCard r={result} cardRef={cardRef} />
         </div>
-        <div style={{ flex: "1 1 360px", minWidth: 0, display: "flex", flexDirection: "column", gap: 22 }}>
-          <h2 className="flow__q" style={{ fontSize: "clamp(34px, 4vw, 52px)" }}>You are <em>{result.archetype.name}</em>.</h2>
-          <p className="lead">{f.what} At home it suits {f.home}</p>
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            <span className="label-mono">BLENDS WELL WITH</span>
-            <div className="chips">
-              {neighbours.map((n) => (
-                <Link key={n.id} href={`/library#${n.id}`} className="chip" style={{ textDecoration: "none" }}><span className="chip__dot" style={{ background: n.hex }} />{n.label}</Link>
-              ))}
-            </div>
+        <div style={{ flex: "1 1 360px", minWidth: 0, display: "flex", flexDirection: "column", gap: 20 }}>
+          <h1 className="h-page">You are {result.archetype.name}.</h1>
+          <p className="lead">{result.archetype.voice}</p>
+          <p>
+            Your scent is {familyById(result.family).label}{result.second ? `, with a second note of ${familyById(result.second).label}` : ""}. It layers well with {neighbours.map((n) => n.label).join(" and ")}.
+          </p>
+          <Link href={`/rooms?family=${[result.family, result.second].filter(Boolean).join(",")}`} className="btn btn--primary" style={{ alignSelf: "flex-start" }}>Design a room in this style</Link>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+            <button type="button" className="btn btn--ghost btn--sm" disabled={busy} onClick={() => exportCard("download")}><Icon name="download" size={18} />{busy ? "Making image…" : "Save card"}</button>
+            <button type="button" className="btn btn--ghost btn--sm" disabled={busy} onClick={() => exportCard("share")}><Icon name="share" size={18} />Share</button>
           </div>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
-            <Link href={`/rooms?family=${result.family}`} className="btn btn--primary">Open a room with this scent</Link>
-            <button type="button" className="btn btn--ghost" disabled={busy} onClick={() => exportCard("share")}>{busy ? "Making image…" : "Share"}</button>
-            <button type="button" className="btn btn--ghost" disabled={busy} onClick={() => exportCard("download")}>Save image</button>
-          </div>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 16, alignItems: "center" }}>
-            <Link href="/edit" style={{ fontWeight: 600 }}>Read The Olfia Edit →</Link>
-            <button type="button" className="btn btn--ghost btn--sm" onClick={restart}>Take it again</button>
-          </div>
+          <button type="button" className="hero__link" onClick={restart} style={{ alignSelf: "flex-start", border: 0, background: "transparent", padding: 0, display: "inline-flex", alignItems: "center", gap: 8 }}><Icon name="rotate" size={18} />Take the quiz again</button>
         </div>
       </div>
     );
@@ -159,6 +151,10 @@ export function Quiz() {
 
   return (
     <div className="flow" style={{ maxWidth: 720 }}>
+      <div>
+        <h1 className="h-page" style={{ marginBottom: 12 }}>Which scent is you?</h1>
+        <p className="lead">Twenty quick questions. Tap what feels right.</p>
+      </div>
       <div className="flow__bar" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progress)} aria-label="Quiz progress">
         <span style={{ width: `${progress}%` }} />
       </div>

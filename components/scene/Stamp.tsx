@@ -104,7 +104,7 @@ function Silhouette({ family }: { family: FamilyId }) {
 
 export function Stamp({ family, size = 96, date, rot = -8, className, variant = "ink" }: StampProps) {
   const f = familyById(family);
-  const label = `${f.label.toUpperCase()} · OLFIA · `;
+  const label = `${f.label} · OLFIA · `;
   const text = label.repeat(3);
   const id = `stamp-${family}`;
   return (
@@ -122,14 +122,14 @@ export function Stamp({ family, size = 96, date, rot = -8, className, variant = 
       </defs>
       <circle cx="50" cy="50" r="47" fill="none" stroke="currentColor" strokeWidth="2.4" strokeDasharray="3 2.2" />
       <circle cx="50" cy="50" r="33" fill={variant === "ink" ? "rgba(255,255,255,0.5)" : "none"} stroke="currentColor" strokeWidth="1.6" />
-      <text fontFamily="'IBM Plex Mono', ui-monospace, monospace" fontSize="7.6" fontWeight="600" letterSpacing="1.4" fill="currentColor">
+      <text fontFamily="'IBM Plex Sans', system-ui, sans-serif" fontSize="7.6" fontWeight="600" letterSpacing="1.4" fill="currentColor">
         <textPath href={`#${id}-ring`} startOffset="0">{text}</textPath>
       </text>
       <g transform="translate(50 46) scale(0.56) translate(-50 -50)">
         <Silhouette family={family} />
       </g>
       {date ? (
-        <text x="50" y="76" textAnchor="middle" fontFamily="'IBM Plex Mono', ui-monospace, monospace" fontSize="8" fontWeight="600" fill="currentColor">
+        <text x="50" y="76" textAnchor="middle" fontFamily="'IBM Plex Sans', system-ui, sans-serif" fontSize="8" fontWeight="600" fill="currentColor">
           {date}
         </text>
       ) : null}
