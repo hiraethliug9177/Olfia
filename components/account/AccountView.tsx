@@ -67,23 +67,23 @@ export function AccountView() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
-      <section className="card" style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 24 }}>
+      <section className="card" style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 24, background: "var(--peri-soft)" }}>
         <span aria-hidden="true" style={{ width: 88, height: 88, borderRadius: "50%", background: "radial-gradient(circle at 35% 30%, #DADDF0, #A0A6C8)", boxShadow: "0 0 0 5px #fff" }} />
         <div style={{ flex: "1 1 240px", display: "flex", flexDirection: "column", gap: 4 }}>
-          <h1 className="h-page" style={{ fontSize: "clamp(32px, 4vw, 48px)" }}>My profile</h1>
+          <h1 className="h-page" style={{ fontSize: "clamp(36px, 4.4vw, 56px)" }}>My Account</h1>
           <span className="muted">Accounts come later. For now, everything lives in this browser.</span>
         </div>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-          <span className="callout">{mounted ? days : "–"} DAYS RECORDED</span>
-          <span className="callout">{mounted ? rooms : "–"} ROOMS</span>
-          <span className="callout">{mounted ? captures : "–"} CAPTURES</span>
+          <span className="callout">{mounted ? days : "–"} days recorded</span>
+          <span className="callout" style={{ background: "var(--terra)" }}>{mounted ? rooms : "–"} rooms</span>
+          <span className="callout" style={{ background: "var(--moss)" }}>{mounted ? captures : "–"} captures</span>
         </div>
       </section>
 
-      <ScentProfile />
+      <div id="profile" className="anchor"><ScentProfile /></div>
 
-      <section className="card" style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-        <h2 className="h-section" style={{ fontSize: 30 }}>My <em>preferences</em></h2>
+      <section id="preferences" className="card anchor" style={{ display: "flex", flexDirection: "column", gap: 18, background: "var(--apricot-soft)" }}>
+        <h2 className="h-section" style={{ fontSize: 34 }}>My preferences</h2>
         <span className="label-mono">Preferred scent styles</span>
         <div className="chips">
           {FAMILIES.map((f) => (
@@ -108,31 +108,31 @@ export function AccountView() {
         ) : null}
       </section>
 
-      <section className="card" style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-        <h2 className="h-section" style={{ fontSize: 30 }}>Personal <em>info</em></h2>
+      <section id="info" className="card anchor" style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+        <h2 className="h-section" style={{ fontSize: 34 }}>Personal info</h2>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 14 }}>
-          {["Name", "Username", "Email", "City, country"].map((l) => (
+          {["Username", "Email", "City, country"].map((l) => (
             <label key={l} className="field">{l}<input className="input" disabled placeholder="Available with accounts" /></label>
           ))}
         </div>
       </section>
 
-      <section className="card" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-        <h2 className="h-section" style={{ fontSize: 30 }}>Settings</h2>
+      <section id="settings" className="card anchor" style={{ display: "flex", flexDirection: "column", gap: 14, background: "var(--sea-soft)" }}>
+        <h2 className="h-section" style={{ fontSize: 34 }}>Settings</h2>
         <p className="muted" style={{ margin: 0 }}>Entries are saved in this browser only.</p>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
-          <button type="button" className="btn btn--ghost" onClick={() => { sampleEntries().forEach((e) => add(e)); show("Sample pages added", "/atlas", "Open Scent Atlas"); }}>Load sample pages</button>
+          <button type="button" className="btn btn--honey" onClick={() => { sampleEntries().forEach((e) => add(e)); show("Sample pages added", "/atlas", "Open Scent Atlas"); }}>Load sample pages</button>
           <button type="button" className="btn btn--ghost" onClick={exportData} disabled={!mounted || entries.length === 0}>Export my data</button>
           <button type="button" className="btn btn--ghost" disabled={!mounted || entries.length === 0} onClick={() => { if (window.confirm("Clear every entry saved in this browser?")) { clear(); show("This browser is cleared"); } }}>Clear this browser</button>
         </div>
       </section>
 
       <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 18 }}>
-        <Link href="/library" className="card" style={{ textDecoration: "none", color: "var(--ink)", display: "flex", flexDirection: "column", gap: 6 }}>
-          <strong style={{ fontSize: 22 }}>Scent Library</strong>
-          <span className="muted">The seven families and their stories.</span>
+        <Link href="/quiz" className="card" style={{ textDecoration: "none", color: "var(--ink)", display: "flex", flexDirection: "column", gap: 6, background: "var(--honey-soft)" }}>
+          <strong style={{ fontSize: 22 }}>Scent quiz</strong>
+          <span className="muted">Twenty questions, one of sixteen characters.</span>
         </Link>
-        <Link href="/about" className="card" style={{ textDecoration: "none", color: "var(--ink)", display: "flex", flexDirection: "column", gap: 6 }}>
+        <Link href="/about" className="card" style={{ textDecoration: "none", color: "var(--ink)", display: "flex", flexDirection: "column", gap: 6, background: "var(--rose-soft)" }}>
           <strong style={{ fontSize: 22 }}>About Olfia</strong>
           <span className="muted">Why we started, and what we believe.</span>
         </Link>

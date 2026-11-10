@@ -10,12 +10,61 @@ import { Icon, MenuMorph } from "@/components/ui/Icon";
 
 const isActive = (path: string, href: string) => (href === "/" ? path === "/" : path === href || path.startsWith(`${href}/`));
 
-const NAV = [
-  { href: "/", label: "Home" },
-  { href: "/capture", label: "Capture" },
-  { href: "/rooms", label: "Rooms" },
-  { href: "/atlas", label: "Scent Atlas" },
-  { href: "/edit", label: "The Edit" },
+type Sub = { href: string; label: string; dot: string };
+type NavItem = { href: string; label: string; icon?: "home" | "user"; sub: Sub[] };
+
+/**
+ * Main navigation (Tiffany 11/10): the house icon stands for Home again, My Account sits in the
+ * middle row, and every tab opens a small menu of the sections on that page when hovered or focused.
+ */
+const NAV: NavItem[] = [
+  {
+    href: "/", label: "Home", icon: "home", sub: [
+      { href: "/#quiz", label: "Scent quiz", dot: "#E7B49F" },
+      { href: "/#families", label: "Seven scent families", dot: "#B4552E" },
+      { href: "/#presets", label: "Room presets", dot: "#8FB5B8" },
+      { href: "/#edit", label: "The Olfia Edit", dot: "#7C8A4A" },
+    ],
+  },
+  {
+    href: "/capture", label: "Capture", sub: [
+      { href: "/capture", label: "Capture a scent", dot: "#E2A23B" },
+      { href: "/card", label: "Make a Scent Card", dot: "#C98A8A" },
+    ],
+  },
+  {
+    href: "/rooms", label: "Rooms", sub: [
+      { href: "/rooms#editor", label: "Room editor", dot: "#8A5A33" },
+      { href: "/rooms#your-rooms", label: "Your rooms", dot: "#E7B49F" },
+      { href: "/rooms#products", label: "Matches this room", dot: "#7C8A4A" },
+      { href: "/#presets", label: "Room presets", dot: "#8FB5B8" },
+    ],
+  },
+  {
+    href: "/atlas", label: "Scent Atlas", sub: [
+      { href: "/atlas?tab=calendar", label: "Calendar", dot: "#E7B49F" },
+      { href: "/atlas?tab=favorites", label: "Favorites", dot: "#A0A6C8" },
+      { href: "/atlas?tab=tags", label: "Tags & profile", dot: "#4C527A" },
+      { href: "/atlas?tab=shelf", label: "My shelf", dot: "#7C8A4A" },
+    ],
+  },
+  {
+    href: "/edit", label: "The Edit", sub: [
+      { href: "/library", label: "Scent Library", dot: "#C98A8A" },
+      { href: "/edit#latest", label: "Latest stories", dot: "#E2A23B" },
+      { href: "/edit#most-read", label: "Most read", dot: "#B4552E" },
+      { href: "/edit#topics", label: "Browse by topic", dot: "#8FB5B8" },
+    ],
+  },
+  {
+    href: "/account", label: "My Account", icon: "user", sub: [
+      { href: "/account#profile", label: "Scent profile", dot: "#A0A6C8" },
+      { href: "/account#preferences", label: "Preferences", dot: "#E7B49F" },
+      { href: "/account#info", label: "Personal info", dot: "#8FB5B8" },
+      { href: "/account#settings", label: "Settings", dot: "#7C8A4A" },
+      { href: "/about", label: "About Olfia", dot: "#4C527A" },
+    ],
+  },
 ];
 
 /** Pages that are mostly white work surfaces get a quieter backdrop. */
@@ -45,16 +94,35 @@ export function Header() {
       <div className="wrap hd__row">
         <Link href="/" className="hd__logo" aria-label="Olfia, home">Olfia</Link>
 
-        <nav aria-label="Main" className="glass-pill hd__full">
-          {NAV.map((n) => (
-            <Link key={n.href} href={n.href} className="hd__link" aria-current={cur(n.href)}>{n.label}</Link>
-          ))}
+        <nav aria-label="Main" className="hd__full">
+          <ul className="glass-pill hd__list">
+            {NAV.map((n) => (
+              <li key={n.href} className="hd__item">
+                <Link
+                  href={n.href}
+                  className={`hd__link${n.icon === "home" ? " hd__link--icon" : ""}`}
+                  aria-current={cur(n.href)}
+                  aria-label={n.icon === "home" ? "Home" : undefined}
+                >
+                  {n.icon === "home" ? <Icon name="home" size={24} /> : null}
+                  {n.icon === "user" ? <Icon name="user" size={24} /> : null}
+                  {n.icon === "home" ? null : n.label}
+                </Link>
+                <ul className="hd__sub" aria-label={`${n.label} sections`}>
+                  {n.sub.map((s) => (
+                    <li key={s.href + s.label}>
+                      <Link href={s.href}><span className="hd__dot" style={{ background: s.dot }} aria-hidden="true" />{s.label}</Link>
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            ))}
+          </ul>
         </nav>
 
-        <Link href="/account" className="hd__profile hd__full" aria-current={cur("/account")}>
-          <Icon name="user" size={24} />
-          My profile
-        </Link>
+        <div className="hd__end hd__full">
+          <Link href="/card" className="btn btn--ink btn--sm hd__cta" aria-current={cur("/card")}>Make a Scent Card</Link>
+        </div>
 
         <button type="button" className="hd__burger hd__mob" aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} onClick={() => setOpen((o) => !o)}>
           <MenuMorph open={open} />
@@ -63,11 +131,15 @@ export function Header() {
       {open ? (
         <nav aria-label="Menu" className="hd__menu hd__mob">
           {NAV.map((n) => (
-            <Link key={n.href} href={n.href} aria-current={cur(n.href)}>{n.label}</Link>
+            <div key={n.href} className="hd__menu-group">
+              <Link href={n.href} aria-current={cur(n.href)} className="hd__menu-main">{n.label}</Link>
+              <div className="hd__menu-sub">
+                {n.sub.map((s) => (
+                  <Link key={s.href + s.label} href={s.href}><span className="hd__dot" style={{ background: s.dot }} aria-hidden="true" />{s.label}</Link>
+                ))}
+              </div>
+            </div>
           ))}
-          <Link href="/quiz" aria-current={cur("/quiz")}>Scent quiz</Link>
-          <Link href="/library" aria-current={cur("/library")}>Scent Library</Link>
-          <Link href="/account" aria-current={cur("/account")}>My profile</Link>
         </nav>
       ) : null}
     </header>

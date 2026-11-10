@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
 import { strings } from "@/lib/strings";
+import { Icon } from "@/components/ui/Icon";
 
 /**
  * Home hero (2026-11-09): the cork scent design board, confirmed by Tiffany.
@@ -11,7 +12,14 @@ import { strings } from "@/lib/strings";
  * courtyard sketch drops branch shadows and clear light by the window. When the reference
  * changes, the old print lingers for a moment over the new one — the afterimage. "Layer both"
  * holds the overlap. Everything is drawn here as SVG; no photographs are used.
+ * 11/10 (Tiffany): the board plays by itself — Bookshop, Courtyard, Layer both — and stops when
+ * someone picks one; the scent words on the board and under the buttons are gone; both buttons
+ * share one style.
  */
+
+type Slide = "books" | "garden" | "both";
+const SLIDES: Slide[] = ["books", "garden", "both"];
+const SLIDE_MS = 4200;
 
 type Ref = "books" | "garden";
 
@@ -36,21 +44,52 @@ export function Hero() {
   const [ref, setRef] = useState<Ref>("books");
   const [ghost, setGhost] = useState<Ref | null>(null);
   const [both, setBoth] = useState(false);
+  const [playing, setPlaying] = useState(true);
   const timer = useRef<number | null>(null);
+  const refState = useRef<{ ref: Ref; both: boolean }>({ ref: "books", both: false });
+  refState.current = { ref, both };
 
   useEffect(() => () => { if (timer.current) window.clearTimeout(timer.current); }, []);
 
+  // auto-advance: bookshop -> courtyard -> both layered -> bookshop ...
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setPlaying(false);
+      return;
+    }
+  }, []);
+  useEffect(() => {
+    if (!playing) return;
+    const id = window.setInterval(() => {
+      const { ref: r, both: b } = refState.current;
+      const now: Slide = b ? "both" : r;
+      const next = SLIDES[(SLIDES.indexOf(now) + 1) % SLIDES.length];
+      if (next === "both") setBoth(true);
+      else { setBoth(false); choose(next); }
+    }, SLIDE_MS);
+    return () => window.clearInterval(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [playing]);
+
   const choose = (next: Ref) => {
-    if (next === ref) return;
+    const cur = refState.current.ref;
+    if (next === cur) return;
     // the reference that is leaving stays visible for a moment over the new one
-    setGhost(ref);
+    setGhost(cur);
     setRef(next);
     if (timer.current) window.clearTimeout(timer.current);
     timer.current = window.setTimeout(() => setGhost(null), 2600);
   };
   const onKey = (next: Ref) => (e: KeyboardEvent) => {
-    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); choose(next); }
+    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setPlaying(false); setBoth(false); choose(next); }
   };
+  const pick = (slide: Slide) => {
+    setPlaying(false);
+    if (slide === "both") { setBoth(true); return; }
+    setBoth(false);
+    choose(slide);
+  };
+  const current: Slide = both ? "both" : ref;
 
   const layer = (id: Ref): CSSProperties => {
     const on = both || ref === id;
@@ -75,14 +114,11 @@ export function Hero() {
     <section className="wrap hero">
       <div className="hero__text">
         <h1 className="hero__h1 anim-rise">Scent is an afterimage.</h1>
-        <p className="lead anim-rise" style={{ animationDelay: "0.12s" }}>{strings.brand.awareness} {strings.brand.invitation}</p>
-        <div className="anim-rise" style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "12px 24px", paddingTop: 8, animationDelay: "0.24s" }}>
+        <p className="lead anim-rise" style={{ animationDelay: "0.12s" }}>{strings.brand.awareness}</p>
+        <div className="anim-rise hero__ctas" style={{ animationDelay: "0.24s" }}>
           <Link href={`/rooms?family=${families}`} className="btn btn--primary">Open in Rooms</Link>
-          <Link href="/capture" className="hero__link">Capture a scent</Link>
+          <Link href="/capture" className="btn btn--apricot">Capture a scent</Link>
         </div>
-        <p className="hand anim-rise" aria-live="polite" style={{ fontSize: 26, color: "var(--deep)", paddingTop: 10, animationDelay: "0.36s" }}>
-          {both ? `${REFS.books.tag} + ${REFS.garden.tag}` : REFS[ref].tag}
-        </p>
       </div>
 
       <div className="hero__board anim-fade" style={{ animationDelay: "0.2s" }}>
@@ -225,7 +261,7 @@ export function Hero() {
           </g>
 
           {/* reference 1: bookshop photograph */}
-          <g role="button" tabIndex={0} aria-pressed={ref === "books" || both} aria-label={`${REFS.books.name}: try it on the sketch`} onClick={() => choose("books")} onKeyDown={onKey("books")} style={card("books", -7)} className="hero__ref">
+          <g role="button" tabIndex={0} aria-pressed={ref === "books" || both} aria-label={`${REFS.books.name}: try it on the sketch`} onClick={() => pick("books")} onKeyDown={onKey("books")} style={card("books", -7)} className="hero__ref">
             <g filter="url(#hb-shadow)">
               <rect x="22" y="170" width="168" height="206" fill="#FBFAF6" />
             </g>
@@ -242,12 +278,11 @@ export function Hero() {
               </g>
             ))}
             <rect x="34" y="182" width="144" height="144" fill="url(#hb-dots-s)" opacity="0.12" />
-            <text x="38" y="356" style={{ fontFamily: "var(--font-hand)", fontWeight: 700 }} fontSize="21" fill={PENCIL}>paperbacks after rain</text>
             <Pin x={106} y={174} />
           </g>
 
           {/* reference 2: courtyard sketch */}
-          <g role="button" tabIndex={0} aria-pressed={ref === "garden" || both} aria-label={`${REFS.garden.name}: try it on the sketch`} onClick={() => choose("garden")} onKeyDown={onKey("garden")} style={card("garden", 6)} className="hero__ref">
+          <g role="button" tabIndex={0} aria-pressed={ref === "garden" || both} aria-label={`${REFS.garden.name}: try it on the sketch`} onClick={() => pick("garden")} onKeyDown={onKey("garden")} style={card("garden", 6)} className="hero__ref">
             <g filter="url(#hb-shadow)">
               <path d="M598 262 l14 -4 14 3 16 -4 14 4 16 -3 14 4 16 -4 16 3 14 -2 V470 H598 Z" fill="#EEF0E2" />
             </g>
@@ -262,15 +297,6 @@ export function Hero() {
             <path d="M610 452 H742" stroke="#56653a" strokeWidth="1.4" />
             <Pin x={672} y={266} c="#7C8A4A" />
           </g>
-
-          {/* kraft tag: the scent this reference stands for */}
-          <g transform="translate(40 404) rotate(-3)" filter="url(#hb-shadow)">
-            <path d="M0 14 L16 0 H286 V40 H16 Z" fill="#E9D7B5" />
-            <circle cx="16" cy="20" r="4" fill="#C79F74" />
-          </g>
-          <text x="66" y="430" transform="rotate(-3 40 404)" style={{ fontFamily: "var(--font-hand)", fontWeight: 700 }} fontSize="22" fill={PENCIL}>
-            {REFS[ref].tag}
-          </text>
 
           {/* ledge: marker with its cap off, incense */}
           <g transform="rotate(-9 300 592)" filter="url(#hb-shadow)">
@@ -289,9 +315,15 @@ export function Hero() {
         </svg>
 
         <div className="hero__tools">
-          <button type="button" className="chip" aria-pressed={ref === "books" && !both} onClick={() => { setBoth(false); choose("books"); }}>Bookshop</button>
-          <button type="button" className="chip" aria-pressed={ref === "garden" && !both} onClick={() => { setBoth(false); choose("garden"); }}>Courtyard</button>
-          <button type="button" className="chip" aria-pressed={both} onClick={() => setBoth((b) => !b)}>Layer both</button>
+          {SLIDES.map((sl) => (
+            <button key={sl} type="button" className="chip hero__slide" aria-pressed={current === sl} onClick={() => pick(sl)}>
+              {sl === "books" ? "Bookshop" : sl === "garden" ? "Courtyard" : "Layer both"}
+              {current === sl && playing ? <span key={`${sl}-${ref}-${both}`} className="hero__progress" style={{ animationDuration: `${SLIDE_MS}ms` }} aria-hidden="true" /> : null}
+            </button>
+          ))}
+          <button type="button" className="tool hero__play" aria-label={playing ? "Pause the slideshow" : "Play the slideshow"} onClick={() => setPlaying((p) => !p)}>
+            <Icon name={playing ? "pause" : "play"} />
+          </button>
         </div>
       </div>
     </section>

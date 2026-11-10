@@ -234,27 +234,7 @@ export function RoomEditor() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
-      <section aria-label="Your rooms" className="strip">
-        {recent.map((r, i) => (
-          <Link key={r.id} href={`/rooms?id=${r.id}`} className="card" style={{ flex: "none", width: i === 0 ? 400 : 210, maxWidth: "80vw", display: "flex", gap: 16, alignItems: "center", padding: 14, textDecoration: "none", color: "var(--ink)", outline: r.id === entryId ? "2px solid var(--deep)" : undefined }}>
-            <div style={{ width: i === 0 ? 120 : 80, flex: "none" }}>
-              <ScenePage items={r.items} families={r.families} title="" date={new Date(r.updatedAt)} showLabels={false} time={r.time} strength={r.strength} windowOpen={r.windowOpen} prefix="olfia" />
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 4, minWidth: 0 }}>
-              <span className="label-mono" style={{ fontSize: 13 }}>{shortDate(new Date(r.updatedAt))}</span>
-              <span style={{ fontFamily: "var(--font-display)", fontSize: i === 0 ? 24 : 19, lineHeight: 1.1 }}>Reading Corner</span>
-              {r.nickname ? <span className="hand" style={{ fontSize: 20, color: "var(--deep)" }}>{r.nickname}</span> : null}
-              {i === 0 ? <span className="btn btn--primary btn--sm" style={{ alignSelf: "flex-start", marginTop: 6, height: 40 }}>Continue</span> : null}
-            </div>
-          </Link>
-        ))}
-        <Link href="/rooms" className="tray-item" style={{ flex: "none", width: 200, minHeight: 150, justifyContent: "center", border: "1.5px dashed rgba(76,82,122,0.45)", background: "transparent", color: "var(--deep)", fontSize: 17, textDecoration: "none" }}>
-          <Icon name="plus" />
-          New room
-        </Link>
-      </section>
-
-      <section aria-label="Room editor" className="editor">
+      <section id="editor" aria-label="Room editor" className="editor anchor">
         <div className="card editor__tray" style={{ padding: 18, display: "flex", flexDirection: "column", gap: 14 }}>
           <div role="tablist" aria-label="Items" className="seg">
             <span className="seg__thumb" aria-hidden="true" style={{ left: `calc(5px + (100% - 10px) * ${tray / 3})`, width: "calc((100% - 10px) / 3)" }} />
@@ -394,12 +374,37 @@ export function RoomEditor() {
 
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             <button type="button" className="btn btn--primary btn--block" onClick={() => save(false)}>{entryId ? "Save changes" : "Save room"}</button>
-            <button type="button" className="btn btn--ghost btn--block" onClick={() => save(true)}>Make a card</button>
+            <button type="button" className="btn btn--apricot btn--block" onClick={() => save(true)}>Make a card</button>
           </div>
         </div>
       </section>
 
-      <section className="card" style={{ marginTop: 32 }}>
+      <section id="your-rooms" aria-label="Your rooms" className="anchor" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+          <h2 style={{ fontSize: 28 }}>Your rooms</h2>
+          <Link href="/rooms" className="btn btn--ghost btn--sm" style={{ height: 40, gap: 6 }}><Icon name="plus" size={18} />New room</Link>
+        </div>
+        {recent.length ? (
+        <div className="strip">
+        {recent.map((r, i) => (
+          <Link key={r.id} href={`/rooms?id=${r.id}`} className="card" style={{ flex: "none", width: i === 0 ? 400 : 210, maxWidth: "80vw", display: "flex", gap: 16, alignItems: "center", padding: 14, textDecoration: "none", color: "var(--ink)", outline: r.id === entryId ? "2px solid var(--deep)" : undefined }}>
+            <div style={{ width: i === 0 ? 120 : 80, flex: "none" }}>
+              <ScenePage items={r.items} families={r.families} title="" date={new Date(r.updatedAt)} showLabels={false} time={r.time} strength={r.strength} windowOpen={r.windowOpen} prefix="olfia" />
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 4, minWidth: 0 }}>
+              <span className="label-mono" style={{ fontSize: 13 }}>{shortDate(new Date(r.updatedAt))}</span>
+              <span style={{ fontFamily: "var(--font-display)", fontSize: i === 0 ? 24 : 19, lineHeight: 1.1 }}>Reading Corner</span>
+              {r.nickname ? <span className="hand" style={{ fontSize: 20, color: "var(--deep)" }}>{r.nickname}</span> : null}
+              {i === 0 ? <span className="btn btn--primary btn--sm" style={{ alignSelf: "flex-start", marginTop: 6, height: 40 }}>Continue</span> : null}
+            </div>
+          </Link>
+        ))}
+        </div>
+        ) : <span className="muted" style={{ fontSize: 15 }}>Rooms you save land here.</span>}
+      </section>
+
+
+      <section id="products" className="card anchor" style={{ marginTop: 8, background: "var(--moss-soft)" }}>
         <ProductCards families={families} title="Matches this room" />
       </section>
     </div>

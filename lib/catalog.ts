@@ -47,7 +47,7 @@ export const FAMILIES: Family[] = [
     texture: "/assets/textures/texture-gourmand.webp",
     materials: [
       { id: "vanilla", label: "vanilla pod", colors: ["#5A3826", "#3A2418", "#8A6A50"], asset: "/assets/materials/gourmand-vanilla.webp" },
-      { id: "honeycomb", label: "honeycomb", colors: ["#E2A23B", "#C98522", "#F7D99A"] },
+      { id: "honeycomb", label: "honeycomb", colors: ["#E2A23B", "#C98522", "#F7D99A"], asset: "/assets/materials/gourmand-honeycomb.webp" },
       { id: "coffee", label: "coffee beans", colors: ["#5A3826", "#3A2418", "#8A5A33"], asset: "/assets/materials/gourmand-coffee.webp" },
     ],
   },
@@ -61,7 +61,7 @@ export const FAMILIES: Family[] = [
     materials: [
       { id: "cinnamon", label: "cinnamon", colors: ["#8E4A1F", "#7A3E19", "#C98A5A"], asset: "/assets/materials/spicy-cinnamon.webp" },
       { id: "resin", label: "resin", colors: ["#D08A45", "#A9662E", "#F2C98E"], asset: "/assets/materials/spicy-resin.webp" },
-      { id: "clove", label: "clove", colors: ["#6A3A22", "#4E2A18", "#9A6A4A"] },
+      { id: "clove", label: "clove", colors: ["#6A3A22", "#4E2A18", "#9A6A4A"], asset: "/assets/materials/spicy-clove.webp" },
     ],
   },
   {

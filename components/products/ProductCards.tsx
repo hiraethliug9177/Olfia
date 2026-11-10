@@ -8,9 +8,25 @@ import { Icon } from "@/components/ui/Icon";
 
 /**
  * Recommended products (B tier). 11/9 feedback 10: larger cards, less text, one line saying why
- * it fits this room, one combined "when" filter. Product photographs are not in yet; the card
- * shows the family's material texture until Tiffany supplies product images.
+ * it fits this room, one combined "when" filter.
+ * 11/10: instead of product photos, every card carries the same Olfia name tile — the brand name set
+ * in Newsreader on a cream label over the family colour and texture. Brand logos are the brands'
+ * own trademark artwork, so they are not redrawn here.
  */
+
+export function NameTile({ brand, kind, family, height }: { brand: string; kind: string; family: FamilyId; height?: number }) {
+  const f = familyById(family);
+  return (
+    <span className="ptile" style={{ backgroundColor: f.hex, height }} aria-hidden="true">
+      <span className="ptile__tex" style={{ backgroundImage: `url(${f.texture})` }} />
+      <span className="ptile__label">
+        <span className="ptile__brand">{brand}</span>
+        <span className="ptile__rule" />
+        <span className="ptile__type">{kind}</span>
+      </span>
+    </span>
+  );
+}
 
 type When = "any" | "mornings" | "evenings" | "warm" | "cold";
 const WHEN: Array<{ id: When; label: string }> = [
@@ -34,7 +50,7 @@ export function ProductCard({ p, match, onSimilar }: { p: Product; match?: Famil
   const why = shared.length ? `Shares ${shared.map((id) => familyById(id).label).join(" and ")} with this room` : p.families.map((id) => familyById(id).label).join(" and ");
   const body = (
     <>
-      <span className="pcard__visual" style={{ backgroundImage: `url(${f.texture})`, backgroundColor: f.hex }} aria-hidden="true" />
+      <NameTile brand={p.brand} kind={sourceLabel(p.type)} family={f.id} />
       <span className="pcard__body">
         <span className="pcard__brand">{p.brand} · {sourceLabel(p.type)} · {p.tier}</span>
         <span className="pcard__name">{p.name}</span>

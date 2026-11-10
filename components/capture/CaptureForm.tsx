@@ -24,10 +24,10 @@ import { newId, useAtlas, useMounted } from "@/lib/store";
 import { useToast } from "@/lib/toast";
 import { track } from "@/lib/analytics";
 import type { CaptureEntry, Daypart, EmotionId, FamilyId, MethodId, Occasion, RoomKind, Season, SourceKind } from "@/lib/types";
-import { dotDate } from "@/lib/dates";
 import { Atmosphere } from "@/components/scene/Atmosphere";
 import { ItemArt } from "@/components/scene/Cutout";
 import { Icon } from "@/components/ui/Icon";
+import { Stamp } from "@/components/scene/Stamp";
 
 /**
  * Capture as a step-by-step flow (11/4 feedback): one question per screen, a progress bar,
@@ -251,8 +251,8 @@ export function CaptureForm() {
   const progress = ((step + 1) / STEPS.length) * 100;
 
   return (
-    <div style={{ display: "flex", flexWrap: "wrap-reverse", alignItems: "flex-start", gap: 40 }}>
-      <div className="flow" style={{ flex: "1 1 560px", minWidth: 0 }}>
+    <div className="capture-layout">
+      <div className="flow" style={{ flex: "1 1 420px", minWidth: 0 }}>
         <div className="flow__bar" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progress)} aria-label="Capture progress">
           <span style={{ width: `${progress}%` }} />
         </div>
@@ -403,7 +403,7 @@ export function CaptureForm() {
           <button type="button" className="btn btn--ghost" onClick={back} disabled={step === 0} style={{ visibility: step === 0 ? "hidden" : "visible" }}>Back</button>
           <span className="mono muted" style={{ fontSize: 14 }}>{step + 1} / {STEPS.length}</span>
           {current === "finish" ? (
-            <button type="button" className="btn btn--primary" onClick={save} disabled={!canNext}>Save to Scent Atlas</button>
+            <button type="button" className="btn btn--terra" onClick={save} disabled={!canNext}>Save to Scent Atlas</button>
           ) : (
             <button type="button" className="btn btn--primary" onClick={next} disabled={!canNext}>{current === "occasion" && !occasion ? "Skip" : current === "emotions" && emotions.length === 0 ? "Skip" : "Next"}</button>
           )}
@@ -415,63 +415,86 @@ export function CaptureForm() {
         ) : null}
       </div>
 
-      <aside aria-label="Preview" style={{ flex: "1 1 320px", minWidth: 0, display: "flex", justifyContent: "center" }}>
-        <div className="scene-sheet" style={{ maxWidth: 340, width: "100%", rotate: "1.2deg" }}>
-          <div className="scene-sheet__paper" style={{ background: paper, transition: "background 0.8s var(--ease)" }}>
-            <div className="scene-sheet__grain" aria-hidden="true" />
-            <Atmosphere key={blendKey} families={chosen} intensity={0.9} />
-            <Setting room={room} daypart={daypart} />
-            <div className="scene-sheet__head">
-              <span>{room ? roomLabel(room) : season ? season[0].toUpperCase() + season.slice(1) : " "}</span>
-              <span>{mounted ? dotDate(new Date()) : ""}</span>
-            </div>
-            {/* blend: two aura clouds drift together */}
-            {chosen.map((f, i) => {
-              const fam = familyById(f);
-              const two = chosen.length === 2;
-              const style: CSSProperties = {
-                position: "absolute",
-                left: two ? (i === 0 ? "4%" : "38%") : "18%",
-                top: two ? (i === 0 ? "12%" : "24%") : "16%",
-                width: "62%",
-                aspectRatio: "1",
-                borderRadius: "50%",
-                background: `radial-gradient(circle, ${fam.glow} 0%, rgba(255,255,255,0) 68%)`,
-                filter: "blur(16px)",
-                opacity: 0.85,
-                transition: "left 1.1s var(--ease), top 1.1s var(--ease)",
-              };
-              return <div key={`${f}-${blendKey}`} className="anim-bloom" aria-hidden="true" style={style} />;
-            })}
-            {/* material stickers */}
-            {chosen.map((f, i) => {
-              const m = familyById(f).materials[0];
-              const spots = [{ l: "8%", t: "30%", r: -8 }, { l: "40%", t: "22%", r: 7 }];
-              const s = spots[i];
-              return (
-                <div key={`${m.id}-${i}`} className="anim-pin" aria-hidden="true" style={{ position: "absolute", left: s.l, top: s.t, width: "28%", aspectRatio: "1", rotate: `${s.r}deg` }}>
-                  <ItemArt kind={m.id} prefix="cap" />
-                  <span className="hand" style={{ position: "absolute", left: "50%", top: "100%", translate: "-50% 0", whiteSpace: "nowrap", fontSize: "max(13px, 5.5cqw)" }}>{m.label}</span>
-                </div>
-              );
-            })}
-            {/* scent source */}
-            {source && sourceDef ? (
-              <div className="anim-rise" aria-hidden="true" style={{ position: "absolute", left: "64%", bottom: "26.5%", width: `${Math.max(13, sourceDef.w * 150)}%`, aspectRatio: `${1 / sourceDef.aspect}` }}>
-                <ItemArt kind={sourceDef.id} prefix="cap" />
+      <aside aria-label="Preview" className="capture-aside">
+        <div
+          className="postcard"
+          style={{
+            "--pc-paper": paper,
+            "--stripe-a": chosen[0] ? familyById(chosen[0]).hex : "#4C527A",
+            "--stripe-b": chosen[1] ? familyById(chosen[1]).hex : chosen[0] ? "#4C527A" : "#E7B49F",
+          } as CSSProperties}
+        >
+          <div className="postcard__inner">
+            {/* the picture side: the place, its light, and what the scent brought */}
+            <div className="postcard__view">
+              <span className="tape tape--a" aria-hidden="true" />
+              <span className="tape tape--b" aria-hidden="true" />
+              <div className="postcard__photo" style={{ background: paper }}>
+                <Atmosphere key={blendKey} families={chosen} intensity={0.9} />
+                <Setting room={room} daypart={daypart} />
+                {chosen.map((f, i) => {
+                  const fam = familyById(f);
+                  const two = chosen.length === 2;
+                  const style: CSSProperties = {
+                    position: "absolute",
+                    left: two ? (i === 0 ? "2%" : "36%") : "16%",
+                    top: two ? (i === 0 ? "6%" : "18%") : "10%",
+                    width: "66%",
+                    aspectRatio: "1",
+                    borderRadius: "50%",
+                    background: `radial-gradient(circle, ${fam.glow} 0%, rgba(255,255,255,0) 68%)`,
+                    filter: "blur(16px)",
+                    opacity: 0.85,
+                    transition: "left 1.1s var(--ease), top 1.1s var(--ease)",
+                  };
+                  return <div key={`${f}-${blendKey}`} className="anim-bloom" aria-hidden="true" style={style} />;
+                })}
+                {chosen.map((f, i) => {
+                  const m = familyById(f).materials[0];
+                  const spots = [{ l: "8%", t: "22%", r: -8 }, { l: "38%", t: "12%", r: 7 }];
+                  const sp = spots[i];
+                  return (
+                    <div key={`${m.id}-${i}`} className="anim-pin" aria-hidden="true" style={{ position: "absolute", left: sp.l, top: sp.t, width: "26%", aspectRatio: "1", rotate: `${sp.r}deg` }}>
+                      <ItemArt kind={m.id} prefix="cap" />
+                    </div>
+                  );
+                })}
+                {source && sourceDef ? (
+                  <div className="anim-rise" aria-hidden="true" style={{ position: "absolute", left: "64%", bottom: "26.5%", width: `${Math.max(12, sourceDef.w * 130)}%`, aspectRatio: `${1 / sourceDef.aspect}` }}>
+                    <ItemArt kind={sourceDef.id} prefix="cap" />
+                  </div>
+                ) : null}
+                <span className="postcard__place">{room ? roomLabel(room) : season ? SEASON_OPTIONS.find((x) => x.id === season)?.label : " "}</span>
               </div>
-            ) : null}
-            {/* emotion word */}
-            {emotions[0] ? (
-              <span className="hand anim-rise" style={{ position: "absolute", left: "8%", top: "9%", fontSize: "max(20px, 9cqw)", color: "var(--deep)", rotate: "-6deg" }}>
-                {EMOTION_OPTIONS.find((e) => e.id === emotions[0])?.label.toLowerCase()}
-              </span>
-            ) : null}
-            <div style={{ position: "absolute", left: "6%", right: "6%", bottom: "5%", display: "flex", flexDirection: "column", gap: 4 }}>
-              <span style={{ fontFamily: "var(--font-display)", fontStyle: "italic", fontSize: "max(18px, 7cqw)", lineHeight: 1.05 }}>
-                {mode === "product" && scentName ? scentName : source ? sourceLabel(source) : "Your scent"}
-              </span>
-              <span className="hand muted" style={{ fontSize: "max(15px, 6cqw)" }}>{momentName || " "}</span>
+            </div>
+
+            <span className="postcard__divider" aria-hidden="true" />
+
+            {/* the writing side: stamp, postmark, message, address lines */}
+            <div className="postcard__back">
+              <div className="postcard__corner">
+                <span className="postcard__stamp" style={{ background: chosen[0] ? familyById(chosen[0]).hex : "#A0A6C8" }}>
+                  {chosen[0] ? <span className="postcard__stamp-img" style={{ backgroundImage: `url(${familyById(chosen[0]).texture})` }} /> : null}
+                  <span className="postcard__stamp-name">{chosen[0] ? familyById(chosen[0]).label : "Olfia"}</span>
+                </span>
+                <span className="postcard__postmark">
+                  {chosen[0] ? <Stamp family={chosen[0]} size={120} rot={-12} /> : null}
+                  <svg viewBox="0 0 120 40" className="postcard__waves" aria-hidden="true">
+                    {[8, 20, 32].map((y) => <path key={y} d={`M0 ${y} q10 -6 20 0 t20 0 t20 0 t20 0 t20 0 t20 0`} fill="none" stroke="currentColor" strokeWidth="2" />)}
+                  </svg>
+                </span>
+              </div>
+              <div className="postcard__message">
+                {emotions.length ? <span className="postcard__feel">{emotions.map((id) => EMOTION_OPTIONS.find((e) => e.id === id)?.label.toLowerCase()).join(" & ")}</span> : null}
+                <span className="postcard__name">{momentName || " "}</span>
+                {sentence ? <span className="postcard__sentence">{sentence}</span> : null}
+              </div>
+              <div className="postcard__lines">
+                <span className="postcard__line postcard__line--title">{mode === "product" && (scentName || productName) ? [scentName, productName].filter(Boolean).join(", ") : source ? sourceLabel(source) : " "}</span>
+                <span className="postcard__line">{[occasion ? OCCASION_OPTIONS.find((o) => o.id === occasion)?.label : null, daypart ? DAYPART_OPTIONS.find((d) => d.id === daypart)?.label : null].filter(Boolean).join(" · ") || " "}</span>
+                <span className="postcard__line postcard__line--tags">{tags.length ? tags.slice(0, 5).map((t) => `#${t}`).join(" ") : " "}</span>
+                <span className="postcard__date">{mounted ? new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : ""}</span>
+              </div>
             </div>
           </div>
         </div>

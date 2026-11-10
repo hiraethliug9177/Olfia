@@ -5,7 +5,9 @@ import type { FamilyId, PlacedItem, TimeOfDay } from "@/lib/types";
  * Room presets for the Home gallery (11/9 feedback 04: the examples all looked like one room).
  * Each preset differs in furniture, light and scent. Only furniture that exists as art is used;
  * Uses Tiffany's 11/10 furniture cut-outs. Kitchen and bathroom wait for their items.
- * Names and lines are placeholders. TODO(Tiffany): rename and rewrite.
+ * Lines drafted by Claude on 2026-11-10 with Tiffany's go-ahead ("generate them or leave them
+ * blank"); she can replace them at any time. Each covers the scent source, the light, and one
+ * small human detail, without repeating the room or family name.
  */
 export interface RoomPreset {
   id: string;
@@ -22,7 +24,7 @@ export const ROOM_PRESETS: RoomPreset[] = [
   {
     id: "reading-night",
     name: "Reading corner, night",
-    line: "TODO(Tiffany): one line.",
+    line: "A cedar candle burning low, one lamp on, a page folded down.",
     families: ["woody", "spicy"],
     time: "night",
     items: [...baseLayout("candle"), ...stickersFor(["woody", "spicy"])],
@@ -30,7 +32,7 @@ export const ROOM_PRESETS: RoomPreset[] = [
   {
     id: "bedroom-morning",
     name: "Bedroom, morning",
-    line: "TODO(Tiffany): one line.",
+    line: "Bergamot mist from the diffuser, blinds half up, sheets still warm.",
     families: ["citrus", "fresh"],
     time: "morning",
     items: [
@@ -45,7 +47,7 @@ export const ROOM_PRESETS: RoomPreset[] = [
   {
     id: "study-afternoon",
     name: "Study, afternoon",
-    line: "TODO(Tiffany): one line.",
+    line: "Cedar incense in slanting sun, a pencil tucked behind one ear.",
     families: ["woody", "green"],
     time: "afternoon",
     items: [
@@ -62,7 +64,7 @@ export const ROOM_PRESETS: RoomPreset[] = [
   {
     id: "living-night",
     name: "Living room, late",
-    line: "TODO(Tiffany): one line.",
+    line: "A vanilla-clove candle, the record on side two, shoes kicked off.",
     families: ["gourmand", "spicy"],
     time: "night",
     items: [

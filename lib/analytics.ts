@@ -11,6 +11,8 @@ type EventMap = {
   entry_deleted: { mode: Mode };
   quiz_complete: { code: string; family: string };
   quiz_share: { method: "download" | "share" };
+  shelf_link_read: { from: "page" | "address"; matched: 0 | 1 };
+  shelf_item_added: { mode: "photo" | "link" };
 };
 
 const enabled = typeof process !== "undefined" && Boolean(process.env.NEXT_PUBLIC_GA_ID);

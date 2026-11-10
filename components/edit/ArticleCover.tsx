@@ -5,6 +5,61 @@ import type { Article } from "@/lib/edit";
 
 /** Drawn covers: used when an article has no photograph, or when its source stops serving one. */
 function Drawn({ kind }: { kind: Article["fallback"] }) {
+  if (kind === "books") {
+    return (
+      <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <rect width="400" height="300" fill="#3d2616" />
+        <circle cx="300" cy="70" r="90" fill="#F2B45A" opacity="0.28" />
+        {[0, 1, 2].map((r) => (
+          <g key={r}>
+            <rect x="20" y={96 + r * 82} width="360" height="7" fill="#24150b" />
+            {Array.from({ length: 16 }, (_, b) => {
+              const cols = ["#B4552E", "#D4A26A", "#7C8A4A", "#E7D7B4", "#8A5A33", "#4C527A", "#C98A8A"];
+              const h = 46 + ((b * 5 + r * 3) % 4) * 6;
+              return <rect key={b} x={26 + b * 22} y={96 + r * 82 - h} width={18} height={h} fill={cols[(b * 3 + r * 2) % cols.length]} opacity="0.92" />;
+            })}
+          </g>
+        ))}
+      </svg>
+    );
+  }
+  if (kind === "rain") {
+    return (
+      <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <rect width="400" height="300" fill="#5E6F78" />
+        <rect y="190" width="400" height="110" fill="#3F4A52" />
+        <g fill="#7E9099">{[20, 90, 170, 250, 320].map((x, i) => <rect key={x} x={x} y={60 + (i % 2) * 24} width="58" height={130 - (i % 2) * 24} />)}</g>
+        <g fill="#F2D27A" opacity="0.8">{[34, 104, 184, 264, 334].map((x) => <rect key={x} x={x} y="110" width="10" height="14" />)}</g>
+        <g fill="#F2D27A" opacity="0.35">{[34, 104, 184, 264, 334].map((x) => <rect key={x} x={x - 4} y="214" width="18" height="40" />)}</g>
+        <g stroke="#DCEAEB" strokeWidth="2" strokeLinecap="round" opacity="0.6">
+          {Array.from({ length: 40 }, (_, i) => <path key={i} d={`M${(i * 37) % 400} ${(i * 53) % 280} l-6 16`} />)}
+        </g>
+      </svg>
+    );
+  }
+  if (kind === "tomato") {
+    return (
+      <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <rect width="400" height="300" fill="#E3E8D3" />
+        <path d="M200 0 C 210 90, 180 170, 210 300" stroke="#56653a" strokeWidth="8" fill="none" />
+        {[[160, 70, -30], [244, 110, 30], [150, 160, -40], [252, 200, 25], [170, 250, -20]].map(([x, y, a], i) => (
+          <ellipse key={i} cx={x} cy={y} rx="58" ry="22" fill="#7C8A4A" transform={`rotate(${a} ${x} ${y})`} />
+        ))}
+        <circle cx="250" cy="150" r="34" fill="#C9452E" /><circle cx="196" cy="196" r="30" fill="#E07A3E" /><circle cx="236" cy="236" r="26" fill="#9FB04E" />
+      </svg>
+    );
+  }
+  if (kind === "vanilla") {
+    return (
+      <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <rect width="400" height="300" fill="#F2C94C" />
+        <path d="M70 230 C 150 190, 260 120, 340 60" stroke="#3A2418" strokeWidth="14" strokeLinecap="round" fill="none" />
+        <path d="M76 226 C 156 186, 262 118, 334 64" stroke="#5A3826" strokeWidth="4" strokeLinecap="round" fill="none" opacity="0.7" />
+        <g fill="#FBF6E6"><ellipse cx="112" cy="96" rx="26" ry="12" transform="rotate(-30 112 96)" /><ellipse cx="96" cy="120" rx="26" ry="12" transform="rotate(40 96 120)" /><ellipse cx="130" cy="122" rx="26" ry="12" transform="rotate(100 130 122)" /></g>
+        <circle cx="112" cy="112" r="7" fill="#E2A23B" />
+      </svg>
+    );
+  }
   if (kind === "pool") {
     return (
       <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">

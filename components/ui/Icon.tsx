@@ -1,9 +1,9 @@
 "use client";
 
 import {
-  ArrowLeft, ArrowRight, BookOpen, Check, ChevronLeft, ChevronRight, CircleUserRound, Copy, Download,
-  ExternalLink, FlipHorizontal2, Instagram, Layers, Mail, Menu, Minus, Plus, Redo2, RotateCcw, RotateCw,
-  SendToBack, Share2, Trash2, Undo2, X, type LucideIcon,
+  ArrowLeft, ArrowRight, BookOpen, Check, ChevronDown, ChevronLeft, ChevronRight, CircleUserRound, Copy, Download,
+  ExternalLink, FlipHorizontal2, House, ImagePlus, Instagram, Layers, Link2, Mail, Menu, Minus, Pause, Play, Plus,
+  Redo2, RotateCcw, RotateCw, SendToBack, Share2, Trash2, Undo2, X, type LucideIcon,
 } from "lucide-react";
 
 /**
@@ -12,7 +12,13 @@ import {
  * Icon-only buttons must carry their own aria-label; the svg is aria-hidden.
  */
 const ICONS = {
+  home: House,
   user: CircleUserRound,
+  chevronDown: ChevronDown,
+  imagePlus: ImagePlus,
+  link: Link2,
+  play: Play,
+  pause: Pause,
   arrowRight: ArrowRight,
   arrowLeft: ArrowLeft,
   chevronLeft: ChevronLeft,

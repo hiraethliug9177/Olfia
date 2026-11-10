@@ -17,6 +17,18 @@ import { ScenePage } from "@/components/scene/ScenePage";
 import { ScentProfile } from "@/components/account/ScentProfile";
 import { Stamp } from "@/components/scene/Stamp";
 import { useSearchParams } from "next/navigation";
+import { Shelf } from "@/components/atlas/Shelf";
+
+/** Atlas views and their colours (Tiffany 11/10: each panel in one of the site's own colours). */
+const TABS = ["calendar", "favorites", "tags", "shelf"] as const;
+type TabId = 0 | 1 | 2 | 3;
+const TAB_LABELS = ["Calendar", "Favorites", "Tags & profile", "My shelf"];
+function tabFromParams(p: URLSearchParams | null): TabId {
+  const t = p?.get("tab");
+  const i = TABS.indexOf((t ?? "") as (typeof TABS)[number]);
+  if (i >= 0) return i as TabId;
+  return p?.get("tag") ? 2 : 0;
+}
 
 function entryTitle(e: Entry): string {
   if (e.type === "rooms") return e.nickname ? `Reading Corner · ${e.nickname}` : "Reading Corner";
@@ -44,11 +56,17 @@ export function AtlasView() {
   const show = useToast((s) => s.show);
 
   const params = useSearchParams();
-  const [tab, setTab] = useState<0 | 1 | 2>(params.get("tag") ? 2 : 0);
+  const [tab, setTab] = useState<TabId>(tabFromParams(params));
   const [tag, setTag] = useState<string | null>(params.get("tag"));
   const [fav, setFav] = useState<0 | 1>(0);
   const [ym, setYm] = useState<{ y: number; m: number } | null>(null);
   const [day, setDay] = useState<number>(1);
+
+  // the header menu links to /atlas?tab=…; follow it when the address changes
+  useEffect(() => {
+    setTab(tabFromParams(params));
+    if (params.get("tag")) setTag(params.get("tag"));
+  }, [params]);
 
   useEffect(() => {
     if (!mounted || ym) return;
@@ -128,13 +146,15 @@ export function AtlasView() {
       </div>
 
       <div role="tablist" aria-label="Atlas views" className="folder-tabs">
-        <button type="button" role="tab" aria-selected={tab === 0} className="folder-tab" onClick={() => setTab(0)}>Calendar</button>
-        <button type="button" role="tab" aria-selected={tab === 1} className="folder-tab" onClick={() => setTab(1)}>Favorites</button>
-        <button type="button" role="tab" aria-selected={tab === 2} className="folder-tab" onClick={() => setTab(2)}>Tags &amp; profile</button>
+        {TAB_LABELS.map((label, i) => (
+          <button key={label} type="button" role="tab" aria-selected={tab === i} className={`folder-tab folder-tab--${i}`} onClick={() => setTab(i as TabId)}>{label}</button>
+        ))}
       </div>
 
-      <div className="card" style={{ padding: 0, borderRadius: 28 }}>
-        {entries.length === 0 ? (
+      <div className={`atlas-panel atlas-panel--${tab}${tab === 2 && entries.length > 0 ? " panel--deep" : ""}`}>
+        {tab === 3 ? (
+          <div style={{ padding: "32px 28px" }}><Shelf /></div>
+        ) : entries.length === 0 ? (
           <div style={{ padding: "56px 32px", display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 16 }}>
             <span className="hand" style={{ fontSize: 30, color: "var(--deep)" }}>nothing pinned yet</span>
             <p className="lead">Save a room or capture a scent, and it lands here as a page of the month.</p>
@@ -217,7 +237,7 @@ export function AtlasView() {
               <div className="stat" style={{ flex: "2 1 420px" }}>
                 <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 12 }}>
                   <span className="label-mono">Families this month</span>
-                  <span className="callout">{byDay.size} DAYS RECORDED</span>
+                  <span className="callout">{byDay.size} days recorded</span>
                 </div>
                 {share.length ? (
                   <>
@@ -238,7 +258,7 @@ export function AtlasView() {
                 {(["morning", "afternoon", "night"] as const).map((k) => (
                   <div key={k} style={{ display: "flex", alignItems: "center", gap: 10 }}>
                     <span className="mono" style={{ width: 92, fontSize: 14, textTransform: "capitalize" }}>{k}</span>
-                    <span className="bar"><span style={{ width: `${(tod[k] / maxTod) * 100}%`, background: "#A0A6C8" }} /></span>
+                    <span className="bar"><span style={{ width: `${(tod[k] / maxTod) * 100}%`, background: "#4C527A" }} /></span>
                     <span className="mono" style={{ width: 24, textAlign: "right", fontSize: 14 }}>{tod[k]}</span>
                   </div>
                 ))}
@@ -248,7 +268,7 @@ export function AtlasView() {
                 {kindRows.length ? kindRows.map(([k, n]) => (
                   <div key={k} style={{ display: "flex", alignItems: "center", gap: 10 }}>
                     <span className="mono" style={{ width: 92, fontSize: 14 }}>{k}</span>
-                    <span className="bar"><span style={{ width: `${(n / maxKind) * 100}%`, background: "#E7B49F" }} /></span>
+                    <span className="bar"><span style={{ width: `${(n / maxKind) * 100}%`, background: "#B4552E" }} /></span>
                     <span className="mono" style={{ width: 24, textAlign: "right", fontSize: 14 }}>{n}</span>
                   </div>
                 )) : <span className="muted">—</span>}
@@ -275,7 +295,7 @@ export function AtlasView() {
                   {tag ? (
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 16 }}>
                       {list.map((e) => (
-                        <div key={e.id} style={{ display: "flex", flexDirection: "column", gap: 8, padding: 16, borderRadius: 18, background: "var(--ivory)" }}>
+                        <div key={e.id} className="light" style={{ display: "flex", flexDirection: "column", gap: 8, padding: 16, borderRadius: 18, background: "var(--ivory)" }}>
                           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                             {e.families[0] ? <Stamp family={e.families[0]} size={48} /> : null}
                             <span style={{ display: "flex", flexDirection: "column", gap: 2 }}>
