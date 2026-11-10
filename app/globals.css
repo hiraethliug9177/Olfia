@@ -644,6 +644,7 @@ body::after {
 .tape--a { left: -14px; top: 14px; rotate: -32deg; }
 .tape--b { right: -14px; top: 14px; rotate: 32deg; background: repeating-linear-gradient(90deg, rgba(160,166,200,0.75) 0 10px, rgba(227,229,241,0.8) 10px 20px); }
 @media (max-width: 860px) { .lib-block { grid-template-columns: minmax(0, 1fr); padding: 22px; } }
+.lib-collage .tape { width: 17cqw; height: 4cqw; }
 .lib-fam-card { display: flex; flex-wrap: wrap; gap: 32px; align-items: flex-start; padding: 36px; border-radius: 32px; scroll-margin-top: 24px; }
 .lib-fam-card__mark { flex: 0 0 auto; width: 150px; display: flex; flex-direction: column; align-items: flex-start; gap: 14px; }
 .lib-fam-card__num { font-family: var(--font-display); font-size: 44px; font-weight: 700; line-height: 1; color: rgba(41,42,49,0.35); }
@@ -672,7 +673,8 @@ body::after {
 .letter__sign { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 12px; margin-top: 36px; padding-top: 20px; border-top: 1px solid rgba(41,42,49,0.14); }
 
 /* ---------- Capture: a travel postcard (11/10) ---------- */
-.capture-layout { display: flex; flex-wrap: wrap-reverse; align-items: flex-start; gap: 40px; }
+.capture-layout { display: flex; flex-wrap: wrap-reverse; align-items: flex-end; gap: 40px; }
+/* wrap-reverse swaps the cross axis: flex-end keeps both columns aligned at the top */
 .capture-aside { flex: 1.45 1 560px; min-width: 0; position: sticky; top: 20px; }
 @media (max-width: 1060px) { .capture-aside { position: static; } }
 .postcard { --pc-paper: #f5eee1; --stripe-a: #4c527a; --stripe-b: #e7b49f; container-type: inline-size; position: relative; width: 100%; max-width: 820px; margin: 0 auto; padding: 1.6cqw; border-radius: 10px; rotate: -1deg;
@@ -685,26 +687,27 @@ body::after {
 .postcard__view .tape--a { left: -2cqw; top: -0.6cqw; }
 .postcard__view .tape--b { right: -2cqw; top: -0.6cqw; }
 .postcard__photo { position: relative; flex: 1; overflow: hidden; border: 1.4cqw solid #fff; box-shadow: 0 1cqw 2cqw rgba(41,42,49,0.2); rotate: -1.6deg; transition: background 0.8s var(--ease); }
-.postcard__place { position: absolute; left: 4%; bottom: 3%; z-index: 70; max-width: 92%; font-family: var(--font-display); font-style: italic; font-weight: 600; font-size: 6.4cqw; line-height: 1; color: #fff; text-shadow: 0 0.3cqw 1.2cqw rgba(41,42,49,0.55); }
+.postcard__place { position: absolute; left: 4%; bottom: 3%; z-index: 70; max-width: 92%; font-family: var(--font-display); font-style: italic; font-weight: 600; font-size: max(24px, 6.4cqw); line-height: 1; color: #fff; text-shadow: 0 0.3cqw 1.2cqw rgba(41,42,49,0.55); }
 .postcard__divider { width: 1px; background: rgba(41,42,49,0.22); margin: 2cqw 0; }
 .postcard__back { position: relative; display: flex; flex-direction: column; min-width: 0; gap: 1.6cqw; }
 .postcard__corner { position: relative; display: flex; justify-content: flex-end; height: 15cqw; }
 .postcard__stamp { position: relative; width: 11.5cqw; height: 14cqw; padding: 0.9cqw; background-clip: content-box; outline: 0.9cqw dotted var(--pc-paper); outline-offset: -0.45cqw; box-shadow: 0 0 0 0.9cqw #fbfaf6; margin: 0.9cqw; rotate: 3deg; transition: background-color 0.6s; }
 .postcard__stamp-img { position: absolute; inset: 0.9cqw; background-size: cover; background-position: center; mix-blend-mode: multiply; opacity: 0.8; }
-.postcard__stamp-name { position: absolute; left: 0.9cqw; right: 0.9cqw; bottom: 1.4cqw; text-align: center; font-family: var(--font-display); font-weight: 600; font-size: max(10px, 1.5cqw); line-height: 1.05; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.35); }
+.postcard__stamp-name { position: absolute; left: 0.9cqw; right: 0.9cqw; bottom: 1.4cqw; text-align: center; font-family: var(--font-display); font-weight: 600; font-size: max(13px, 1.5cqw); line-height: 1.05; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.35); }
 .postcard__postmark { position: absolute; right: 7cqw; top: 3cqw; display: flex; align-items: center; color: rgba(41,42,49,0.55); pointer-events: none; }
 .postcard__postmark .stamp { width: 12cqw; height: 12cqw; opacity: 0.85; }
 .postcard__waves { width: 14cqw; height: 4.6cqw; margin-left: -1cqw; color: rgba(41,42,49,0.45); }
 .postcard__message { display: flex; flex-direction: column; gap: 0.8cqw; flex: 1; min-height: 0; font-family: var(--font-hand); font-weight: 700; color: var(--ink); }
-.postcard__feel { font-size: 3.4cqw; line-height: 1; color: var(--deep); rotate: -3deg; align-self: flex-start; }
-.postcard__name { font-size: 3.6cqw; line-height: 1.05; }
-.postcard__sentence { font-size: 2.7cqw; line-height: 1.15; color: var(--slate); }
+.postcard__feel { font-size: max(20px, 3.4cqw); line-height: 1; color: var(--deep); rotate: -3deg; align-self: flex-start; }
+.postcard__name { font-size: max(20px, 3.6cqw); line-height: 1.05; }
+.postcard__sentence { font-size: max(17px, 2.7cqw); line-height: 1.15; color: var(--slate); }
 .postcard__lines { display: flex; flex-direction: column; gap: 0.4cqw; }
-.postcard__line { display: block; min-height: 3.6cqw; padding: 0.6cqw 0 0.3cqw; border-bottom: 1px solid rgba(41,42,49,0.3); font-family: var(--font-ui); font-size: max(12px, 1.6cqw); line-height: 1.4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.postcard__line { display: block; min-height: 3.6cqw; padding: 0.6cqw 0 0.3cqw; border-bottom: 1px solid rgba(41,42,49,0.3); font-family: var(--font-ui); font-size: max(13px, 1.6cqw); line-height: 1.4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .postcard__line--title { font-family: var(--font-display); font-weight: 600; font-size: max(14px, 2.4cqw); }
 .postcard__line--tags { color: var(--deep); }
-.postcard__date { align-self: flex-end; margin-top: 0.6cqw; font-family: var(--font-ui); font-size: max(12px, 1.4cqw); color: var(--slate); }
+.postcard__date { align-self: flex-end; margin-top: 0.6cqw; font-family: var(--font-ui); font-size: max(13px, 1.4cqw); color: var(--slate); }
 @media (max-width: 640px) { .postcard { rotate: 0deg; } }
+
 
 /* ---------- Scent Atlas: My shelf ---------- */
 .shelf { display: flex; flex-direction: column; gap: 32px; }

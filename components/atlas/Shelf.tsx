@@ -206,7 +206,7 @@ export function Shelf() {
                   <button key={r.id} type="button" className="chip" aria-pressed={draft.routine === r.id} onClick={() => set("routine", r.id)}>{r.label}</button>
                 ))}
               </div>
-              <label className="field">A note <span className="field__hint">(optional)</span>
+              <label className="field"><span>A note <span className="field__hint">(optional)</span></span>
                 <input className="input" value={draft.note} onChange={(e) => set("note", e.target.value)} maxLength={120} placeholder="Two sprays in the hallway before guests arrive" />
               </label>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>

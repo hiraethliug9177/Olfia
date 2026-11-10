@@ -58,7 +58,7 @@ const NAV: NavItem[] = [
   },
   {
     href: "/account", label: "My Account", icon: "user", sub: [
-      { href: "/account#profile", label: "Scent profile", dot: "#A0A6C8" },
+      { href: "/account#profile", label: "Your profile", dot: "#A0A6C8" },
       { href: "/account#preferences", label: "Preferences", dot: "#E7B49F" },
       { href: "/account#info", label: "Personal info", dot: "#8FB5B8" },
       { href: "/account#settings", label: "Settings", dot: "#7C8A4A" },
@@ -87,7 +87,8 @@ export function Header() {
   const [open, setOpen] = useState(false);
   useRehydrateAtlas();
   useEffect(() => setOpen(false), [path]);
-  const cur = (href: string) => (isActive(path, href) ? "page" : undefined);
+  // the Scent Library is part of The Edit since 11/10
+  const cur = (href: string) => (isActive(path, href) || (href === "/edit" && path.startsWith("/library")) ? "page" : undefined);
 
   return (
     <header className="hd">
