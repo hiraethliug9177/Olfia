@@ -7,34 +7,42 @@ import { ItemArt } from "@/components/scene/Cutout";
 import { Atmosphere } from "@/components/scene/Atmosphere";
 
 /**
- * Seven families as an old rotary telephone dial (11/10, Tiffany's reference): a brushed
- * metal plate, a finger wheel with seven holes that each show the family's material photo,
- * a cream paper label in the middle and a finger stop. Picking a family turns the wheel until
- * that hole rests against the stop; the label reads the name. The panel beside it shows the
- * real materials, what it smells like, and one action: take it into Rooms.
+ * Seven families as an old rotary telephone dial (Tiffany's reference, 11/10).
+ * A satin metal plate inside a raised rim; a finger wheel of seven recessed, chrome-rimmed holes,
+ * each holding the family's plain colour circle (Tiffany 11/10: keep the pure colour circles);
+ * a cream label in a metal bezel; a chrome finger stop. Picking a family turns the wheel until that
+ * hole rests beside the stop, and the label reads its name.
  */
+
+/** Where the chosen hole comes to rest: degrees clockwise from 3 o'clock (here, 4 o'clock). */
+const REST = 30;
+
+/** The finger stop, drawn in the dial's 400 × 400 box: from just outside the rim, curving inward. */
+const STOP = "M303.8 387.2 Q288 352.4 292.4 318.2";
+
 export function FamilyWheel() {
   const n = FAMILIES.length;
+  const step = 360 / n;
   const [k, setK] = useState(3);
-  const [turn, setTurn] = useState(60 - 3 * (360 / n));
+  const [turn, setTurn] = useState(REST - 3 * step);
   const sel = FAMILIES[k];
   const prev = FAMILIES[(k + n - 1) % n];
   const next = FAMILIES[(k + 1) % n];
 
   const pick = (j: number) => {
     if (j === k) return;
-    // shortest way round
+    // turn the shortest way round
     let d = j - k;
     if (d > n / 2) d -= n;
     if (d < -n / 2) d += n;
-    setTurn((t) => t - d * (360 / n));
+    setTurn((t) => t - d * step);
     setK(j);
   };
 
-  const step = 360 / n;
   return (
     <div className="dial-wrap">
       <div className="rotary" role="radiogroup" aria-label="Scent families">
+        <div className="rotary__rim" aria-hidden="true" />
         <div className="rotary__plate" aria-hidden="true" />
         <div className="rotary__wheel" style={{ transform: `rotate(${turn}deg)` }}>
           {FAMILIES.map((f, j) => (
@@ -46,24 +54,28 @@ export function FamilyWheel() {
               aria-label={f.label}
               className="rotary__hole"
               onClick={() => pick(j)}
+              // the last rotate keeps each hole's lighting upright while the wheel turns
               style={{ transform: `rotate(${j * step}deg) translateX(var(--hole-r)) rotate(${-(j * step) - turn}deg)` }}
             >
-              <span className="rotary__photo" style={{ backgroundImage: `url(${f.texture})`, backgroundColor: f.hex }} />
-              <span className="rotary__tint" style={{ background: f.hex }} />
+              <span className="rotary__color" style={{ background: f.hex }} />
             </button>
           ))}
         </div>
-        <div className="rotary__label">
-          <span className="rotary__name">{sel.label}</span>
-          <span className="rotary__dot" style={{ background: sel.hex }} />
+        <div className="rotary__bezel" aria-hidden="true">
+          <div className="rotary__label">{sel.label}</div>
         </div>
-        <svg className="rotary__stop" viewBox="0 0 60 90" aria-hidden="true">
+        <svg className="rotary__stop" viewBox="0 0 400 400" aria-hidden="true">
           <defs>
-            <linearGradient id="stop-metal" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0" stopColor="#f2f2ef" /><stop offset="0.5" stopColor="#b5b5b0" /><stop offset="1" stopColor="#7d7d78" />
-            </linearGradient>
+            <filter id="rotary-stop-shadow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="2.4" />
+            </filter>
           </defs>
-          <path d="M14 6 C 40 18, 50 46, 46 84 L 34 84 C 36 52, 28 30, 6 18 Z" fill="url(#stop-metal)" stroke="#6d6d68" strokeWidth="1.2" />
+          <g fill="none" strokeLinecap="round">
+            <path d={STOP} transform="translate(3 5)" stroke="rgba(41,42,49,0.35)" strokeWidth="16" filter="url(#rotary-stop-shadow)" />
+            <path d={STOP} stroke="#6b6c68" strokeWidth="16" />
+            <path d={STOP} stroke="#a8a9a5" strokeWidth="12" />
+            <path d={STOP} transform="translate(-1.8 -1.6)" stroke="#f8f8f5" strokeWidth="4.5" opacity="0.9" />
+          </g>
         </svg>
       </div>
 

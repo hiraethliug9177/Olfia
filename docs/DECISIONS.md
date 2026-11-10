@@ -4,6 +4,9 @@ One line per decision: date · decision · why. Newest first. Proposals are not 
 
 | Date | Decision | Why |
 | --- | --- | --- |
+| 2026-11-10 | **Live site switched to the v3 build.** `main` was fast-forwarded to `v3-design` (708d4b3), so olfia-nine.vercel.app now builds from `main`. From here, changes land on `v3-design` (preview), are checked there, then `main` is fast-forwarded. Every earlier version stays in Git history and in Vercel's deployment list, so any of them can be restored | Tiffany approved 11/10 |
+| 2026-11-10 | Family dial: plain colour circles return to the finger holes (photos removed); the metal is redrawn as a satin plate inside a raised rim, recessed chrome-rimmed holes, a metal bezel round the cream label, and a chrome finger stop | Tiffany 11/10: the metal looked cheap, and the holes must show pure colour circles |
+| 2026-11-10 | Soft-focus (defocus) edge on the hero board removed; film grain, glass panels and the light leak stay | Tiffany 11/10 |
 | 2026-11-10 | Body and interface font is **IBM Plex Mono** (follows the advice sheet as written); Newsreader for titles, Caveat Bold for notes | Tiffany 11/10 |
 | 2026-11-10 | **Lucide** (`lucide-react`) is the only icon library: 20px controls, 24px primary navigation, stroke 1.5; conventions in `AGENTS.md` | Tiffany 11/10 |
 | 2026-11-10 | Analog finish: film grain over every page, soft-focus edge and a warm light leak on the hero board, glass panels; the family dial becomes an old rotary telephone dial with material photos in the finger holes | Tiffany's references (rotary dial, defocused film photos) |

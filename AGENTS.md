@@ -21,4 +21,5 @@ Read `CLAUDE.md` first (stack, terms, data rules). This file holds conventions e
 
 ## Look
 
-- Analog: film grain over every page, soft-focus glass panels, a slow three-colour backdrop. Keep grain and blur light enough that body text stays sharp.
+- Analog: film grain over every page, frosted-glass panels, a slow three-colour backdrop, a warm light leak on the hero board. No soft-focus or defocus blur on content or images (removed 11/10). Keep the grain light enough that body text stays sharp.
+- The family dial keeps plain colour circles in its holes (no photos).
