@@ -239,13 +239,16 @@ textarea.input { padding: 14px 16px; min-height: 96px; resize: vertical; }
 }
 
 /* ---------- footer ---------- */
-.ft { background: rgba(236,237,245,0.82); backdrop-filter: blur(14px); }
+/* 11/10: a halftone sky over rolling hills (scripts/footer.py), with the links on a paper panel */
+.ft { position: relative; padding: 150px 0 72px; background: #e3e6f0 url(/assets/footer/sky.webp) center bottom / cover no-repeat; }
+.ft__panel { border-radius: 30px; background: rgba(248,246,240,0.9); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); box-shadow: 0 18px 44px rgba(41,42,49,0.16); padding: 0 36px; }
+@media (max-width: 640px) { .ft { padding: 96px 0 48px; } .ft__panel { padding: 0 20px; border-radius: 24px; } }
 .ft a { color: var(--ink); text-decoration: none; }
 .ft a:hover { color: var(--deep); text-decoration: underline; }
-.ft__grid { display: flex; flex-wrap: wrap; gap: 40px 56px; padding-top: 56px; padding-bottom: 32px; }
+.ft__grid { display: flex; flex-wrap: wrap; gap: 40px 56px; padding-top: 44px; padding-bottom: 28px; }
 .ft__col { display: flex; flex-direction: column; gap: 10px; font-size: 16px; flex: 1 1 140px; }
-.ft__icon { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: #fff; }
-.ft__base { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; padding-top: 18px; padding-bottom: 28px; border-top: 1px solid rgba(41,42,49,0.12); font-size: 14px; color: var(--slate); }
+.ft__icon { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--mist); }
+.ft__base { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; padding-top: 16px; padding-bottom: 22px; border-top: 1px solid rgba(41,42,49,0.12); font-size: 14px; color: var(--slate); }
 
 /* ---------- scene page ---------- */
 .scene-sheet {

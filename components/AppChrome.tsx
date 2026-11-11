@@ -151,7 +151,8 @@ export function Header() {
 export function Footer() {
   return (
     <footer className="ft">
-      <div className="wrap ft__grid">
+      <div className="wrap"><div className="ft__panel">
+      <div className="ft__grid">
         <div className="ft__col" style={{ flex: "2 1 280px", gap: 12 }}>
           <Link href="/" style={{ fontFamily: "var(--font-display)", fontStyle: "italic", fontSize: 34, lineHeight: 1 }}>Olfia</Link>
           <span className="muted" style={{ maxWidth: "24em" }}>{strings.brand.invitation}</span>
@@ -181,10 +182,11 @@ export function Footer() {
           </div>
         </div>
       </div>
-      <div className="wrap ft__base">
+      <div className="ft__base">
         <span>© 2026 Olfia</span>
         <span>A USC DSM596 capstone project</span>
       </div>
+      </div></div>
     </footer>
   );
 }

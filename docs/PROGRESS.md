@@ -21,6 +21,6 @@ Workflow: commit to `v3-design` → Vercel preview build passes → `git push or
 - [ ] 4 Kitchen + bathroom
 - [ ] 5 Scent Card templates
 - [ ] 6 Monthly record
-- [ ] 7 Footer
+- [x] 7 Footer (scripts/footer.py → public/assets/footer/sky.webp: halftone sky with bare-paper clouds, sage hills, cross-stitch sprigs; links on a paper panel)
 
 Note 11/10 ~5:50 pm PT: Tiffany's laptop is closed, so the Mac type-check and her browser pane are unavailable. Vercel preview builds are the type check; new visuals are checked as local static mockups rendered with Playwright in the container.
