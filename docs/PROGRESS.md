@@ -39,3 +39,4 @@ Done 11/10 ~6:45 pm PT: all seven items are live on olfia-nine.vercel.app (main 
 - [x] Account: Settings on Mist, primary button; Quiz result = character only + result details in place, no link out
 - [x] /quiz: the Sixteen characters gallery removed
 - [x] Footer narrower and shorter; hills apricot (scripts/footer.py)
+- [x] Quiz characters: Tiffany's 14 figures matched and cut out (public/assets/archetypes/<code>.webp); INFJ and ENFJ still use the drawn stand-ins (svg, no background) until she sends those two

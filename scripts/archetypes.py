@@ -4,6 +4,10 @@ Olfia quiz archetypes — sixteen original characters (Claude, 2026-11-10, for T
 Big-head, short-body proportions with soft shading, each standing in a room corner whose walls take
 the colour of the archetype's scent family; pose and the object in hand show the personality.
 Run:  python3 scripts/archetypes.py   ->  public/assets/archetypes/<code>.svg  (+ a contact sheet)
+
+Since 11/10 the site uses Tiffany's own figures (scripts/cutout_characters.py). Until she supplies the two
+that are still missing, those two are drawn here without the room ("bare": figure and a neutral shadow):
+      python3 scripts/archetypes.py --bare --only INFJ,ENFJ
 """
 from __future__ import annotations
 
@@ -381,13 +385,18 @@ ARCH = [
 ]
 
 
-def character(row) -> str:
+def character(row, bare: bool = False) -> str:
     code, fam, skin, hstyle, hcol, outfit, top, accent, pants, shoe, pose, thing, expr, ex = row
     uid = code.lower()
     left, right = POSES[pose]
     sleeve = shade(top, 0.04)
     hand_l, hand_r = left[-1], right[-1]
-    parts = [room(fam, uid)]
+    if bare:
+        # no room and no colour behind the figure; a neutral charcoal ground shadow like the cut-outs
+        parts = [f'<defs><radialGradient id="sh-{uid}" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#292A31" stop-opacity="0.24"/><stop offset="1" stop-color="#292A31" stop-opacity="0"/></radialGradient></defs>'
+                 f'<ellipse cx="200" cy="452" rx="84" ry="14" fill="url(#sh-{uid})"/>']
+    else:
+        parts = [room(fam, uid)]
     parts.append(f"<g>{hair_back(hstyle, hcol)}</g>")
     if ex.get("backpack"):
         parts.append(backpack(ex["backpack"]))
@@ -428,17 +437,24 @@ def character(row) -> str:
 
 def main() -> None:
     os.makedirs(OUT, exist_ok=True)
+    args = sys.argv[1:]
+    bare = "--bare" in args
+    only: set[str] | None = None
+    if "--only" in args:
+        only = set(args[args.index("--only") + 1].upper().split(","))
+    rest = [a for i, a in enumerate(args) if not a.startswith("--") and (i == 0 or args[i - 1] != "--only")]
     sheet = []
-    for row in ARCH:
-        svg = character(row)
+    rows = [r for r in ARCH if only is None or r[0] in only]
+    for row in rows:
+        svg = character(row, bare=bare)
         path = os.path.join(OUT, f"{row[0].lower()}.svg")
         with open(path, "w", encoding="utf-8") as f:
             f.write(svg)
         sheet.append(f'<figure><img src="{os.path.abspath(path)}" width="200" height="240"><figcaption>{row[0]}</figcaption></figure>')
-    if len(sys.argv) > 1:
-        with open(sys.argv[1], "w", encoding="utf-8") as f:
+    if rest:
+        with open(rest[0], "w", encoding="utf-8") as f:
             f.write('<html><body style="margin:0;background:#eee;display:grid;grid-template-columns:repeat(8,200px);gap:8px;font:12px monospace">' + "".join(sheet) + "</body></html>")
-    print("wrote", len(ARCH))
+    print("wrote", len(rows))
 
 
 if __name__ == "__main__":
