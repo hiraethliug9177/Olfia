@@ -1,7 +1,8 @@
 """
 Quiz characters: cut Tiffany's sixteen-personality figures out of their flat backgrounds (2026-11-10).
 
-Tiffany supplied the figures (one image per personality, unnamed, each on its own plain colour). This
+Tiffany supplied the figures (one image per personality, unnamed, each on its own plain colour; the Empath
+and the Altruist arrived later the same night). This
 script removes the background so the figures sit on Olfia's own colours, and gives every figure the same
 canvas and scale:
   1. model the background as a smooth colour surface fitted to the image border (Lab, quadratic);
@@ -45,6 +46,8 @@ MAP = {
     "64fe5420": "isfp",  # beret and paint palette: The Muse (the yellow-background copy)
     "8f547a25": "entp",  # paper plane held high, wink: The Spark
     "cecabfcc": "intp",  # hand on chin, open book: The Thinker
+    "b34f5d8d": "infj",  # low bun, lilac sweater, hugs a sealed letter: The Empath (sent later the same night)
+    "eff89a90": "enfj",  # apron, holds out a basket of oranges: The Altruist (sent later the same night)
 }
 
 CANVAS_W, CANVAS_H = 800, 960

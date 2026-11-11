@@ -5,9 +5,8 @@ Big-head, short-body proportions with soft shading, each standing in a room corn
 the colour of the archetype's scent family; pose and the object in hand show the personality.
 Run:  python3 scripts/archetypes.py   ->  public/assets/archetypes/<code>.svg  (+ a contact sheet)
 
-Since 11/10 the site uses Tiffany's own figures (scripts/cutout_characters.py). Until she supplies the two
-that are still missing, those two are drawn here without the room ("bare": figure and a neutral shadow):
-      python3 scripts/archetypes.py --bare --only INFJ,ENFJ
+Retired the same night: the site now uses Tiffany's own figures for all sixteen personalities
+(scripts/cutout_characters.py). Kept for the record; "--bare --only CODE,..." draws figures without the room.
 """
 from __future__ import annotations
 

@@ -1,16 +1,12 @@
 /**
- * One of the sixteen quiz characters. Since 2026-11-10 these are Tiffany's own figures, cut out of their
- * backgrounds by scripts/cutout_characters.py (transparent, same scale, neutral ground shadow).
- * The two she has not supplied yet use the earlier drawn figures, also without a background.
+ * One of the sixteen quiz characters: Tiffany's own figures (2026-11-10), cut out of their backgrounds by
+ * scripts/cutout_characters.py (transparent, one shared scale, neutral ground shadow).
  */
-const DRAWN = new Set(["infj", "enfj"]);
-
 export function Character({ code, alt = "", className, eager = false }: { code: string; alt?: string; className?: string; eager?: boolean }) {
-  const c = code.toLowerCase();
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src={`/assets/archetypes/${c}.${DRAWN.has(c) ? "svg" : "webp"}`}
+      src={`/assets/archetypes/${code.toLowerCase()}.webp`}
       alt={alt}
       width={400}
       height={480}
