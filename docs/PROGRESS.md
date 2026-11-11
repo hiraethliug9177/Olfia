@@ -19,8 +19,12 @@ Workflow: commit to `v3-design` → Vercel preview build passes → `git push or
 - [x] 2 Twelve articles (19 in total; topics Culture/History/Science/Design/Places/Rituals; Unsplash covers with credit; rail: Most read / In season / Try this)
 - [x] 3 Archetype illustrations (scripts/archetypes.py → public/assets/archetypes/*.svg; on the quiz result card and a 'Sixteen characters' gallery on /quiz; regenerate with `python3 scripts/archetypes.py`)
 - [ ] 4 Kitchen + bathroom
-- [ ] 5 Scent Card templates
+- [x] 5 Scent Card templates (components/card/CardStudio.tsx: Film strip / Instant print / Postcard; picture = saved room stage cropped to fill, or the Capture picture via components/capture/CaptureScene.tsx; family colour when opened without a page)
 - [x] 6 Monthly record (components/atlas/MonthRecord.tsx: ticket with stub — totals with singular/plural, one stamp per recorded day, most-used family; stub: families, time of day, tags; empty month shows a Capture button)
 - [x] 7 Footer (scripts/footer.py → public/assets/footer/sky.webp: halftone sky with bare-paper clouds, sage hills, cross-stitch sprigs; links on a paper panel)
 
 Note 11/10 ~5:50 pm PT: Tiffany's laptop is closed, so the Mac type-check and her browser pane are unavailable. Vercel preview builds are the type check; new visuals are checked as local static mockups rendered with Playwright in the container.
+
+Note 11/10 ~5:30 pm PT: a local preview harness renders the real components without the laptop: scratchpad `harness/` (esbuild + stand-ins for next/link, next/navigation, zustand, lucide-react, html-to-image; `node build.mjs`, serve `www/` on :8765, `python3 shot2.py URL OUT W H [actions]`).
+Live: main = 6b30ee3 (characters, footer, monthly record, Scent Card templates).
+Next: kitchen + bathroom (drawn items in components/scene/Cutout.tsx, scene layouts in lib/catalog.ts, scene tabs in RoomEditor, `?scene=` and `?preset=`), then docs and the report to Tiffany.
