@@ -41,3 +41,12 @@ Done 11/10 ~6:45 pm PT: all seven items are live on olfia-nine.vercel.app (main 
 - [x] Footer narrower and shorter; hills apricot (scripts/footer.py)
 - [x] Quiz characters: Tiffany's 14 figures matched and cut out (public/assets/archetypes/<code>.webp); INFJ and ENFJ still use the drawn stand-ins (svg, no background) until she sends those two
 - [x] INFJ and ENFJ figures from Tiffany cut out and in place: all sixteen characters are hers
+
+## 11/10 night — ready to submit
+
+- [x] Sample data on by default: 30 pages over about six weeks, four My shelf products and preferences, once per browser (`lib/demo.ts`, `lib/sample.ts`)
+- [x] README rewritten; GitHub checked: `main` = `v3-design`, no missing assets, no stray files
+- [x] Summary panel renamed "Your scents at a glance" (Scent Profile is a retired term); PRD and design spec marked as the 11/2 record
+- [x] User guide: Claude Docs document "Olfia User Guide" (features and design logic, for the presentation handout)
+- [x] Feedback history in one note: `claude/olfia-feedback-and-changes.md` (Capstone project and the Mac's `Olfia notes/`)
+- [x] Mac folder sorted: `Olfia notes/`, `Research and references/` (was `GPT/`); old copies in `_to_delete/` until Tiffany confirms
