@@ -46,7 +46,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
           {a.blocks.map((b, i) => (b.t === "h" ? <h2 key={i}><Rich text={b.text} /></h2> : <p key={i}><Rich text={b.text} /></p>))}
         </div>
 
-        <aside className="article__try">
+        <aside id="try" className="article__try anchor">
           <span className="hand" style={{ fontSize: 26, color: "var(--deep)" }}>try this</span>
           <h2>{a.tryThis.title}</h2>
           {a.tryThis.paras.map((p, i) => <p key={i}><Rich text={p} /></p>)}
@@ -61,7 +61,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
             <span className="edit-card__meta">The take-home edit</span>
             <h2 style={{ fontSize: 30 }}><Rich text={a.object.name} /></h2>
             {a.takeHome.paras.map((p, i) => <p key={i}><Rich text={p} /></p>)}
-            <p className="muted" style={{ fontSize: 15 }}>{a.object.notes}</p>
+            {a.object.notes ? <p className="muted" style={{ fontSize: 15 }}>{a.object.notes}</p> : null}
             {a.object.meta ? <p style={{ fontSize: 15, fontWeight: 600 }}>{a.object.meta}</p> : null}
             {a.object.href ? (
               <a href={a.object.href} target="_blank" rel="noopener noreferrer" className="btn btn--ghost" style={{ alignSelf: "flex-start" }}>

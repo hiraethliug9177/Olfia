@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { FAMILIES } from "@/lib/catalog";
-import { LIBRARY_INTRO } from "@/lib/library";
 
 /**
  * The Scent Library's own block at the top of The Olfia Edit (Tiffany 11/10: moved here from
@@ -46,7 +45,6 @@ export function LibraryBlock() {
       <LibraryCollage />
       <div className="lib-block__text">
         <h2 id="lib-block-h" className="h-section">Scent Library</h2>
-        <p className="lead">{LIBRARY_INTRO}</p>
         <div className="lib-block__fams">
           {FAMILIES.map((f) => (
             <Link key={f.id} href={`/library#${f.id}`} className="lib-fam">

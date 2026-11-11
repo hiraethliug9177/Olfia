@@ -207,7 +207,9 @@ textarea.input { padding: 14px 16px; min-height: 96px; resize: vertical; }
   opacity: 0; visibility: hidden; transform: translateY(6px); transition: opacity 0.2s, transform 0.2s var(--ease), visibility 0s linear 0.2s;
 }
 .hd__sub::before { content: ""; position: absolute; left: 0; right: 0; top: -16px; height: 16px; }
-.hd__item:hover > .hd__sub, .hd__item:focus-within > .hd__sub { opacity: 1; visibility: visible; transform: none; transition: opacity 0.2s, transform 0.2s var(--ease); }
+.hd__item:hover > .hd__sub, .hd__item:has(:focus-visible) > .hd__sub { opacity: 1; visibility: visible; transform: none; transition: opacity 0.2s, transform 0.2s var(--ease); }
+/* while the pointer is over the row, only the tab under it keeps its menu (11/10 fix: two menus overlapped) */
+.hd__list:hover > .hd__item:not(:hover) > .hd__sub { opacity: 0; visibility: hidden; transform: translateY(6px); transition: none; }
 .hd__sub a { display: flex; align-items: center; gap: 10px; min-height: 42px; padding: 0 14px; border-radius: 12px; color: var(--ink); text-decoration: none; font-size: 15px; white-space: nowrap; }
 .hd__sub a:hover { background: var(--mist); color: var(--ink); }
 .hd__dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
@@ -623,6 +625,9 @@ body::after {
 .np-coming { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 12px; }
 .np-coming li { display: flex; flex-direction: column; gap: 2px; }
 .np-coming__title { font-family: var(--font-display); font-size: 18px; line-height: 1.2; }
+.np-try { display: flex; flex-direction: column; gap: 2px; color: var(--ink); text-decoration: none; }
+.np-try:hover { color: var(--ink); }
+.np-try:hover .np-coming__title { text-decoration: underline; text-underline-offset: 4px; }
 @media (max-width: 960px) { .np-grid { grid-template-columns: minmax(0, 1fr); } .np-rail { position: static; max-height: none; overflow: visible; } }
 
 /* Scent Library block on The Edit, and the library page */

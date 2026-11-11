@@ -2,14 +2,14 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { ARTICLES, PITCHES, TOPICS, articleMonth, byDate, byViews, reads, type Topic } from "@/lib/edit";
+import { ARTICLES, IN_SEASON, TOPICS, articleMonth, byDate, byViews, reads, type Topic } from "@/lib/edit";
 import { ArticleCard } from "@/components/edit/ArticleCard";
 import Link from "next/link";
 
 /**
  * The Olfia Edit as a newspaper section front (Tiffany 11/10, after the New York Times):
  * the wide column runs by date or by what is being read, with topic and month tabs on top;
- * the narrow column keeps the most-read list, what is in season, and what is coming next,
+ * the narrow column keeps the most-read list, what is in season, and a few experiments to try,
  * and scrolls on its own.
  */
 type Sort = "latest" | "trending";
@@ -36,7 +36,8 @@ export function EditList() {
   const [lead, ...rest] = list;
 
   const mostRead = byViews().slice(0, 5);
-  const inSeason = byDate(ARTICLES.filter((a) => a.topic === "Seasons" || a.families.includes("gourmand"))).slice(0, 3);
+  const inSeason = byDate(ARTICLES.filter((a) => IN_SEASON.includes(a.slug)));
+  const tryThis = byDate().slice(0, 4);
 
   return (
     <div className="np-grid">
@@ -98,12 +99,14 @@ export function EditList() {
         </section>
 
         <section className="np-box np-box--sea">
-          <h2 className="np-h">Coming up</h2>
+          <h2 className="np-h">Try this</h2>
           <ul className="np-coming">
-            {PITCHES.map((p) => (
-              <li key={p.title}>
-                <span className="edit-card__meta">{p.topic}</span>
-                <span className="np-coming__title">{p.title}</span>
+            {tryThis.map((a) => (
+              <li key={a.slug}>
+                <Link href={`/edit/${a.slug}#try`} className="np-try">
+                  <span className="edit-card__meta">{a.topic}</span>
+                  <span className="np-coming__title">{a.tryThis.title}</span>
+                </Link>
               </li>
             ))}
           </ul>

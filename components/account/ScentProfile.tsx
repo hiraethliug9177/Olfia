@@ -98,9 +98,9 @@ export function ScentProfile({ compact = false }: { compact?: boolean }) {
             ))}
           </div>
           {top ? (
-            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-              <Stamp family={top} size={72} />
-              <span style={{ fontSize: 18 }}>Most used: <span className="hl" style={{ "--hl": `${familyById(top).hex}66` } as CSSProperties}>{familyById(top).label}</span></span>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <Stamp family={top} size={56} />
+              <span style={{ fontSize: 15, whiteSpace: "nowrap" }}>Most used: <span className="hl" style={{ "--hl": `${familyById(top).hex}66` } as CSSProperties}>{familyById(top).label}</span></span>
             </div>
           ) : null}
         </div>

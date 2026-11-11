@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
 import { strings } from "@/lib/strings";
-import { Icon } from "@/components/ui/Icon";
 
 /**
  * Home hero (2026-11-09): the cork scent design board, confirmed by Tiffany.
@@ -12,8 +11,8 @@ import { Icon } from "@/components/ui/Icon";
  * courtyard sketch drops branch shadows and clear light by the window. When the reference
  * changes, the old print lingers for a moment over the new one — the afterimage. "Layer both"
  * holds the overlap. Everything is drawn here as SVG; no photographs are used.
- * 11/10 (Tiffany): the board plays by itself — Bookshop, Courtyard, Layer both — and stops when
- * someone picks one; the scent words on the board and under the buttons are gone; both buttons
+ * 11/10 (Tiffany): the board plays by itself — Bookshop, Courtyard, Layer both — with no slide
+ * controls (removed 11/10 evening); picking a pinned reference pauses it for a moment; the scent words on the board and under the buttons are gone; both buttons
  * share one style.
  */
 
@@ -83,13 +82,19 @@ export function Hero() {
   const onKey = (next: Ref) => (e: KeyboardEvent) => {
     if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setPlaying(false); setBoth(false); choose(next); }
   };
+  // picking a reference pauses the slideshow; it starts again after a quiet moment
+  const resume = useRef<number | null>(null);
+  useEffect(() => () => { if (resume.current) window.clearTimeout(resume.current); }, []);
   const pick = (slide: Slide) => {
     setPlaying(false);
+    if (resume.current) window.clearTimeout(resume.current);
+    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      resume.current = window.setTimeout(() => setPlaying(true), 12000);
+    }
     if (slide === "both") { setBoth(true); return; }
     setBoth(false);
     choose(slide);
   };
-  const current: Slide = both ? "both" : ref;
 
   const layer = (id: Ref): CSSProperties => {
     const on = both || ref === id;
@@ -314,17 +319,6 @@ export function Hero() {
           </g>
         </svg>
 
-        <div className="hero__tools">
-          {SLIDES.map((sl) => (
-            <button key={sl} type="button" className="chip hero__slide" aria-pressed={current === sl} onClick={() => pick(sl)}>
-              {sl === "books" ? "Bookshop" : sl === "garden" ? "Courtyard" : "Layer both"}
-              {current === sl && playing ? <span key={`${sl}-${ref}-${both}`} className="hero__progress" style={{ animationDuration: `${SLIDE_MS}ms` }} aria-hidden="true" /> : null}
-            </button>
-          ))}
-          <button type="button" className="tool hero__play" aria-label={playing ? "Pause the slideshow" : "Play the slideshow"} onClick={() => setPlaying((p) => !p)}>
-            <Icon name={playing ? "pause" : "play"} />
-          </button>
-        </div>
       </div>
     </section>
   );

@@ -9,6 +9,39 @@ import { partOfDay } from "@/lib/dates";
 import { sampleEntries } from "@/lib/sample";
 import type { Entry, FamilyId, SourceKind } from "@/lib/types";
 import { ScentProfile } from "@/components/account/ScentProfile";
+import { ResultCard } from "@/components/quiz/Quiz";
+import { loadQuiz, type QuizResult } from "@/lib/quiz";
+
+/** The person's own quiz result, or an invitation to take the quiz (Tiffany 11/10). */
+function AccountQuiz() {
+  const mounted = useMounted();
+  const [r, setR] = useState<QuizResult | null>(null);
+  useEffect(() => { if (mounted) setR(loadQuiz()); }, [mounted]);
+  if (!mounted) return <section id="quiz" className="card anchor" style={{ minHeight: 200, background: "var(--honey-soft)" }} />;
+  return (
+    <section id="quiz" className="card anchor" style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 36, background: "var(--honey-soft)" }}>
+      {r ? (
+        <>
+          <div style={{ flex: "0 1 280px", minWidth: 220, rotate: "-2deg" }}><ResultCard r={r} /></div>
+          <div style={{ flex: "1 1 320px", display: "flex", flexDirection: "column", gap: 14, minWidth: 0 }}>
+            <h2 className="h-section" style={{ fontSize: 40 }}>You are {r.archetype.name}.</h2>
+            <p className="lead">{r.archetype.voice}</p>
+            <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "12px 20px" }}>
+              <Link href={`/rooms?family=${r.family}`} className="btn btn--terra">Design a room in this style</Link>
+              <Link href="/quiz" className="hero__link">See your result</Link>
+            </div>
+          </div>
+        </>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 14, alignItems: "flex-start" }}>
+          <h2 className="h-section" style={{ fontSize: 40 }}>Which scent is you?</h2>
+          <p className="lead">Twenty questions about how you live. You get one of sixteen characters, the scent family that fits, and a room to start from.</p>
+          <Link href="/quiz" className="btn btn--terra">Take the quiz</Link>
+        </div>
+      )}
+    </section>
+  );
+}
 
 const PREFS_KEY = "olfia.prefs.v1";
 interface Prefs { families: FamilyId[]; sources: SourceKind[] }
@@ -127,16 +160,7 @@ export function AccountView() {
         </div>
       </section>
 
-      <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 18 }}>
-        <Link href="/quiz" className="card" style={{ textDecoration: "none", color: "var(--ink)", display: "flex", flexDirection: "column", gap: 6, background: "var(--honey-soft)" }}>
-          <strong style={{ fontSize: 22 }}>Scent quiz</strong>
-          <span className="muted">Twenty questions, one of sixteen characters.</span>
-        </Link>
-        <Link href="/about" className="card" style={{ textDecoration: "none", color: "var(--ink)", display: "flex", flexDirection: "column", gap: 6, background: "var(--rose-soft)" }}>
-          <strong style={{ fontSize: 22 }}>About Olfia</strong>
-          <span className="muted">Why we started, and what we believe.</span>
-        </Link>
-      </section>
+      <AccountQuiz />
     </div>
   );
 }

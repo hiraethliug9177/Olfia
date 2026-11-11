@@ -2,9 +2,25 @@
 
 import { useState } from "react";
 import type { Article } from "@/lib/edit";
+import { familyById } from "@/lib/catalog";
 
 /** Drawn covers: used when an article has no photograph, or when its source stops serving one. */
-function Drawn({ kind }: { kind: Article["fallback"] }) {
+function Drawn({ kind, a }: { kind: Article["fallback"]; a: Article }) {
+  if (kind === "families") {
+    // two family colours drifting into each other: the site's afterimage motif
+    const [c1, c2] = [familyById(a.families[0]).hex, familyById(a.families[1] ?? a.families[0]).hex];
+    return (
+      <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <defs>
+          <radialGradient id={`fc1-${a.slug}`}><stop offset="0" stopColor={c1} stopOpacity="0.95" /><stop offset="1" stopColor={c1} stopOpacity="0" /></radialGradient>
+          <radialGradient id={`fc2-${a.slug}`}><stop offset="0" stopColor={c2} stopOpacity="0.9" /><stop offset="1" stopColor={c2} stopOpacity="0" /></radialGradient>
+        </defs>
+        <rect width="400" height="300" fill="#F5EEE1" />
+        <circle cx="150" cy="140" r="150" fill={`url(#fc1-${a.slug})`} />
+        <circle cx="270" cy="170" r="140" fill={`url(#fc2-${a.slug})`} />
+      </svg>
+    );
+  }
   if (kind === "books") {
     return (
       <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
@@ -122,7 +138,7 @@ export function ArticleCover({ a, ratio = "4 / 3", eager = false }: { a: Article
         // eslint-disable-next-line @next/next/no-img-element
         <img src={a.image.src} alt={a.image.alt} loading={eager ? "eager" : "lazy"} referrerPolicy="no-referrer" onError={() => setFailed(true)} />
       ) : (
-        <Drawn kind={a.fallback} />
+        <Drawn kind={a.fallback} a={a} />
       )}
     </div>
   );

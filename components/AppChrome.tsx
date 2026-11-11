@@ -62,6 +62,7 @@ const NAV: NavItem[] = [
       { href: "/account#preferences", label: "Preferences", dot: "#E7B49F" },
       { href: "/account#info", label: "Personal info", dot: "#8FB5B8" },
       { href: "/account#settings", label: "Settings", dot: "#7C8A4A" },
+      { href: "/account#quiz", label: "Quiz result", dot: "#E2A23B" },
       { href: "/about", label: "About Olfia", dot: "#4C527A" },
     ],
   },
