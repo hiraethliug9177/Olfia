@@ -8,15 +8,14 @@ import { useToast } from "@/lib/toast";
 import { track } from "@/lib/analytics";
 import { useMounted } from "@/lib/store";
 import { Atmosphere } from "@/components/scene/Atmosphere";
-import { ItemArt } from "@/components/scene/Cutout";
 import { Stamp } from "@/components/scene/Stamp";
 import { dotDate } from "@/lib/dates";
 import { Icon } from "@/components/ui/Icon";
+import { Character } from "@/components/quiz/Character";
 
-/** Result card: archetype headline, family by colour + stamp + materials, Tiffany's line. Exported as a 1080-wide PNG. */
+/** Result card: the archetype's character, name, Tiffany's line, family by colour + stamp. Exported as a 1080-wide PNG. */
 export function ResultCard({ r, cardRef }: { r: QuizResult; cardRef?: Ref<HTMLDivElement> }) {
   const f = familyById(r.family);
-  const mats = f.materials.filter((m) => m.asset);
   return (
     <div ref={cardRef} className="scene-sheet" style={{ width: "100%", maxWidth: 420, aspectRatio: "3 / 4", position: "relative", borderRadius: 18, overflow: "hidden", background: "#fff", boxShadow: "0 18px 40px rgba(41,42,49,0.16)" }}>
       <div style={{ position: "absolute", inset: 0, background: `linear-gradient(180deg, ${f.hex}33 0%, #F5EEE1 60%)` }} />
@@ -27,20 +26,12 @@ export function ResultCard({ r, cardRef }: { r: QuizResult; cardRef?: Ref<HTMLDi
           <span className="label-mono" style={{ fontSize: "max(10px, 3cqw)", }}>Olfia · {dotDate(new Date(r.takenAt))}</span>
           <Stamp family={r.family} size={82} rot={9} />
         </div>
-        <div style={{ position: "relative", height: "34%" }}>
-          {mats.map((m, i) => {
-            const spots = [{ l: "6%", t: "10%", r: -10, w: "34%" }, { l: "38%", t: "0%", r: 6, w: "36%" }, { l: "62%", t: "28%", r: -4, w: "32%" }];
-            const s = spots[i];
-            return (
-              <div key={m.id} aria-hidden="true" style={{ position: "absolute", left: s.l, top: s.t, width: s.w, aspectRatio: "1", rotate: `${s.r}deg` }}>
-                <ItemArt kind={m.id} prefix="qz" />
-              </div>
-            );
-          })}
+        <div className="qcard__figure">
+          <Character code={r.code} alt={`${r.archetype.name}, the ${r.code} character`} eager />
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-          <span style={{ fontFamily: "var(--font-display)", fontStyle: "italic", fontSize: "max(26px, 10.5cqw)", lineHeight: 1 }}>{r.archetype.name}</span>
-          <span className="hand" style={{ fontSize: "max(16px, 6cqw)", lineHeight: 1.2, color: "var(--ink)" }}>{r.archetype.voice}</span>
+          <span style={{ fontFamily: "var(--font-display)", fontStyle: "italic", fontSize: "max(24px, 9cqw)", lineHeight: 1 }}>{r.archetype.name}</span>
+          <span className="hand" style={{ fontSize: "max(15px, 5.2cqw)", lineHeight: 1.15, color: "var(--ink)" }}>{r.archetype.voice}</span>
           <span style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 6, fontFamily: "var(--font-mono)", fontSize: "max(10px, 3.2cqw)", color: "var(--slate)" }}>
             <span className="chip__dot" style={{ background: f.hex, width: 12, height: 12 }} />
             {f.label}

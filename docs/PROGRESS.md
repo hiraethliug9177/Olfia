@@ -17,8 +17,10 @@ Workflow: commit to `v3-design` → Vercel preview build passes → `git push or
 
 - [x] 1 Screenshot fixes (menus: only the hovered tab opens; hero chips + pause removed, a picked reference pauses autoplay 12 s; Account quiz section; profile line; library block line)
 - [x] 2 Twelve articles (19 in total; topics Culture/History/Science/Design/Places/Rituals; Unsplash covers with credit; rail: Most read / In season / Try this)
-- [ ] 3 Archetype illustrations
+- [x] 3 Archetype illustrations (scripts/archetypes.py → public/assets/archetypes/*.svg; on the quiz result card and a 'Sixteen characters' gallery on /quiz; regenerate with `python3 scripts/archetypes.py`)
 - [ ] 4 Kitchen + bathroom
 - [ ] 5 Scent Card templates
 - [ ] 6 Monthly record
 - [ ] 7 Footer
+
+Note 11/10 ~5:50 pm PT: Tiffany's laptop is closed, so the Mac type-check and her browser pane are unavailable. Vercel preview builds are the type check; new visuals are checked as local static mockups rendered with Playwright in the container.
