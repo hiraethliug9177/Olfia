@@ -18,7 +18,7 @@ Workflow: commit to `v3-design` → Vercel preview build passes → `git push or
 - [x] 1 Screenshot fixes (menus: only the hovered tab opens; hero chips + pause removed, a picked reference pauses autoplay 12 s; Account quiz section; profile line; library block line)
 - [x] 2 Twelve articles (19 in total; topics Culture/History/Science/Design/Places/Rituals; Unsplash covers with credit; rail: Most read / In season / Try this)
 - [x] 3 Archetype illustrations (scripts/archetypes.py → public/assets/archetypes/*.svg; on the quiz result card and a 'Sixteen characters' gallery on /quiz; regenerate with `python3 scripts/archetypes.py`)
-- [ ] 4 Kitchen + bathroom
+- [x] 4 Kitchen + bathroom (14 drawn pieces + simmer pot source in components/scene/Cutout.tsx; layouts in lib/catalog.ts baseLayout(source, sceneId); room tabs in RoomEditor; presets kitchen-morning and bath-evening; presets open with ?preset=)
 - [x] 5 Scent Card templates (components/card/CardStudio.tsx: Film strip / Instant print / Postcard; picture = saved room stage cropped to fill, or the Capture picture via components/capture/CaptureScene.tsx; family colour when opened without a page)
 - [x] 6 Monthly record (components/atlas/MonthRecord.tsx: ticket with stub — totals with singular/plural, one stamp per recorded day, most-used family; stub: families, time of day, tags; empty month shows a Capture button)
 - [x] 7 Footer (scripts/footer.py → public/assets/footer/sky.webp: halftone sky with bare-paper clouds, sage hills, cross-stitch sprigs; links on a paper panel)
