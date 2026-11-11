@@ -9,36 +9,45 @@ import { partOfDay } from "@/lib/dates";
 import { sampleEntries } from "@/lib/sample";
 import type { Entry, FamilyId, SourceKind } from "@/lib/types";
 import { ScentProfile } from "@/components/account/ScentProfile";
-import { ResultCard } from "@/components/quiz/Quiz";
-import { loadQuiz, type QuizResult } from "@/lib/quiz";
+import { Character } from "@/components/quiz/Character";
+import { blendsWith, loadQuiz, type QuizResult } from "@/lib/quiz";
 
-/** The person's own quiz result, or an invitation to take the quiz (Tiffany 11/10). */
+/**
+ * The person's own quiz result, or an invitation to take the quiz. Tiffany 11/10: the character only
+ * (not the whole result card), and the result and its details here instead of a link to the quiz page.
+ */
 function AccountQuiz() {
   const mounted = useMounted();
   const [r, setR] = useState<QuizResult | null>(null);
   useEffect(() => { if (mounted) setR(loadQuiz()); }, [mounted]);
-  if (!mounted) return <section id="quiz" className="card anchor" style={{ minHeight: 200, background: "var(--honey-soft)" }} />;
+  if (!mounted) return <section id="quiz" className="card anchor" style={{ minHeight: 200 }} />;
+  if (!r) {
+    return (
+      <section id="quiz" className="card anchor" style={{ display: "flex", flexDirection: "column", gap: 14, alignItems: "flex-start" }}>
+        <h2 className="h-section" style={{ fontSize: 40 }}>Which scent is you?</h2>
+        <p className="lead">Twenty questions about how you live. You get one of sixteen characters, the scent family that fits, and a room to start from.</p>
+        <Link href="/quiz" className="btn btn--primary">Take the quiz</Link>
+      </section>
+    );
+  }
+  const fam = familyById(r.family);
+  const second = r.second ? familyById(r.second) : null;
+  const neighbours = blendsWith(r.family).map((id) => familyById(id));
   return (
-    <section id="quiz" className="card anchor" style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 36, background: "var(--honey-soft)" }}>
-      {r ? (
-        <>
-          <div style={{ flex: "0 1 280px", minWidth: 220, rotate: "-2deg" }}><ResultCard r={r} /></div>
-          <div style={{ flex: "1 1 320px", display: "flex", flexDirection: "column", gap: 14, minWidth: 0 }}>
-            <h2 className="h-section" style={{ fontSize: 40 }}>You are {r.archetype.name}.</h2>
-            <p className="lead">{r.archetype.voice}</p>
-            <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "12px 20px" }}>
-              <Link href={`/rooms?family=${r.family}`} className="btn btn--terra">Design a room in this style</Link>
-              <Link href="/quiz" className="hero__link">See your result</Link>
-            </div>
-          </div>
-        </>
-      ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: 14, alignItems: "flex-start" }}>
-          <h2 className="h-section" style={{ fontSize: 40 }}>Which scent is you?</h2>
-          <p className="lead">Twenty questions about how you live. You get one of sixteen characters, the scent family that fits, and a room to start from.</p>
-          <Link href="/quiz" className="btn btn--terra">Take the quiz</Link>
-        </div>
-      )}
+    <section id="quiz" className="card anchor account-quiz">
+      <div className="account-quiz__figure">
+        <Character code={r.code} alt={`${r.archetype.name}, the ${r.code} character`} eager />
+      </div>
+      <div className="account-quiz__text">
+        <h2 className="h-section" style={{ fontSize: 40 }}>You are {r.archetype.name}.</h2>
+        <p className="lead">{r.archetype.voice}</p>
+        <p style={{ margin: 0 }}>
+          Your scent is <span className="account-quiz__fam"><span className="chip__dot" style={{ background: fam.hex }} aria-hidden="true" />{fam.label}</span>
+          {second ? <>, with a second note of <span className="account-quiz__fam"><span className="chip__dot" style={{ background: second.hex }} aria-hidden="true" />{second.label}</span></> : null}.
+          {neighbours.length ? ` It layers well with ${neighbours.map((n) => n.label).join(" and ")}.` : null}
+        </p>
+        <Link href={`/rooms?family=${[r.family, r.second].filter(Boolean).join(",")}`} className="btn btn--primary" style={{ alignSelf: "flex-start" }}>Design a room in this style</Link>
+      </div>
     </section>
   );
 }
@@ -108,8 +117,8 @@ export function AccountView() {
         </div>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
           <span className="callout">{mounted ? days : "–"} days recorded</span>
-          <span className="callout" style={{ background: "var(--terra)" }}>{mounted ? rooms : "–"} rooms</span>
-          <span className="callout" style={{ background: "var(--moss)" }}>{mounted ? captures : "–"} captures</span>
+          <span className="callout" style={{ background: "var(--deep)" }}>{mounted ? rooms : "–"} rooms</span>
+          <span className="callout" style={{ background: "var(--apricot)", color: "var(--ink)" }}>{mounted ? captures : "–"} captures</span>
         </div>
       </section>
 
@@ -150,11 +159,11 @@ export function AccountView() {
         </div>
       </section>
 
-      <section id="settings" className="card anchor" style={{ display: "flex", flexDirection: "column", gap: 14, background: "var(--sea-soft)" }}>
+      <section id="settings" className="card anchor" style={{ display: "flex", flexDirection: "column", gap: 14, background: "var(--mist)" }}>
         <h2 className="h-section" style={{ fontSize: 34 }}>Settings</h2>
         <p className="muted" style={{ margin: 0 }}>Entries are saved in this browser only.</p>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
-          <button type="button" className="btn btn--honey" onClick={() => { sampleEntries().forEach((e) => add(e)); show("Sample pages added", "/atlas", "Open Scent Atlas"); }}>Load sample pages</button>
+          <button type="button" className="btn btn--primary" onClick={() => { sampleEntries().forEach((e) => add(e)); show("Sample pages added", "/atlas", "Open Scent Atlas"); }}>Load sample pages</button>
           <button type="button" className="btn btn--ghost" onClick={exportData} disabled={!mounted || entries.length === 0}>Export my data</button>
           <button type="button" className="btn btn--ghost" disabled={!mounted || entries.length === 0} onClick={() => { if (window.confirm("Clear every entry saved in this browser?")) { clear(); show("This browser is cleared"); } }}>Clear this browser</button>
         </div>

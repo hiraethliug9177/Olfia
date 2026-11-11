@@ -64,7 +64,7 @@ export function MonthRecord({ entries, year, month }: { entries: Entry[]; year: 
         {empty ? (
           <div className="record__empty">
             <span className="hand" style={{ fontSize: 26, color: "var(--deep)" }}>no stamps in {name} yet</span>
-            <Link href="/capture" className="btn btn--terra btn--sm">Capture a scent</Link>
+            <Link href="/capture" className="btn btn--primary btn--sm">Capture a scent</Link>
           </div>
         ) : (
           <ul className="record__stamps" aria-label={`${plural(days.length, "day")} with a page`}>

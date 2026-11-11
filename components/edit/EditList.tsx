@@ -35,9 +35,8 @@ export function EditList() {
   }, [topic, month, sort]);
   const [lead, ...rest] = list;
 
-  const mostRead = byViews().slice(0, 5);
+  const mostRead = byViews().slice(0, 3);
   const inSeason = byDate(ARTICLES.filter((a) => IN_SEASON.includes(a.slug)));
-  const tryThis = byDate().slice(0, 4);
 
   return (
     <div className="np-grid">
@@ -76,7 +75,7 @@ export function EditList() {
       </div>
 
       <aside className="np-rail" aria-label="More from The Edit">
-        <section id="most-read" className="np-box np-box--honey">
+        <section id="most-read" className="np-box">
           <h2 className="np-h">Most read</h2>
           <ol className="np-rank">
             {mostRead.map((a, i) => (
@@ -91,26 +90,13 @@ export function EditList() {
           </ol>
         </section>
 
-        <section className="np-box np-box--rose">
+        <section className="np-box">
           <h2 className="np-h">In season</h2>
           <div className="np-mini-list">
             {inSeason.map((a) => <ArticleCard key={a.slug} a={a} variant="mini" />)}
           </div>
         </section>
 
-        <section className="np-box np-box--sea">
-          <h2 className="np-h">Try this</h2>
-          <ul className="np-coming">
-            {tryThis.map((a) => (
-              <li key={a.slug}>
-                <Link href={`/edit/${a.slug}#try`} className="np-try">
-                  <span className="edit-card__meta">{a.topic}</span>
-                  <span className="np-coming__title">{a.tryThis.title}</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
       </aside>
     </div>
   );

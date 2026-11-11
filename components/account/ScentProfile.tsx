@@ -115,7 +115,7 @@ export function ScentProfile({ compact = false }: { compact?: boolean }) {
         {!compact ? (
           <div className="stat" style={{ flex: "1 1 220px" }}>
             <span className="label-mono">Product types</span>
-            {typeRows.length ? <Bars rows={typeRows} color="#8FB5B8" labelOf={(k) => sourceLabel(k as Parameters<typeof sourceLabel>[0])} /> : <span className="muted">—</span>}
+            {typeRows.length ? <Bars rows={typeRows} color="#4C527A" labelOf={(k) => sourceLabel(k as Parameters<typeof sourceLabel>[0])} /> : <span className="muted">—</span>}
           </div>
         ) : null}
       </div>

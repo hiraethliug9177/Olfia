@@ -30,3 +30,12 @@ Live: main = 6b30ee3 (characters, footer, monthly record, Scent Card templates).
 Next: kitchen + bathroom (drawn items in components/scene/Cutout.tsx, scene layouts in lib/catalog.ts, scene tabs in RoomEditor, `?scene=` and `?preset=`), then docs and the report to Tiffany.
 
 Done 11/10 ~6:45 pm PT: all seven items are live on olfia-nine.vercel.app (main fast-forwarded after each preview build passed). Nothing is left half-done; open, optional items are in the project doc `claude/olfia-content-brief.md` §5.
+
+## 11/10 late — brand-colour pass (Tiffany's annotated screenshots)
+
+- [x] Interface colours only from the 11/3 brand guide; family colours only for scents (rule in CLAUDE.md)
+- [x] The Edit: Most read = 3 on white; Try this removed; Scent Library block = title + seven families on one line
+- [x] Home Edit section white with a Periwinkle deep button; Matches this room on white
+- [x] Account: Settings on Mist, primary button; Quiz result = character only + result details in place, no link out
+- [x] /quiz: the Sixteen characters gallery removed
+- [x] Footer narrower and shorter; hills apricot (scripts/footer.py)

@@ -135,7 +135,7 @@ export function Shelf() {
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
           <h2 id="shelf-add-h" style={{ fontSize: 30 }}>Add to my shelf</h2>
           <div role="tablist" aria-label="Add by" className="seg" style={{ width: 320, maxWidth: "100%" }}>
-            <span className="seg__thumb" aria-hidden="true" style={{ left: mode === "link" ? 5 : "50%", width: "calc(50% - 5px)", background: "var(--moss)" }} />
+            <span className="seg__thumb" aria-hidden="true" style={{ left: mode === "link" ? 5 : "50%", width: "calc(50% - 5px)" }} />
             <button type="button" role="tab" aria-selected={mode === "link"} className="seg__opt" onClick={() => setMode("link")}>Paste a link</button>
             <button type="button" role="tab" aria-selected={mode === "photo"} className="seg__opt" onClick={() => setMode("photo")}>Upload a photo</button>
           </div>
@@ -148,7 +148,7 @@ export function Shelf() {
               <Icon name="link" />
               <input id="shelf-link" className="input" type="url" inputMode="url" value={link} onChange={(e) => setLink(e.target.value)} placeholder="https://www.diptyqueparis.com/…" />
             </span>
-            <button type="submit" className="btn btn--moss" disabled={reading || !link.trim()}>{reading ? "Reading…" : "Make the card"}</button>
+            <button type="submit" className="btn btn--primary" disabled={reading || !link.trim()}>{reading ? "Reading…" : "Make the card"}</button>
           </form>
         ) : (
           <div className="shelf-row">
@@ -210,7 +210,7 @@ export function Shelf() {
                 <input className="input" value={draft.note} onChange={(e) => set("note", e.target.value)} maxLength={120} placeholder="Two sprays in the hallway before guests arrive" />
               </label>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
-                <button type="button" className="btn btn--moss" onClick={add}>Add to my shelf</button>
+                <button type="button" className="btn btn--primary" onClick={add}>Add to my shelf</button>
                 <button type="button" className="btn btn--ghost" onClick={reset}>Cancel</button>
               </div>
             </div>
@@ -241,7 +241,7 @@ export function Shelf() {
           ))}
         </div>
       ) : (
-        <p className="hand" style={{ fontSize: 26, color: "var(--moss)" }}>nothing on your shelf yet</p>
+        <p className="hand" style={{ fontSize: 26, color: "var(--deep)" }}>nothing on your shelf yet</p>
       )}
     </div>
   );

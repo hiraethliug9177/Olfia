@@ -331,7 +331,7 @@ export function CaptureForm() {
           <button type="button" className="btn btn--ghost" onClick={back} disabled={step === 0} style={{ visibility: step === 0 ? "hidden" : "visible" }}>Back</button>
           <span className="mono muted" style={{ fontSize: 14 }}>{step + 1} / {STEPS.length}</span>
           {current === "finish" ? (
-            <button type="button" className="btn btn--terra" onClick={save} disabled={!canNext}>Save to Scent Atlas</button>
+            <button type="button" className="btn btn--primary" onClick={save} disabled={!canNext}>Save to Scent Atlas</button>
           ) : (
             <button type="button" className="btn btn--primary" onClick={next} disabled={!canNext}>{current === "occasion" && !occasion ? "Skip" : current === "emotions" && emotions.length === 0 ? "Skip" : "Next"}</button>
           )}

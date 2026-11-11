@@ -434,7 +434,7 @@ export function RoomEditor() {
       </section>
 
 
-      <section id="products" className="card anchor" style={{ marginTop: 8, background: "var(--moss-soft)" }}>
+      <section id="products" className="card anchor" style={{ marginTop: 8 }}>
         <ProductCards families={families} title="Matches this room" />
       </section>
     </div>

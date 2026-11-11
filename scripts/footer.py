@@ -1,7 +1,8 @@
 """
 Footer background for Olfia (Claude, 2026-11-10, after two mood references Tiffany shared:
-a dot-dithered sky and a hillside with pixel lace). Drawn from scratch in Olfia's colours:
-a halftone sky whose clouds are left as bare paper, rolling sage hills, and a few cross-stitch sprigs.
+a dot-dithered sky and a hillside with pixel lace). Drawn from scratch in the brand colours only
+(Tiffany 11/10): a halftone sky in periwinkle deep and periwinkle whose clouds are left as bare paper,
+rolling hills in apricot (the guide's pink), and a few white cross-stitch sprigs.
 Run:  python3 scripts/footer.py  ->  public/assets/footer/sky.webp
 """
 from __future__ import annotations
@@ -57,23 +58,24 @@ def main() -> None:
     band = np.exp(-((yy - 0.40) / 0.2) ** 2)
     cloud = np.clip((cloud * 0.85 + band * 0.5 - 0.42) * 2.2, 0, 1)
     sky = np.clip(1.0 - yy * 1.05, 0, 1) ** 0.9
-    deep, mid, peri = hexrgb("#4C527A"), hexrgb("#6E76A8"), hexrgb("#A0A6C8")
+    deep, peri = hexrgb("#4C527A"), hexrgb("#A0A6C8")
     for j in range(gh):
         for i in range(gw):
             v = sky[j, 0] * (1 - cloud[j, i])
             if v <= 0.05:
                 continue
             r = (CELL * 0.42) * min(1.0, v) ** 0.7
-            col = deep if v > 0.7 else mid if v > 0.4 else peri
+            col = deep if v > 0.55 else peri
             cx, cy = i * CELL + CELL / 2, j * CELL + CELL / 2
             d.rectangle([cx - r, cy - r, cx + r, cy + r], fill=col)
 
     # --- rolling hills, back to front
     arr = np.asarray(paper, dtype=float)
+    # apricot #E7B49F and two lighter washes of it, back to front
     layers = [
-        (H * 0.66, 34, 2.2, 0.6, "#C9D4B2"),
-        (H * 0.74, 42, 1.6, 2.1, "#9DB28A"),
-        (H * 0.84, 36, 2.6, 4.0, "#7C8A4A"),
+        (H * 0.66, 34, 2.2, 0.6, "#F4DDD2"),
+        (H * 0.74, 42, 1.6, 2.1, "#EDC6B5"),
+        (H * 0.84, 36, 2.6, 4.0, "#E7B49F"),
     ]
     for y0, amp, freq, ph, col in layers:
         m = hills_mask(y0, amp, freq, ph)
@@ -90,9 +92,9 @@ def main() -> None:
     for j in range(0, H, CELL):
         for i in range(0, W, CELL):
             if front[j, i]:
-                hd.rectangle([i + 3, j + 3, i + 5, j + 5], fill=hexrgb("#6A7840"))
+                hd.rectangle([i + 3, j + 3, i + 5, j + 5], fill=hexrgb("#D9A08A"))
             elif mid_h[j, i] and (i // CELL + j // CELL) % 2 == 0:
-                hd.rectangle([i + 3, j + 3, i + 5, j + 5], fill=hexrgb("#8CA078"))
+                hd.rectangle([i + 3, j + 3, i + 5, j + 5], fill=hexrgb("#E2B6A3"))
 
     # --- cross-stitch sprigs (white squares) drifting over the sky
     sprig = [

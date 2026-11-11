@@ -21,23 +21,23 @@ const NAV: NavItem[] = [
   {
     href: "/", label: "Home", icon: "home", sub: [
       { href: "/#quiz", label: "Scent quiz", dot: "#E7B49F" },
-      { href: "/#families", label: "Seven scent families", dot: "#B4552E" },
-      { href: "/#presets", label: "Room presets", dot: "#8FB5B8" },
-      { href: "/#edit", label: "The Olfia Edit", dot: "#7C8A4A" },
+      { href: "/#families", label: "Seven scent families", dot: "#A0A6C8" },
+      { href: "/#presets", label: "Room presets", dot: "#4C527A" },
+      { href: "/#edit", label: "The Olfia Edit", dot: "#E7B49F" },
     ],
   },
   {
     href: "/capture", label: "Capture", sub: [
-      { href: "/capture", label: "Capture a scent", dot: "#E2A23B" },
-      { href: "/card", label: "Make a Scent Card", dot: "#C98A8A" },
+      { href: "/capture", label: "Capture a scent", dot: "#A0A6C8" },
+      { href: "/card", label: "Make a Scent Card", dot: "#4C527A" },
     ],
   },
   {
     href: "/rooms", label: "Rooms", sub: [
-      { href: "/rooms#editor", label: "Room editor", dot: "#8A5A33" },
-      { href: "/rooms#your-rooms", label: "Your rooms", dot: "#E7B49F" },
-      { href: "/rooms#products", label: "Matches this room", dot: "#7C8A4A" },
-      { href: "/#presets", label: "Room presets", dot: "#8FB5B8" },
+      { href: "/rooms#editor", label: "Room editor", dot: "#E7B49F" },
+      { href: "/rooms#your-rooms", label: "Your rooms", dot: "#A0A6C8" },
+      { href: "/rooms#products", label: "Matches this room", dot: "#4C527A" },
+      { href: "/#presets", label: "Room presets", dot: "#E7B49F" },
     ],
   },
   {
@@ -45,24 +45,24 @@ const NAV: NavItem[] = [
       { href: "/atlas?tab=calendar", label: "Calendar", dot: "#E7B49F" },
       { href: "/atlas?tab=favorites", label: "Favorites", dot: "#A0A6C8" },
       { href: "/atlas?tab=tags", label: "Tags & profile", dot: "#4C527A" },
-      { href: "/atlas?tab=shelf", label: "My shelf", dot: "#7C8A4A" },
+      { href: "/atlas?tab=shelf", label: "My shelf", dot: "#E7B49F" },
     ],
   },
   {
     href: "/edit", label: "The Edit", sub: [
-      { href: "/library", label: "Scent Library", dot: "#C98A8A" },
-      { href: "/edit#latest", label: "Latest stories", dot: "#E2A23B" },
-      { href: "/edit#most-read", label: "Most read", dot: "#B4552E" },
-      { href: "/edit#topics", label: "Browse by topic", dot: "#8FB5B8" },
+      { href: "/library", label: "Scent Library", dot: "#4C527A" },
+      { href: "/edit#latest", label: "Latest stories", dot: "#E7B49F" },
+      { href: "/edit#most-read", label: "Most read", dot: "#A0A6C8" },
+      { href: "/edit#topics", label: "Browse by topic", dot: "#4C527A" },
     ],
   },
   {
     href: "/account", label: "My Account", icon: "user", sub: [
-      { href: "/account#profile", label: "Your profile", dot: "#A0A6C8" },
-      { href: "/account#preferences", label: "Preferences", dot: "#E7B49F" },
-      { href: "/account#info", label: "Personal info", dot: "#8FB5B8" },
-      { href: "/account#settings", label: "Settings", dot: "#7C8A4A" },
-      { href: "/account#quiz", label: "Quiz result", dot: "#E2A23B" },
+      { href: "/account#profile", label: "Your profile", dot: "#E7B49F" },
+      { href: "/account#preferences", label: "Preferences", dot: "#A0A6C8" },
+      { href: "/account#info", label: "Personal info", dot: "#4C527A" },
+      { href: "/account#settings", label: "Settings", dot: "#E7B49F" },
+      { href: "/account#quiz", label: "Quiz result", dot: "#A0A6C8" },
       { href: "/about", label: "About Olfia", dot: "#4C527A" },
     ],
   },
@@ -153,7 +153,7 @@ export function Footer() {
     <footer className="ft">
       <div className="wrap"><div className="ft__panel">
       <div className="ft__grid">
-        <div className="ft__col" style={{ flex: "2 1 280px", gap: 12 }}>
+        <div className="ft__col" style={{ flex: "1.6 1 240px", gap: 10 }}>
           <Link href="/" style={{ fontFamily: "var(--font-display)", fontStyle: "italic", fontSize: 34, lineHeight: 1 }}>Olfia</Link>
           <span className="muted" style={{ maxWidth: "24em" }}>{strings.brand.invitation}</span>
           <span className="muted" style={{ fontSize: 14 }}>{strings.common.persistenceNotice}</span>

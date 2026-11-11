@@ -14,7 +14,7 @@ const LETTER = [
 const BELIEFS = [
   { t: "A sense of place", d: "A scent belongs to a room and a moment, not only to a bottle.", c: "#A0A6C8", bg: "var(--peri-soft)" },
   { t: "Self-expression", d: "A familiar fragrance can be a routine; an imagined room can be a beginning.", c: "#E7B49F", bg: "var(--apricot-soft)" },
-  { t: "Memory and ritual", d: "Keep the detail worth remembering, with as little effort as possible.", c: "#9DB28A", bg: "var(--moss-soft)" },
+  { t: "Memory and ritual", d: "Keep the detail worth remembering, with as little effort as possible.", c: "#4C527A", bg: "var(--mist)" },
 ];
 
 export default function AboutPage() {
@@ -66,7 +66,7 @@ export default function AboutPage() {
       </section>
 
       <p style={{ display: "flex", flexWrap: "wrap", gap: 16 }}>
-        <Link href="/library" className="btn btn--moss">Scent Library</Link>
+        <Link href="/library" className="btn btn--primary">Scent Library</Link>
         <Link href="/edit" className="btn btn--ghost">The Olfia Edit</Link>
       </p>
     </div>

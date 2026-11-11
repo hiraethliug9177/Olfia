@@ -32,7 +32,7 @@ export function QuizInvite() {
           {r ? r.archetype.voice : "Twenty questions about how you live. You get one of sixteen characters, the scent family that fits, and a room to start from."}
         </p>
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "12px 24px", paddingTop: 4 }}>
-          <Link href="/quiz" className="btn btn--terra">{r ? "See your result" : "Take the quiz"}</Link>
+          <Link href="/quiz" className="btn btn--primary">{r ? "See your result" : "Take the quiz"}</Link>
           {r ? <Link href={`/rooms?family=${r.family}`} className="hero__link">Design a room in this style</Link> : <span className="muted" style={{ fontSize: 15 }}>About three minutes</span>}
         </div>
       </div>

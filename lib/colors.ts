@@ -1,17 +1,17 @@
 import type { FamilyId } from "@/lib/types";
 
 /**
- * Colour pairs for filled buttons and panels (2026-11-10: Tiffany asked for the whole palette to
- * show up in buttons and sections, with body text and page background unchanged).
- * Every pair here passes WCAG AA for 16–17px text (checked 11/10):
- * dark fills carry white text, light fills carry charcoal.
+ * Family colours as fills, for places that stand for a scent (Scent Library sections, the Scent Card,
+ * the postcard stamp). Interface buttons and panels never use these: they use the brand guide only
+ * (ivory, white, mist, charcoal, slate, periwinkle deep, periwinkle, apricot). Tiffany 11/10.
+ * Every pair passes WCAG AA for 16–17px text: dark fills carry white text, light fills carry charcoal.
  */
 export interface Pair { bg: string; fg: string }
 
 const INK = "#292A31";
 const WHITE = "#FFFFFF";
 
-/** A family's colour as a button fill. Green is one step darker so white text stays legible. */
+/** A family's colour as a fill. Green is one step darker so white text stays legible. */
 export const FAMILY_FILL: Record<FamilyId, Pair> = {
   floral: { bg: "#C98A8A", fg: INK },
   gourmand: { bg: "#D4A26A", fg: INK },

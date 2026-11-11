@@ -37,7 +37,7 @@ export default function HomePage() {
             <h2 className="h-section">{strings.brand.explore}</h2>
             <div className="split-head__side">
               <p className="lead">Start from a room that is already set, then make it yours.</p>
-              <Link href="/rooms" className="btn btn--terra btn--sm">Open Rooms</Link>
+              <Link href="/rooms" className="btn btn--primary btn--sm">Open Rooms</Link>
             </div>
           </div>
           <div className="preset-grid">
@@ -53,12 +53,12 @@ export default function HomePage() {
       </section>
 
       <section id="edit" className="wrap section">
-        <div className="panel panel--moss">
+        <div className="panel panel--white">
           <div className="split-head">
             <h2 className="h-section">The Olfia Edit</h2>
             <div className="split-head__side">
               <p className="lead">Culture, fragrance, and the art of living.</p>
-              <Link href="/edit" className="btn btn--moss btn--sm">Read the Edit</Link>
+              <Link href="/edit" className="btn btn--primary btn--sm">Read the Edit</Link>
             </div>
           </div>
           <div className="edit-grid">

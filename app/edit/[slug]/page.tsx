@@ -50,7 +50,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
           <span className="hand" style={{ fontSize: 26, color: "var(--deep)" }}>try this</span>
           <h2>{a.tryThis.title}</h2>
           {a.tryThis.paras.map((p, i) => <p key={i}><Rich text={p} /></p>)}
-          <Link href={`/rooms?family=${a.families.join(",")}`} className="btn btn--terra" style={{ alignSelf: "flex-start", marginTop: 6 }}>
+          <Link href={`/rooms?family=${a.families.join(",")}`} className="btn btn--primary" style={{ alignSelf: "flex-start", marginTop: 6 }}>
             Build this room in {a.families.map((f) => familyById(f).label).join(" + ")}
           </Link>
         </aside>
