@@ -747,3 +747,42 @@ body::after {
 .cast__cap { display: flex; flex-direction: column; gap: 4px; padding: 0 4px; }
 .cast__name { font-family: var(--font-display); font-size: 22px; font-weight: 600; line-height: 1.1; }
 .cast__meta { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--slate); }
+
+/* ---------- Scent Atlas: the month's record, drawn as a ticket with a stub (11/10) ---------- */
+.record { position: relative; display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(260px, 1fr); border-radius: 22px; background: var(--paper); box-shadow: 0 10px 26px rgba(41,42,49,0.1); }
+.record::after { content: ""; position: absolute; inset: 0; border-radius: inherit; opacity: 0.16; pointer-events: none; background-image: radial-gradient(rgba(90,70,50,0.8) 0.6px, transparent 0.8px); background-size: 3px 3px; }
+.record__main { position: relative; padding: 28px 30px; display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+.record__stub { position: relative; padding: 28px 26px; display: flex; flex-direction: column; gap: 18px; min-width: 0; border-left: 2px dashed rgba(41,42,49,0.22); background: rgba(255,255,255,0.45); border-radius: 0 22px 22px 0; }
+.record__stub::before, .record__stub::after { content: ""; position: absolute; left: -13px; width: 24px; height: 24px; border-radius: 50%; background: var(--apricot-soft); z-index: 1; }
+.record__stub::before { top: -12px; }
+.record__stub::after { bottom: -12px; }
+.record__head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 12px; }
+.record__title { font-family: var(--font-display); font-size: clamp(30px, 3vw, 40px); font-weight: 600; letter-spacing: -0.01em; }
+.record__kind { font-size: 13px; color: var(--slate); }
+.record__totals { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 0; }
+.record__totals > div { display: flex; flex-direction: column-reverse; gap: 4px; padding: 12px 14px; border-radius: 16px; background: rgba(255,255,255,0.7); }
+.record__totals dd { margin: 0; font-family: var(--font-display); font-size: 40px; font-weight: 600; line-height: 1; }
+.record__totals dt { font-size: 13px; color: var(--slate); }
+.record__stamps { list-style: none; margin: 0; padding: 6px 0 0 4px; display: flex; flex-wrap: wrap; gap: 6px 0; }
+.record__stamps li { width: 84px; height: 84px; margin-right: -8px; }
+.record__empty { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; min-height: 84px; }
+.record__block { display: flex; flex-direction: column; gap: 10px; }
+.record__label { font-size: 14px; font-weight: 600; color: var(--slate); }
+.record__bar { display: flex; height: 16px; border-radius: 999px; overflow: hidden; gap: 2px; }
+.record__legend { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
+.record__legend li { display: flex; align-items: center; gap: 8px; }
+.record__legend em { margin-left: auto; font-style: normal; color: var(--slate); }
+.record__tod { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; align-items: end; }
+.record__tod > div { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.record__col { display: flex; align-items: flex-end; width: 28px; height: 64px; border-radius: 9px; background: rgba(41,42,49,0.08); overflow: hidden; }
+.record__col span { display: block; width: 100%; background: var(--deep); border-radius: 9px; }
+.record__num { font-family: var(--font-display); font-size: 20px; font-weight: 600; line-height: 1; }
+.record__cap { font-size: 13px; color: var(--slate); text-transform: capitalize; }
+.record__top { display: flex; align-items: center; gap: 14px; margin-top: auto; padding-top: 8px; border-top: 1px solid rgba(41,42,49,0.12); font-family: var(--font-display); font-size: 22px; white-space: nowrap; }
+@media (max-width: 760px) {
+  .record { grid-template-columns: minmax(0, 1fr); }
+  .record__stub { border-left: 0; border-top: 2px dashed rgba(41,42,49,0.22); border-radius: 0 0 22px 22px; }
+  .record__stub::before { top: -13px; left: -12px; }
+  .record__stub::after { top: -13px; bottom: auto; left: auto; right: -12px; }
+  .record__totals { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

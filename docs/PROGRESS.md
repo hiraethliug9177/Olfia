@@ -20,7 +20,7 @@ Workflow: commit to `v3-design` → Vercel preview build passes → `git push or
 - [x] 3 Archetype illustrations (scripts/archetypes.py → public/assets/archetypes/*.svg; on the quiz result card and a 'Sixteen characters' gallery on /quiz; regenerate with `python3 scripts/archetypes.py`)
 - [ ] 4 Kitchen + bathroom
 - [ ] 5 Scent Card templates
-- [ ] 6 Monthly record
+- [x] 6 Monthly record (components/atlas/MonthRecord.tsx: ticket with stub — totals with singular/plural, one stamp per recorded day, most-used family; stub: families, time of day, tags; empty month shows a Capture button)
 - [x] 7 Footer (scripts/footer.py → public/assets/footer/sky.webp: halftone sky with bare-paper clouds, sage hills, cross-stitch sprigs; links on a paper panel)
 
 Note 11/10 ~5:50 pm PT: Tiffany's laptop is closed, so the Mac type-check and her browser pane are unavailable. Vercel preview builds are the type check; new visuals are checked as local static mockups rendered with Playwright in the container.

@@ -18,6 +18,7 @@ import { ScentProfile } from "@/components/account/ScentProfile";
 import { Stamp } from "@/components/scene/Stamp";
 import { useSearchParams } from "next/navigation";
 import { Shelf } from "@/components/atlas/Shelf";
+import { MonthRecord } from "@/components/atlas/MonthRecord";
 
 /** Atlas views and their colours (Tiffany 11/10: each panel in one of the site's own colours). */
 const TABS = ["calendar", "favorites", "tags", "shelf"] as const;
@@ -100,18 +101,6 @@ export function AtlasView() {
     setDay(d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth() ? now.getDate() : 1);
   };
 
-  const famCount = new Map<FamilyId, number>();
-  monthEntries.forEach((e) => e.families.forEach((f) => famCount.set(f, (famCount.get(f) ?? 0) + 1)));
-  const share = FAMILIES.filter((f) => famCount.has(f.id))
-    .map((f) => ({ f, n: famCount.get(f.id) ?? 0 }))
-    .sort((a, b) => b.n - a.n);
-  const tod = { morning: 0, afternoon: 0, night: 0 };
-  monthEntries.forEach((e) => { tod[partOfDay(new Date(e.createdAt))] += 1; });
-  const kinds = new Map<string, number>();
-  monthEntries.forEach((e) => kinds.set(entryKind(e), (kinds.get(entryKind(e)) ?? 0) + 1));
-  const kindRows = [...kinds.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5);
-  const maxTod = Math.max(1, tod.morning, tod.afternoon, tod.night);
-  const maxKind = Math.max(1, ...kindRows.map((k) => k[1]));
   const dayEntries = byDay.get(day) ?? [];
   const today = new Date();
   const monthName = monthLabel(ym.y, ym.m).split(" ")[0];
@@ -233,46 +222,8 @@ export function AtlasView() {
               </aside>
             </div>
 
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 20, padding: "8px 28px 32px" }}>
-              <div className="stat" style={{ flex: "2 1 420px" }}>
-                <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 12 }}>
-                  <span className="label-mono">Families this month</span>
-                  <span className="callout">{byDay.size} days recorded</span>
-                </div>
-                {share.length ? (
-                  <>
-                    <div style={{ display: "flex", height: 22, borderRadius: 999, overflow: "hidden", gap: 3 }}>
-                      {share.map(({ f, n }) => <span key={f.id} title={f.label} style={{ flex: `${n} 1 0`, background: f.hex }} />)}
-                    </div>
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: "8px 18px" }}>
-                      {share.map(({ f, n }) => (
-                        <span key={f.id} className="mono" style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 14 }}><span className="chip__dot" style={{ width: 12, height: 12, background: f.hex }} />{f.label} {n}</span>
-                      ))}
-                    </div>
-                    <span style={{ fontSize: 18 }}>Most used: <span className="hl" style={{ "--hl": `${share[0].f.hex}66` } as CSSProperties}>{share[0].f.label}</span></span>
-                  </>
-                ) : <span className="muted">Nothing this month yet.</span>}
-              </div>
-              <div className="stat" style={{ flex: "1 1 240px" }}>
-                <span className="label-mono">Time of day</span>
-                {(["morning", "afternoon", "night"] as const).map((k) => (
-                  <div key={k} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                    <span className="mono" style={{ width: 92, fontSize: 14, textTransform: "capitalize" }}>{k}</span>
-                    <span className="bar"><span style={{ width: `${(tod[k] / maxTod) * 100}%`, background: "#4C527A" }} /></span>
-                    <span className="mono" style={{ width: 24, textAlign: "right", fontSize: 14 }}>{tod[k]}</span>
-                  </div>
-                ))}
-              </div>
-              <div className="stat" style={{ flex: "1 1 240px" }}>
-                <span className="label-mono">Scent sources</span>
-                {kindRows.length ? kindRows.map(([k, n]) => (
-                  <div key={k} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                    <span className="mono" style={{ width: 92, fontSize: 14 }}>{k}</span>
-                    <span className="bar"><span style={{ width: `${(n / maxKind) * 100}%`, background: "#B4552E" }} /></span>
-                    <span className="mono" style={{ width: 24, textAlign: "right", fontSize: 14 }}>{n}</span>
-                  </div>
-                )) : <span className="muted">—</span>}
-              </div>
+            <div style={{ padding: "8px 28px 32px" }}>
+              <MonthRecord entries={monthEntries} year={ym.y} month={ym.m} />
             </div>
           </>
         ) : tab === 2 ? (
