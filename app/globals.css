@@ -797,7 +797,9 @@ body::after {
 .sc__line { font-family: var(--font-hand); font-weight: 700; font-size: 7.4cqw; line-height: 1.02; color: var(--ink); overflow-wrap: anywhere; }
 .sc__meta { display: flex; flex-direction: column; gap: 0.3cqw; min-width: 0; font-family: var(--font-ui); font-size: max(13px, 3.6cqw); line-height: 1.35; color: var(--slate); }
 .sc__meta span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.sc__foot { display: flex; align-items: flex-end; justify-content: space-between; gap: 3cqw; margin-top: auto; }
+.sc__foot > .sc__meta { flex: 1 1 auto; max-width: 100%; }
+.sc__foot { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 1cqw 3cqw; margin-top: auto; }
+.sc__foot > .sc__sig { margin-left: auto; }
 .sc__sig { flex: none; font-family: var(--font-hand); font-weight: 700; font-size: 9cqw; line-height: 0.9; color: var(--deep); rotate: -7deg; }
 .sc__date { position: absolute; right: 4cqw; bottom: 3.4cqw; z-index: 4; font-family: var(--font-ui); font-weight: 600; font-size: max(13px, 3.9cqw); letter-spacing: 0.08em; color: #F7931E; text-shadow: 0 0 0.9cqw rgba(255,140,40,0.75), 0 0.2cqw 0.5cqw rgba(41,42,49,0.4); pointer-events: none; }
 .sc__postmark { position: absolute; z-index: 5; pointer-events: none; }
