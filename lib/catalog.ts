@@ -291,6 +291,9 @@ export interface SceneDef {
 
 export const SCENES: SceneDef[] = [{ id: "reading-corner", name: "Reading Corner" }];
 
+/** A saved room's official name (the user's own name for it is the nickname). */
+export const sceneName = (id: string | undefined): string => SCENES.find((s) => s.id === id)?.name ?? SCENES[0].name;
+
 let uidCounter = 0;
 export function uid(): string {
   uidCounter += 1;
