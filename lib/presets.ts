@@ -4,13 +4,15 @@ import type { FamilyId, PlacedItem, TimeOfDay } from "@/lib/types";
 /**
  * Room presets for the Home gallery (11/9 feedback 04: the examples all looked like one room).
  * Each preset differs in furniture, light and scent. Only furniture that exists as art is used;
- * Uses Tiffany's 11/10 furniture cut-outs. Kitchen and bathroom wait for their items.
+ * Uses Tiffany's 11/10 furniture cut-outs; the kitchen and bathroom pieces are drawn in code (11/10).
  * Lines drafted by Claude on 2026-11-10 with Tiffany's go-ahead ("generate them or leave them
  * blank"); she can replace them at any time. Each covers the scent source, the light, and one
  * small human detail, without repeating the room or family name.
  */
 export interface RoomPreset {
   id: string;
+  /** which room it is drawn in (lib/catalog.ts SCENES) */
+  scene: string;
   name: string;
   line: string;
   families: FamilyId[];
@@ -23,6 +25,7 @@ const p = (kind: string, x: number, y: number, z: number, extra: Partial<PlacedI
 export const ROOM_PRESETS: RoomPreset[] = [
   {
     id: "reading-night",
+    scene: "reading-corner",
     name: "Reading corner, night",
     line: "A cedar candle burning low, one lamp on, a page folded down.",
     families: ["woody", "spicy"],
@@ -31,6 +34,7 @@ export const ROOM_PRESETS: RoomPreset[] = [
   },
   {
     id: "bedroom-morning",
+    scene: "reading-corner",
     name: "Bedroom, morning",
     line: "Bergamot mist from the diffuser, blinds half up, sheets still warm.",
     families: ["citrus", "fresh"],
@@ -46,6 +50,7 @@ export const ROOM_PRESETS: RoomPreset[] = [
   },
   {
     id: "study-afternoon",
+    scene: "reading-corner",
     name: "Study, afternoon",
     line: "Cedar incense in slanting sun, a pencil tucked behind one ear.",
     families: ["woody", "green"],
@@ -63,6 +68,7 @@ export const ROOM_PRESETS: RoomPreset[] = [
   },
   {
     id: "living-night",
+    scene: "reading-corner",
     name: "Living room, late",
     line: "A vanilla-clove candle, the record on side two, shoes kicked off.",
     families: ["gourmand", "spicy"],
@@ -77,5 +83,23 @@ export const ROOM_PRESETS: RoomPreset[] = [
       p("record-player", 0.9, 0.71, 5, { scale: 0.85 }),
       ...stickersFor(["gourmand", "spicy"]),
     ],
+  },
+  {
+    id: "kitchen-morning",
+    scene: "kitchen",
+    name: "Kitchen, Sunday morning",
+    line: "Orange peel and cinnamon on a low simmer, the radio on quietly.",
+    families: ["citrus", "spicy"],
+    time: "morning",
+    items: [...baseLayout("candle", "kitchen"), ...stickersFor(["citrus", "spicy"])],
+  },
+  {
+    id: "bath-evening",
+    scene: "bathroom",
+    name: "Bathroom, evening",
+    line: "A eucalyptus candle on the edge of the tub, the tap still running.",
+    families: ["green", "fresh"],
+    time: "night",
+    items: [...baseLayout("candle", "bathroom"), ...stickersFor(["green", "fresh"])],
   },
 ];

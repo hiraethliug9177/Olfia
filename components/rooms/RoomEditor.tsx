@@ -12,12 +12,15 @@ import {
   baseLayout,
   areNeighbours,
   FURNITURE_GROUPS,
+  SCENES,
   familyById,
   findMaterial,
   itemById,
+  sceneName,
   stickersFor,
   uid,
 } from "@/lib/catalog";
+import { ROOM_PRESETS } from "@/lib/presets";
 import { newId, useAtlas } from "@/lib/store";
 import { useToast } from "@/lib/toast";
 import { track } from "@/lib/analytics";
@@ -44,12 +47,15 @@ export function RoomEditor() {
   const params = useSearchParams();
   const editId = params.get("id");
   const famParam = params.get("family");
+  const sceneParam = params.get("scene");
+  const presetParam = params.get("preset");
   const entries = useAtlas((s) => s.entries);
   const hydrated = useAtlas((s) => s.hydrated);
   const replace = useAtlas((s) => s.replace);
   const show = useToast((s) => s.show);
 
   const [entryId, setEntryId] = useState<string | null>(null);
+  const [sceneId, setSceneId] = useState<string>("reading-corner");
   const [createdAt, setCreatedAt] = useState<string | null>(null);
   const [nickname, setNickname] = useState("");
   const [items, setItems] = useState<PlacedItem[]>(() => [...baseLayout("candle"), ...stickersFor(DEFAULT_FAMS)]);
@@ -70,26 +76,41 @@ export function RoomEditor() {
   // Load a saved room when opened with ?id=
   useEffect(() => {
     if (!hydrated) return;
-    const key = editId ?? "new";
+    const key = editId ?? `new:${presetParam ?? ""}:${sceneParam ?? ""}`;
     if (loadedFor === key) return;
     setLoadedFor(key);
     if (!editId) {
-      // Opened from the quiz result or a family window: start with that family applied.
+      setEntryId(null); setCreatedAt(null); setNickname("");
+      setPast([]); setFuture([]); setSelected(null);
+      // Opened from a Home preset: that exact room, ready to change.
+      const preset = ROOM_PRESETS.find((r) => r.id === presetParam);
+      if (preset) {
+        setSceneId(preset.scene); setItems(preset.items); setFamilies(preset.families);
+        setStrength(70); setTime(preset.time); setWindowOpen(false);
+        return;
+      }
+      // Opened from the quiz result, a family window or a room tab: start with that family applied.
       const fromParam = (famParam ?? "").split(",").map((id) => FAMILIES.find((f) => f.id === id)?.id).filter((id): id is FamilyId => !!id).slice(0, 3);
       const start: FamilyId[] = fromParam.length ? fromParam : DEFAULT_FAMS;
-      setEntryId(null); setCreatedAt(null); setNickname("");
-      setItems([...baseLayout("candle"), ...stickersFor(start)]);
+      const scene = SCENES.find((x) => x.id === sceneParam)?.id ?? "reading-corner";
+      setSceneId(scene);
+      setItems([...baseLayout("candle", scene), ...stickersFor(start)]);
       setFamilies(start); setStrength(70); setTime("afternoon"); setWindowOpen(false);
-      setPast([]); setFuture([]); setSelected(null);
       return;
     }
     const e = entries.find((x) => x.id === editId);
     if (e && e.type === "rooms") {
-      setEntryId(e.id); setCreatedAt(e.createdAt); setNickname(e.nickname);
+      setEntryId(e.id); setCreatedAt(e.createdAt); setNickname(e.nickname); setSceneId(e.sceneId);
       setItems(e.items); setFamilies(e.families); setStrength(e.strength); setTime(e.time); setWindowOpen(e.windowOpen);
       setPast([]); setFuture([]); setSelected(null);
     }
-  }, [hydrated, editId, famParam, entries, loadedFor]);
+  }, [hydrated, editId, famParam, sceneParam, presetParam, entries, loadedFor]);
+
+  /** A room tab starts a new page of that room, keeping the families already chosen. */
+  const openScene = (id: string) => {
+    if (id === sceneId) return;
+    router.replace(`/rooms?scene=${id}&family=${families.join(",")}`, { scroll: false });
+  };
 
   const commit = (next: PlacedItem[]) => {
     setPast((p) => [...p.slice(-40), items]);
@@ -206,10 +227,10 @@ export function RoomEditor() {
     const entry: RoomsEntry = {
       id, schemaVersion: 2, type: "rooms", createdAt: createdAt ?? now, updatedAt: now,
       starred: entries.find((x) => x.id === id)?.starred ?? false,
-      families, sceneId: "reading-corner", nickname: nickname.trim(), items, strength, time, windowOpen,
+      families, sceneId, nickname: nickname.trim(), items, strength, time, windowOpen,
     };
     replace(entry);
-    if (!entryId) track("creation_complete", { mode: "rooms", scene_id: "reading-corner" });
+    if (!entryId) track("creation_complete", { mode: "rooms", scene_id: sceneId });
     setEntryId(id); setCreatedAt(entry.createdAt); setLoadedFor(id);
     if (goCard) {
       router.push(`/card?from=${id}`);
@@ -258,7 +279,12 @@ export function RoomEditor() {
             }
             return (
               <div className="tray-groups">
-                {FURNITURE_GROUPS.map((g) => {
+                {(() => {
+                  // the room's own pieces first, then everything else
+                  const own = SCENES.find((x) => x.id === sceneId)?.group;
+                  const others = SCENES.map((x) => x.group).filter((g) => g && g !== own);
+                  return [...(own ? [own] : []), ...FURNITURE_GROUPS.filter((g) => g !== own && !others.includes(g)), ...others.filter((g): g is NonNullable<typeof g> => !!g)];
+                })().map((g) => {
                   const list = trayItems.filter((it) => (it.group ?? "Objects") === g);
                   return list.length ? (
                     <div key={g} style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -289,7 +315,7 @@ export function RoomEditor() {
             <ScenePage
               items={items}
               families={families}
-              title="Reading Corner"
+              title={sceneName(sceneId)}
               nickname={nickname}
               strength={strength}
               time={time}
@@ -318,7 +344,11 @@ export function RoomEditor() {
 
         <div className="card editor__panel" style={{ padding: 22 }}>
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            <span style={{ fontFamily: "var(--font-display)", fontSize: 28, lineHeight: 1.1 }}>Reading Corner</span>
+            <div role="radiogroup" aria-label="Room" className="room-tabs">
+              {SCENES.map((x) => (
+                <button key={x.id} type="button" role="radio" aria-checked={sceneId === x.id} className="room-tabs__opt" onClick={() => openScene(x.id)}>{x.name}</button>
+              ))}
+            </div>
             <label className="field" style={{ fontSize: 15, color: "var(--slate)" }}>
               Your name for it
               <input className="input hand" style={{ fontSize: 22 }} type="text" value={nickname} maxLength={40} onChange={(e) => setNickname(e.target.value)} placeholder="rain, chapter three" />
@@ -393,7 +423,7 @@ export function RoomEditor() {
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 4, minWidth: 0 }}>
               <span className="label-mono" style={{ fontSize: 13 }}>{shortDate(new Date(r.updatedAt))}</span>
-              <span style={{ fontFamily: "var(--font-display)", fontSize: i === 0 ? 24 : 19, lineHeight: 1.1 }}>Reading Corner</span>
+              <span style={{ fontFamily: "var(--font-display)", fontSize: i === 0 ? 24 : 19, lineHeight: 1.1 }}>{sceneName(r.sceneId)}</span>
               {r.nickname ? <span className="hand" style={{ fontSize: 20, color: "var(--deep)" }}>{r.nickname}</span> : null}
               {i === 0 ? <span className="btn btn--primary btn--sm" style={{ alignSelf: "flex-start", marginTop: 6, height: 40 }}>Continue</span> : null}
             </div>

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState, type CSSProperties } from "react";
-import { FAMILIES, familyById, itemById, methodLabel, roomLabel, sourceLabel } from "@/lib/catalog";
+import { FAMILIES, familyById, itemById, methodLabel, roomLabel, sceneName, sourceLabel } from "@/lib/catalog";
 import { useAtlas, useMounted } from "@/lib/store";
 import { useToast } from "@/lib/toast";
 import { track } from "@/lib/analytics";
@@ -32,7 +32,7 @@ function tabFromParams(p: URLSearchParams | null): TabId {
 }
 
 function entryTitle(e: Entry): string {
-  if (e.type === "rooms") return e.nickname ? `Reading Corner · ${e.nickname}` : "Reading Corner";
+  if (e.type === "rooms") return e.nickname ? `${sceneName(e.sceneId)} · ${e.nickname}` : sceneName(e.sceneId);
   if (e.what.mode === "product") return e.what.productName || e.what.scentName || sourceLabel(e.source);
   return e.what.text || methodLabel(e.what.method);
 }
@@ -278,7 +278,7 @@ export function AtlasView() {
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 26 }}>
                   {starredRooms.map((r) => (
                     <Link key={r.id} href={`/rooms?id=${r.id}`} style={{ display: "flex", flexDirection: "column", gap: 10, textDecoration: "none", color: "var(--ink)" }}>
-                      <ScenePage items={r.items} families={r.families} title="Reading Corner" note={r.nickname} date={new Date(r.updatedAt)} time={r.time} strength={r.strength} windowOpen={r.windowOpen} showLabels={false} />
+                      <ScenePage items={r.items} families={r.families} title={sceneName(r.sceneId)} note={r.nickname} date={new Date(r.updatedAt)} time={r.time} strength={r.strength} windowOpen={r.windowOpen} showLabels={false} />
                     </Link>
                   ))}
                 </div>

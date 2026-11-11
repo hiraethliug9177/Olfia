@@ -176,7 +176,7 @@ export interface ItemDef {
   group?: FurnitureGroup;
 }
 
-export const FURNITURE_GROUPS = ["Seating", "Tables", "Lighting", "Storage", "Beds", "Paper & books", "Objects", "Walls & floor"] as const;
+export const FURNITURE_GROUPS = ["Seating", "Tables", "Lighting", "Storage", "Beds", "Paper & books", "Objects", "Walls & floor", "Kitchen", "Bath"] as const;
 export type FurnitureGroup = (typeof FURNITURE_GROUPS)[number];
 
 export const FURNITURE: ItemDef[] = [
@@ -262,6 +262,21 @@ export const FURNITURE: ItemDef[] = [
   { id: "photo-box", label: "Photo box", category: "furniture", group: "Paper & books", w: 0.14, aspect: 1.0347, asset: "/assets/furniture/photo-box.webp" },
   { id: "basket", label: "Picnic basket", category: "furniture", group: "Objects", w: 0.14, aspect: 1.1549, asset: "/assets/furniture/basket.webp" },
   { id: "cake", label: "Strawberry cake", category: "furniture", group: "Objects", w: 0.12, aspect: 0.997, asset: "/assets/furniture/cake.webp" },
+  // 2026-11-10: kitchen and bathroom pieces, drawn in code (components/scene/Cutout.tsx)
+  { id: "counter", label: "Kitchen counter", category: "furniture", group: "Kitchen", w: 0.74, aspect: 165 / 300, floor: true },
+  { id: "backsplash", label: "Tiled wall", category: "furniture", group: "Kitchen", w: 0.8, aspect: 120 / 300 },
+  { id: "jar-shelf", label: "Jar shelf", category: "furniture", group: "Kitchen", w: 0.36, aspect: 84 / 160 },
+  { id: "kettle", label: "Kettle", category: "furniture", group: "Kitchen", w: 0.12, aspect: 56 / 60 },
+  { id: "fruit-bowl", label: "Fruit bowl", category: "furniture", group: "Kitchen", w: 0.15, aspect: 52 / 80 },
+  { id: "herb-pots", label: "Herb pots", category: "furniture", group: "Kitchen", w: 0.16, aspect: 70 / 90 },
+  { id: "bathtub", label: "Bathtub", category: "furniture", group: "Bath", w: 0.62, aspect: 162 / 300, floor: true },
+  { id: "pedestal-sink", label: "Pedestal sink", category: "furniture", group: "Bath", w: 0.22, aspect: 158 / 100, floor: true },
+  { id: "bath-tiles", label: "Bath tiles", category: "furniture", group: "Bath", w: 0.84, aspect: 130 / 300 },
+  { id: "round-mirror", label: "Round mirror", category: "furniture", group: "Bath", w: 0.18, aspect: 104 / 90 },
+  { id: "towel-rail", label: "Towel rail", category: "furniture", group: "Bath", w: 0.22, aspect: 92 / 110 },
+  { id: "bath-mat", label: "Bath mat", category: "furniture", group: "Bath", w: 0.5, aspect: 46 / 300, floor: true },
+  { id: "soap", label: "Soap dish", category: "furniture", group: "Bath", w: 0.09, aspect: 27 / 60 },
+  { id: "bottles", label: "Bottles", category: "furniture", group: "Bath", w: 0.12, aspect: 70 / 80 },
 ];
 
 export const SOURCES: ItemDef[] = [
@@ -270,6 +285,7 @@ export const SOURCES: ItemDef[] = [
   { id: "spray", label: "Room spray", category: "source", w: 0.06, aspect: 282 / 120, asset: "/assets/sources/source-spray.webp" },
   { id: "incense", label: "Incense", category: "source", w: 0.08, aspect: 296 / 158, asset: "/assets/sources/source-incense.webp" },
   { id: "oil", label: "Oil burner", category: "source", w: 0.1, aspect: 259 / 220, asset: "/assets/sources/source-oil-burner.webp" },
+  { id: "simmer-pot", label: "Simmer pot", category: "source", w: 0.14, aspect: 72 / 70 },
 ];
 
 export const MATERIAL_ITEMS: ItemDef[] = FAMILIES.flatMap((f) =>
@@ -287,9 +303,15 @@ export const FLOOR_LINE = 0.74;
 export interface SceneDef {
   id: string;
   name: string;
+  /** the tray group shown first while designing this room */
+  group?: FurnitureGroup;
 }
 
-export const SCENES: SceneDef[] = [{ id: "reading-corner", name: "Reading Corner" }];
+export const SCENES: SceneDef[] = [
+  { id: "reading-corner", name: "Reading Corner" },
+  { id: "kitchen", name: "Kitchen", group: "Kitchen" },
+  { id: "bathroom", name: "Bathroom", group: "Bath" },
+];
 
 /** A saved room's official name (the user's own name for it is the nickname). */
 export const sceneName = (id: string | undefined): string => SCENES.find((s) => s.id === id)?.name ?? SCENES[0].name;
@@ -304,7 +326,33 @@ function place(kind: string, x: number, y: number, z: number, extra?: Partial<Pl
   return { uid: `${kind}-${z}`, kind, x, y, scale: 1, rot: 0, flip: 1, z, ...extra };
 }
 
-export function baseLayout(source: string = "candle"): PlacedItem[] {
+/** The room a new page starts with. Item anchors are bottom-centre, as fractions of the stage. */
+export function baseLayout(source: string = "candle", sceneId: string = "reading-corner"): PlacedItem[] {
+  if (sceneId === "kitchen") {
+    // countertop surface at y ≈ 0.561 (counter 0.74 wide, standing on 0.9)
+    return [
+      place("backsplash", 0.5, 0.62, 1),
+      place("paper-lamp", 0.28, 0.3, 2),
+      place("jar-shelf", 0.68, 0.46, 3),
+      place("counter", 0.5, 0.9, 4),
+      place("kettle", 0.24, 0.566, 6),
+      place("fruit-bowl", 0.72, 0.566, 7),
+      place(source === "candle" ? "simmer-pot" : source, 0.46, 0.566, 9),
+    ];
+  }
+  if (sceneId === "bathroom") {
+    // tub rim at y ≈ 0.686 (tub 0.62 wide, standing on 0.9)
+    return [
+      place("bath-tiles", 0.5, 0.7, 1),
+      place("towel-rail", 0.17, 0.5, 2),
+      place("round-mirror", 0.83, 0.58, 3),
+      place("pedestal-sink", 0.83, 0.9, 4),
+      place("bathtub", 0.38, 0.9, 5),
+      place("bath-mat", 0.42, 0.99, 6),
+      place("soap", 0.2, 0.69, 7),
+      place(source, 0.3, 0.69, 9),
+    ];
+  }
   const sourceY = source === "candle" ? 0.69 : 0.7;
   return [
     place("rug", 0.5, 0.98, 1),

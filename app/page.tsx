@@ -42,7 +42,7 @@ export default function HomePage() {
           </div>
           <div className="preset-grid">
             {ROOM_PRESETS.map((r) => (
-              <Link key={r.id} href={`/rooms?family=${r.families.join(",")}`} className="preset">
+              <Link key={r.id} href={`/rooms?preset=${r.id}`} className="preset">
                 <ScenePage items={r.items} families={r.families} title={r.name} time={r.time} showLabels={false} prefix={`pre-${r.id}`} />
                 <span className="preset__name">{r.name}</span>
                 {r.line.startsWith("TODO(") ? null : <span className="preset__line">{r.line}</span>}

@@ -11,9 +11,9 @@ export function sampleEntries(now: Date = new Date()): Entry[] {
     d.setHours(hour, 0, 0, 0);
     return d.toISOString();
   };
-  const room = (daysAgo: number, hour: number, families: FamilyId[], nickname: string, time: TimeOfDay, source: string, starred = false): RoomsEntry => ({
+  const room = (daysAgo: number, hour: number, families: FamilyId[], nickname: string, time: TimeOfDay, source: string, starred = false, sceneId = "reading-corner"): RoomsEntry => ({
     id: newId(), schemaVersion: 2, type: "rooms", createdAt: at(daysAgo, hour), updatedAt: at(daysAgo, hour), starred, families,
-    sceneId: "reading-corner", nickname, items: [...baseLayout(source), ...stickersFor(families)], strength: 70, time, windowOpen: false,
+    sceneId, nickname, items: [...baseLayout(source, sceneId), ...stickersFor(families)], strength: 70, time, windowOpen: false,
   });
   const dp = (hour: number): Daypart => (hour < 12 ? "morning" : hour < 17 ? "afternoon" : hour < 21 ? "evening" : "night");
   const ctx = (daysAgo: number, hour: number, families: FamilyId[], emotions: EmotionId[], room: CaptureEntry["room"]) => {
@@ -34,11 +34,12 @@ export function sampleEntries(now: Date = new Date()): Entry[] {
   return [
     room(0, 21, ["woody", "spicy", "gourmand"], "rain, chapter three", "night", "candle", true),
     product(0, 21, ["woody", "spicy"], "Cedar & Clove candle", "Cedar & Clove", "Reading after work", "candle", true, ["cozy", "focused"]),
-    room(2, 8, ["citrus", "green"], "first coffee", "morning", "diffuser", true),
+    room(2, 8, ["citrus", "green"], "first coffee", "morning", "diffuser", true, "kitchen"),
     method(3, 18, ["spicy", "citrus"], "simmer", "First cold evening", ["nostalgic", "cozy"]),
     room(5, 16, ["floral", "gourmand"], "a slow sunday", "afternoon", "spray"),
     product(7, 22, ["fresh"], "Sea salt reeds", "Sea Salt", "Bathroom, after a long shower", "diffuser", true, ["calm", "fresh-start"]),
     method(9, 10, ["fresh"], "laundry", "Sheets just off the line", ["fresh-start"]),
+    room(10, 22, ["green", "fresh"], "long bath", "night", "candle", false, "bathroom"),
     product(11, 20, ["gourmand"], "Vanilla tonka oil", "Vanilla Tonka", "Too sweet for summer", "oil", false, ["restless"]),
     room(13, 21, ["woody", "green"], "desk, late", "night", "incense"),
     method(16, 15, ["gourmand"], "baking", "Banana bread", ["playful", "safe"]),
