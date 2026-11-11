@@ -8,7 +8,7 @@ import { useToast } from "@/lib/toast";
 import { partOfDay } from "@/lib/dates";
 import { sampleEntries } from "@/lib/sample";
 import type { Entry, FamilyId, SourceKind } from "@/lib/types";
-import { ScentProfile } from "@/components/account/ScentProfile";
+import { ScentSummary } from "@/components/account/ScentSummary";
 import { Character } from "@/components/quiz/Character";
 import { blendsWith, loadQuiz, type QuizResult } from "@/lib/quiz";
 
@@ -122,7 +122,7 @@ export function AccountView() {
         </div>
       </section>
 
-      <div id="profile" className="anchor"><ScentProfile /></div>
+      <div id="profile" className="anchor"><ScentSummary /></div>
 
       <section id="preferences" className="card anchor" style={{ display: "flex", flexDirection: "column", gap: 18, background: "var(--apricot-soft)" }}>
         <h2 className="h-section" style={{ fontSize: 34 }}>My preferences</h2>

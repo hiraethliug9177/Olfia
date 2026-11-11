@@ -14,7 +14,7 @@ import { Star as StarIcon } from "lucide-react";
 import { sampleEntries } from "@/lib/sample";
 import type { CaptureEntry, Entry, FamilyId, RoomsEntry } from "@/lib/types";
 import { ScenePage } from "@/components/scene/ScenePage";
-import { ScentProfile } from "@/components/account/ScentProfile";
+import { ScentSummary } from "@/components/account/ScentSummary";
 import { Stamp } from "@/components/scene/Stamp";
 import { useSearchParams } from "next/navigation";
 import { Shelf } from "@/components/atlas/Shelf";
@@ -261,7 +261,7 @@ export function AtlasView() {
                       ))}
                     </div>
                   ) : null}
-                  <ScentProfile compact />
+                  <ScentSummary compact />
                 </>
               );
             })()}

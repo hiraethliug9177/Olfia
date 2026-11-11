@@ -11,7 +11,8 @@ import { Stamp } from "@/components/scene/Stamp";
 import type { Entry, FamilyId } from "@/lib/types";
 
 /**
- * "Your scent profile" (11/4 feedback, B tier): family frequency, top emotions and tags,
+ * "Your scents at a glance" (11/4 feedback, B tier; renamed 11/10 because "Scent Profile" is a retired term):
+ * family frequency, top emotions and tags,
  * time-of-day and product-type split, and rule-based "try next" suggestions
  * (wheel neighbours of your top family that you haven't used, plus fixed pairings).
  * A "sample data" switch shows it filled when the browser is empty.
@@ -48,7 +49,7 @@ function Bars({ rows, color, labelOf }: { rows: Array<[string, number]>; color: 
   );
 }
 
-export function ScentProfile({ compact = false }: { compact?: boolean }) {
+export function ScentSummary({ compact = false }: { compact?: boolean }) {
   const mounted = useMounted();
   const saved = useAtlas((s) => s.entries);
   const [useSample, setUseSample] = useState(false);
@@ -76,7 +77,7 @@ export function ScentProfile({ compact = false }: { compact?: boolean }) {
   return (
     <section className="card" style={{ display: "flex", flexDirection: "column", gap: 22 }}>
       <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-        <h2 className="h-section" style={{ fontSize: compact ? 26 : 30 }}>Your scent <em>profile</em></h2>
+        <h2 className="h-section" style={{ fontSize: compact ? 26 : 30 }}>Your scents at a glance</h2>
         <button type="button" role="switch" aria-checked={showingSample} className="switch" onClick={() => setUseSample((v) => !v)} disabled={saved.length === 0}>
           Sample data
           <span className="switch__track" aria-hidden="true"><span className="switch__knob" /></span>

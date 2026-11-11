@@ -1,7 +1,10 @@
 # Olfia — Design Specification (v0.9)
 
 **Status:** v0.9. Owner: Tiffany Liu. Last updated 2026-11-02.
-This file is the single source for colours, type, spacing, components, scene rules, Scene Card layout, and copy rules. The earlier Notion "Typography and Color Guide" is superseded by §2; do not consult it.
+
+> Kept for the record. The current rules are in `CLAUDE.md`, `AGENTS.md` and `DECISIONS.md`: three fonts (Newsreader, IBM Plex Mono, Caveat Bold), interface colours only from the brand guide, family colours only where they stand for a scent, and Scent Card in place of Scene Card. Where this file differs, those win.
+
+This file was the single source for colours, type, spacing, components, scene rules, Scene Card layout, and copy rules. The earlier Notion "Typography and Color Guide" is superseded by §2; do not consult it.
 
 ## 1. Direction
 

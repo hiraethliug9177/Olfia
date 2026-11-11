@@ -15,7 +15,7 @@
 - **Scent Atlas.** Everything you saved, in four views:
   - a jigsaw calendar with a monthly record;
   - favourites;
-  - tags and your scent profile;
+  - tags, and your scents at a glance;
   - **My shelf**, where you add the products you love by link or photo.
 - **Scent Card.** Turn any room or captured moment into a card to share. There are three templates (Film, Instant, Postcard) and two sizes (9:16 and 3:4). Export is a 1080 px PNG.
 - **The Olfia Edit.** Stories about scent, culture, history and places. The **Scent Library** explains the seven scent families.
