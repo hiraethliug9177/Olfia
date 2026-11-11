@@ -28,3 +28,5 @@ Note 11/10 ~5:50 pm PT: Tiffany's laptop is closed, so the Mac type-check and he
 Note 11/10 ~5:30 pm PT: a local preview harness renders the real components without the laptop: scratchpad `harness/` (esbuild + stand-ins for next/link, next/navigation, zustand, lucide-react, html-to-image; `node build.mjs`, serve `www/` on :8765, `python3 shot2.py URL OUT W H [actions]`).
 Live: main = 6b30ee3 (characters, footer, monthly record, Scent Card templates).
 Next: kitchen + bathroom (drawn items in components/scene/Cutout.tsx, scene layouts in lib/catalog.ts, scene tabs in RoomEditor, `?scene=` and `?preset=`), then docs and the report to Tiffany.
+
+Done 11/10 ~6:45 pm PT: all seven items are live on olfia-nine.vercel.app (main fast-forwarded after each preview build passed). Nothing is left half-done; open, optional items are in the project doc `claude/olfia-content-brief.md` §5.
