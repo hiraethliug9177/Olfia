@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
-import { GoogleAnalytics } from "@next/third-parties/google";
 import "./globals.css";
+import { Analytics } from "@/components/Analytics";
 import { Backdrop, Footer, Header, Toaster } from "@/components/AppChrome";
 import { CutDefs } from "@/components/scene/Cutout";
 import { strings } from "@/lib/strings";
@@ -37,7 +37,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <main id="main" style={{ flex: 1 }}>{children}</main>
         <Footer />
         <Toaster />
-        {gaId ? <GoogleAnalytics gaId={gaId} /> : null}
+        {gaId ? <Analytics gaId={gaId} /> : null}
       </body>
     </html>
   );

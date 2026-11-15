@@ -5,6 +5,7 @@ import { familyById, sourceLabel } from "@/lib/catalog";
 import { matchProducts, type Product } from "@/lib/products";
 import type { Daypart, FamilyId, Season } from "@/lib/types";
 import { Icon } from "@/components/ui/Icon";
+import { ProductLink } from "@/components/products/ProductLink";
 
 /**
  * Recommended products (B tier). 11/9 feedback 10: larger cards, less text, one line saying why
@@ -62,10 +63,10 @@ export function ProductCard({ p, match, onSimilar }: { p: Product; match?: Famil
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
       {p.url ? (
-        <a className="pcard" href={p.url} target="_blank" rel="noopener noreferrer" aria-label={`${p.brand} ${p.name}, opens the brand's site`}>
+        <ProductLink className="pcard" href={p.url} product={{ id: p.id, brand: p.brand, family: p.families[0], tier: p.tier }} ariaLabel={`${p.brand} ${p.name}, opens the brand's site`}>
           {body}
           <span className="pcard__out"><Icon name="external" size={18} /></span>
-        </a>
+        </ProductLink>
       ) : (
         <div className="pcard">{body}</div>
       )}

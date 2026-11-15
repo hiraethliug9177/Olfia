@@ -11,7 +11,7 @@
 | Fonts | Google Fonts stylesheet (Lora, Newsreader, Source Sans 3) linked in `app/layout.tsx`; CSS variables `--font-lora` etc. in `globals.css` | `next/font/google` failed on Vercel's first build (font-file URL parse error in the loader); the stylesheet link is deterministic. Revisit `next/font` once verified locally |
 | State | `zustand` store persisted to `localStorage` (`persist` middleware), hydrated client-side | Simple, SSR-safe, migration hook |
 | Export | `html-to-image` (`toPng`) on an offscreen 540×675 node, `pixelRatio: 2` | Pure client; same-origin assets only |
-| Analytics | GA4 via `@next/third-parties/google` (`GoogleAnalytics`, `sendGAEvent`) | Official, minimal |
+| Analytics | GA4 via gtag.js, loaded by `components/Analytics.tsx` (consent defaults, "this browser is me" switch) | Control over consent and debug mode (11/15) |
 | Hosting | Vercel (Hobby), GitHub → auto deploy; `main` = production, PRs = preview | First push is live |
 | Content | JSON in `content/`, strings in `lib/strings.ts` | No CMS needed for one editor; i18n-ready |
 
@@ -89,7 +89,7 @@ Catalog types (`Scene`, `Slot`, `Option`, `LightPreset`, `Mood`) mirror `DESIGN-
 - **Export:** render `<SceneCard>` in an offscreen container (fixed 540×675, fonts loaded via `document.fonts.ready`), `toPng(node, { pixelRatio: 2, cacheBust: true })` → Blob → `navigator.share({ files })` when `canShare` supports files, else `<a download>`. Errors → toast with retry. Assets must be same-origin (they are).
 - **Suggestions (Should):** `moods.json` → apply `selections` + `light`; `from_suggestion` recorded on the entry.
 - **LLM route (Could):** `POST /api/suggest` with `{ sceneId, moodText }`; server builds a prompt from the scene catalog, calls the model with a JSON schema that only allows known option/preset ids, validates with `zod`, returns `{ selections, light, line }`. Rate limit by IP (simple in-memory token bucket, 10/min), daily cost cap via env, fallback to presets on any failure. Key in `OLFIA_LLM_API_KEY` (server only).
-- **Analytics:** `lib/analytics.ts` wraps `sendGAEvent` with the typed events from PRD §9; no-ops when `NEXT_PUBLIC_GA_ID` is unset.
+- **Analytics:** `lib/analytics.ts` holds the typed events (PRD §9 plus `quiz_start`, `product_click`, `email_signup`, `partner_inquiry` from the 11/15 plan) and queues any fired before the loader runs; it no-ops when `NEXT_PUBLIC_GA_ID` is unset. `components/Analytics.tsx` loads gtag.js with ads features off, analytics cookies off for the EEA, UK and Switzerland and for Global Privacy Control / Do Not Track, and debug mode for a browser opened once with `?me=on` (`?me=off` undoes it). Product links go through `components/products/ProductLink.tsx`, which sends `product_click`.
 
 ## 5. Environment and secrets
 

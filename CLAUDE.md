@@ -2,7 +2,7 @@
 
 Read `docs/PRD.md`, `docs/DESIGN-SPEC.md`, and `docs/ARCHITECTURE.md` before changing anything. This file is the short version.
 
-- Stack: Next.js 15 App Router, React 19, TypeScript strict, Tailwind v4 (tokens in `app/globals.css` `@theme`), zustand + localStorage, html-to-image, GA4 via `@next/third-parties`. npm. Node 22.
+- Stack: Next.js 15 App Router, React 19, TypeScript strict, Tailwind v4 (tokens in `app/globals.css` `@theme`), zustand + localStorage, html-to-image, GA4 via gtag.js (`components/Analytics.tsx`, events in `lib/analytics.ts`). npm. Node 22.
 - Commands: `npm run dev`, `npm run typecheck`, `npm run build`. Type errors fail the build; run typecheck before finishing.
 - Terms, exactly: **Scent Scene**, **Rooms**, **Scent Atlas**, **Scent Card** (renamed from Scene Card on 2026-11-03). Never use: Scent Profile, Room Profile, Scent Direction, Experience Record.
 - Design: ivory canvas, charcoal text; `periwinkle` (#A0A6C8) is decorative only — never text or meaningful icons; interactive colour is `periwinkle-deep` (#4C527A). Fonts (three only, 2026-11-10): Newsreader (titles, work names), IBM Plex Mono (navigation, body, questions, buttons, dates, charts), Caveat Bold (notes and quick handwriting). No all-caps labels, no single italic word in headings. Icons: Lucide only, see `AGENTS.md`. Minimum text 13px. Signature double frame only on the Rooms stage and Scent Card.

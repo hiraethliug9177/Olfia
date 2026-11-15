@@ -71,6 +71,7 @@ export function Quiz() {
 
   const choose = (idx: number) => {
     const next = { ...answers, [q.id]: idx };
+    if (answered === 0) track("quiz_start", {});
     setAnswers(next);
     if (i < order.length - 1) {
       window.setTimeout(() => setI(i + 1), 180);

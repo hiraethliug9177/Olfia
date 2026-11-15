@@ -8,6 +8,7 @@ import { ArticleCard } from "@/components/edit/ArticleCard";
 import { ObjectPhoto } from "@/components/edit/ObjectPhoto";
 import { Rich } from "@/components/edit/Rich";
 import { Icon } from "@/components/ui/Icon";
+import { ProductLink } from "@/components/products/ProductLink";
 
 export function generateStaticParams() {
   return ARTICLES.map((a) => ({ slug: a.slug }));
@@ -64,9 +65,9 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
             {a.object.notes ? <p className="muted" style={{ fontSize: 15 }}>{a.object.notes}</p> : null}
             {a.object.meta ? <p style={{ fontSize: 15, fontWeight: 600 }}>{a.object.meta}</p> : null}
             {a.object.href ? (
-              <a href={a.object.href} target="_blank" rel="noopener noreferrer" className="btn btn--ghost" style={{ alignSelf: "flex-start" }}>
+              <ProductLink href={a.object.href} product={{ id: `edit-${a.slug}`, family: a.families[0] }} place="edit" className="btn btn--ghost" style={{ alignSelf: "flex-start" }}>
                 {a.object.cta ?? "Discover it"}<Icon name="external" size={18} />
-              </a>
+              </ProductLink>
             ) : null}
           </div>
         </section>
