@@ -10,9 +10,9 @@ import { useToast } from "@/lib/toast";
  * - Advertising features are off for everyone; the site has no ads tags.
  * - Visitors in the EEA, the UK and Switzerland, and browsers that send Global Privacy Control or
  *   Do Not Track, start with analytics cookies off: Google gets cookieless pings only, so no banner.
- * - "This browser is me": open any page with ?me=on (?me=off undoes it). A marked browser sends its
- *   events in debug mode: GA4's DebugView shows them, and the property's Developer-traffic filter
- *   keeps them out of the reports.
+ * - "This browser is me": open any page with ?me=on (?me=off undoes it). A marked browser does not
+ *   load Google Analytics at all, so its visits are never counted. (Tested 11/15: gtag.js ignored a
+ *   page-wide debug_mode, so debug mode could not be relied on to keep these visits out.)
  */
 
 const COOKIELESS_REGIONS = [
@@ -22,10 +22,8 @@ const COOKIELESS_REGIONS = [
 
 const NO_ADS = { ad_storage: "denied", ad_user_data: "denied", ad_personalization: "denied" };
 
-function initScript(gaId: string, me: boolean): string {
-  const config: Record<string, unknown> = { allow_google_signals: false, allow_ad_personalization_signals: false };
-  // GA4 treats any debug_mode value, even false, as debug, so the key is only set for a marked browser.
-  if (me) config.debug_mode = true;
+function initScript(gaId: string): string {
+  const config = { allow_google_signals: false, allow_ad_personalization_signals: false };
   return `
 window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
@@ -56,18 +54,22 @@ export function Analytics({ gaId }: { gaId: string }) {
       if (flag === "on" || flag === "off") {
         url.searchParams.delete("me");
         window.history.replaceState(null, "", url.pathname + url.search + url.hash);
-        show(mine ? "This browser is marked as you. Its visits stay out of the reports." : "This browser counts as a visitor again.");
+        show(mine ? "This browser is marked as you. Its visits are not counted." : "This browser counts as a visitor again.");
       }
     } catch {
       // storage blocked: count as a visitor
     }
+    if (mine) {
+      window.__olfiaGaOff = true;
+      window.__olfiaGaQueue = [];
+    }
     setMe(mine);
   }, [show]);
 
-  if (me === null) return null;
+  if (me === null || me) return null;
   return (
     <>
-      <Script id="olfia-ga-init" strategy="afterInteractive">{initScript(gaId, me)}</Script>
+      <Script id="olfia-ga-init" strategy="afterInteractive">{initScript(gaId)}</Script>
       <Script id="olfia-ga" src={`https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(gaId)}`} strategy="afterInteractive" />
     </>
   );

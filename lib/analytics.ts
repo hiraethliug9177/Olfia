@@ -35,16 +35,17 @@ declare global {
     dataLayer?: unknown[];
     gtag?: (...args: unknown[]) => void;
     __olfiaGaQueue?: Command[];
+    __olfiaGaOff?: boolean;
   }
 }
 
-/** A browser marked "this is me" (?me=on) sends events in debug mode, which GA4's developer-traffic filter keeps out of reports. */
+/** A browser marked "this is me" (?me=on) does not load Google Analytics, so its visits are not counted. */
 export const ME_KEY = "olfia.analytics.me";
 
 const enabled = Boolean(process.env.NEXT_PUBLIC_GA_ID);
 
 export function track<K extends keyof EventMap>(name: K, params: EventMap[K]): void {
-  if (!enabled || typeof window === "undefined") return;
+  if (!enabled || typeof window === "undefined" || window.__olfiaGaOff) return;
   try {
     if (typeof window.gtag === "function") window.gtag("event", name, params);
     else (window.__olfiaGaQueue ??= []).push(["event", name, params]);
