@@ -4,7 +4,14 @@ import { useState } from "react";
 import { strings } from "@/lib/strings";
 import { track } from "@/lib/analytics";
 
-/** Email sign-up (Kit, via /api/subscribe). `place` says where on the site it sits, for analytics. */
+/**
+ * Email sign-up. Posts straight from the browser to Kit's public form address (form "Olfia website
+ * sign-up", id 10196062), the same way Kit's own embed does; no API key. Kit answers HTTP 200 even when it
+ * refuses an address, so success is read from the JSON `status`. Kit then sends its confirmation email
+ * (double opt-in). The "found us" answer goes to GA4 with email_signup.
+ */
+const KIT_FORM = "https://app.kit.com/forms/10196062/subscriptions";
+
 export function SignupForm({ place }: { place: string }) {
   const s = strings.signup;
   const [email, setEmail] = useState("");
@@ -15,14 +22,16 @@ export function SignupForm({ place }: { place: string }) {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (state === "sending") return;
+    if (trap) { setState("done"); return; } // people never see the trap field; bots fill it
     setState("sending");
     try {
-      const res = await fetch("/api/subscribe", {
+      const res = await fetch(KIT_FORM, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, found, website: trap }),
+        headers: { Accept: "application/json", "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({ email_address: email.trim() }),
       });
-      if (!res.ok) throw new Error("failed");
+      const data = (await res.json().catch(() => null)) as { status?: string } | null;
+      if (!res.ok || !data || data.status === "failed") throw new Error("refused");
       track("email_signup", { place, ...(found ? { found } : {}) });
       setState("done");
     } catch {
