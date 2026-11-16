@@ -235,6 +235,14 @@ textarea.input { padding: 14px 16px; min-height: 96px; resize: vertical; }
 .ft__grid { display: flex; flex-wrap: wrap; gap: 28px 44px; padding-top: 32px; padding-bottom: 22px; }
 .ft__col { display: flex; flex-direction: column; gap: 8px; font-size: 15px; flex: 1 1 120px; }
 .ft__icon { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--mist); }
+.ft__signup { padding-bottom: 24px; }
+.signup { display: flex; flex-direction: column; gap: 10px; max-width: 540px; }
+.signup__heading { margin: 0; font-family: var(--font-display); font-size: 22px; }
+.signup__row { display: flex; flex-wrap: wrap; gap: 10px; }
+.signup__row .input { flex: 1 1 220px; }
+.signup__found { max-width: 300px; min-height: 44px; font-size: 15px; color: var(--slate); }
+.signup__note { margin: 0; font-size: 14px; color: var(--slate); }
+.signup__trap { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
 .ft__base { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; padding-top: 14px; padding-bottom: 18px; border-top: 1px solid rgba(41,42,49,0.12); font-size: 14px; color: var(--slate); }
 
 /* ---------- scene page ---------- */

@@ -8,6 +8,7 @@ import { loadSample } from "@/lib/demo";
 import { track } from "@/lib/analytics";
 import { useToast } from "@/lib/toast";
 import { strings } from "@/lib/strings";
+import { SignupForm } from "@/components/SignupForm";
 import { Icon, MenuMorph } from "@/components/ui/Icon";
 
 const isActive = (path: string, href: string) => (href === "/" ? path === "/" : path === href || path.startsWith(`${href}/`));
@@ -201,6 +202,7 @@ export function Footer() {
           </div>
         </div>
       </div>
+      <div className="ft__signup"><SignupForm place="footer" /></div>
       <div className="ft__base">
         <span>© 2026 Olfia</span>
         <span>A USC DSM596 capstone project</span>

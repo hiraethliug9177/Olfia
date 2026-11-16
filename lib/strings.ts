@@ -17,4 +17,15 @@ export const strings = {
     persistenceNotice: "Entries are saved in this browser only.",
     saved: "Saved to your Scent Atlas",
   },
+  /** Email sign-up (Kit). Button and note: Tiffany 11/15. */
+  signup: {
+    // TODO(Tiffany): the line above the email box. Hidden while empty.
+    heading: "",
+    button: "Count me in",
+    note: "Occasional inspirations from Olfia. Unsubscribe anytime.",
+    found: "Where did you find Olfia?",
+    foundOptions: ["Instagram", "小红书", "Pinterest", "A friend", "Google", "Somewhere else"],
+    done: "Almost there: check your inbox to confirm.",
+    failed: "That didn't go through. Please try again.",
+  },
 };

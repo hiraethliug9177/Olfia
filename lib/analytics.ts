@@ -24,7 +24,7 @@ type EventMap = {
   product_click: { product_id: string; place: string; brand?: string; family?: string; tier?: string };
   /** The sample pages are loaded: from the Scent Atlas button, or from a ?sample=on link. */
   sample_loaded: { place: "atlas" | "link" };
-  /** The sign-up form is sent (wired when the Kit form lands). */
+  /** The sign-up form is sent (components/SignupForm.tsx): where it sat, and the "found us" answer. */
   email_signup: { place: string; found?: string };
   /** The partner contact is used (wired when the partners page lands). */
   partner_inquiry: { place: string };
