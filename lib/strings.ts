@@ -24,7 +24,7 @@ export const strings = {
     button: "Count me in",
     note: "Occasional inspirations from Olfia. Unsubscribe anytime.",
     found: "Where did you find Olfia?",
-    foundOptions: ["Instagram", "小红书", "Pinterest", "A friend", "Google", "Somewhere else"],
+    foundOptions: ["Instagram", "RedNote", "Pinterest", "A friend", "Google", "Somewhere else"],
     done: "Almost there: check your inbox to confirm.",
     failed: "That didn't go through. Please try again.",
   },
