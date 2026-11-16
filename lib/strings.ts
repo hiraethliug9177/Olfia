@@ -25,7 +25,7 @@ export const strings = {
     note: "Occasional inspirations from Olfia. Unsubscribe anytime.",
     found: "Where did you find Olfia?",
     foundOptions: ["Instagram", "RedNote", "Pinterest", "A friend", "Google", "Somewhere else"],
-    done: "Almost there: check your inbox to confirm.",
+    done: "You’re in. Welcome to Olfia.",
     failed: "That didn't go through. Please try again.",
   },
 };
