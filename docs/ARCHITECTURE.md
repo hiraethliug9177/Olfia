@@ -96,7 +96,7 @@ Catalog types (`Scene`, `Slot`, `Option`, `LightPreset`, `Mood`) mirror `DESIGN-
 | Variable | Scope | Purpose |
 | --- | --- | --- |
 | `NEXT_PUBLIC_GA_ID` | public | GA4 measurement id (G-…) |
-| `NEXT_PUBLIC_SITE_URL` | public | Canonical URL for OG and Scene Card footer |
+| `NEXT_PUBLIC_SITE_URL` | public | Canonical URL for metadata, `app/sitemap.ts` and `app/robots.ts` (https://www.olfia.studio since 11/15) |
 | `NEXT_PUBLIC_FEEDBACK_URL` | public | Feedback form link |
 | `OLFIA_LLM_API_KEY` | server | Only if the LLM route ships |
 

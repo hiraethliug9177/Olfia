@@ -4,7 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useRehydrateAtlas } from "@/lib/store";
-import { seedDemo } from "@/lib/demo";
+import { loadSample } from "@/lib/demo";
+import { track } from "@/lib/analytics";
 import { useToast } from "@/lib/toast";
 import { strings } from "@/lib/strings";
 import { Icon, MenuMorph } from "@/components/ui/Icon";
@@ -88,8 +89,21 @@ export function Header() {
   const path = usePathname() ?? "/";
   const [open, setOpen] = useState(false);
   useRehydrateAtlas();
-  // sample pages on a first visit, for the class review (lib/demo.ts)
-  useEffect(() => { seedDemo(); }, []);
+  const showToast = useToast((s) => s.show);
+  // ?sample=on loads the sample pages (the professor's link, lib/demo.ts); first visits otherwise start clean
+  useEffect(() => {
+    try {
+      const url = new URL(window.location.href);
+      if (url.searchParams.get("sample") !== "on") return;
+      url.searchParams.delete("sample");
+      window.history.replaceState(null, "", url.pathname + url.search + url.hash);
+      loadSample();
+      track("sample_loaded", { place: "link" });
+      showToast("Sample pages added");
+    } catch {
+      // storage blocked: nothing to load
+    }
+  }, [showToast]);
   useEffect(() => setOpen(false), [path]);
   // the Scent Library is part of The Edit since 11/10
   const cur = (href: string) => (isActive(path, href) || (href === "/edit" && path.startsWith("/library")) ? "page" : undefined);

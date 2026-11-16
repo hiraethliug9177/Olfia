@@ -11,7 +11,7 @@ import { PIECE_H, PIECE_W, monthPieces } from "@/lib/jigsaw";
 import { FitWidth } from "@/components/ui/FitWidth";
 import { Icon } from "@/components/ui/Icon";
 import { Star as StarIcon } from "lucide-react";
-import { sampleEntries } from "@/lib/sample";
+import { loadSample } from "@/lib/demo";
 import type { CaptureEntry, Entry, FamilyId, RoomsEntry } from "@/lib/types";
 import { ScenePage } from "@/components/scene/ScenePage";
 import { ScentSummary } from "@/components/account/ScentSummary";
@@ -53,7 +53,6 @@ export function AtlasView() {
   const hydrated = useAtlas((s) => s.hydrated);
   const toggleStar = useAtlas((s) => s.toggleStar);
   const remove = useAtlas((s) => s.remove);
-  const add = useAtlas((s) => s.add);
   const show = useToast((s) => s.show);
 
   const params = useSearchParams();
@@ -150,7 +149,7 @@ export function AtlasView() {
             <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
               <Link href="/capture" className="btn btn--primary">Capture a scent</Link>
               <Link href="/rooms" className="btn btn--ghost">Make a room</Link>
-              <button type="button" className="btn btn--ghost" onClick={() => { sampleEntries().forEach((e) => add(e)); show("Sample pages added"); }}>Try with sample pages</button>
+              <button type="button" className="btn btn--ghost" onClick={() => { loadSample(); track("sample_loaded", { place: "atlas" }); show("Sample pages added"); }}>See a sample</button>
             </div>
           </div>
         ) : tab === 0 ? (

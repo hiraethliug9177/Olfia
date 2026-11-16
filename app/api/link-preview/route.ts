@@ -106,7 +106,7 @@ export async function GET(req: Request) {
         redirect: "manual",
         signal: ctrl.signal,
         headers: {
-          "user-agent": "Mozilla/5.0 (compatible; OlfiaLinkPreview/1.0; +https://olfia-nine.vercel.app)",
+          "user-agent": "Mozilla/5.0 (compatible; OlfiaLinkPreview/1.0; +https://www.olfia.studio)",
           accept: "text/html,application/xhtml+xml",
           "accept-language": "en-US,en;q=0.8",
         },

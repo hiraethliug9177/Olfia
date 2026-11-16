@@ -4,11 +4,12 @@ import { productById } from "@/lib/products";
 import { newId, useAtlas } from "@/lib/store";
 
 /**
- * Sample data on a first visit (Tiffany 11/10: this version is for the professor's review, so the site
- * opens with a lived-in Atlas, shelf and preferences). It runs once per browser: after that, nothing is
- * added again, so "Clear this browser" in My Account empties it for good. Everything stays in this browser.
+ * Sample pages on request (Tiffany 11/15: first visits start clean; the "See a sample" button in the
+ * Scent Atlas and the ?sample=on link load them; the link is the one for the professor). Adds the sample
+ * Atlas pages if the Atlas is empty, four My shelf products if the shelf is empty, and preferences if none
+ * are set. Everything stays in this browser; "Clear this browser" in My Account removes it.
+ * (11/10–11/15 the samples loaded by themselves on a first visit, for the class review.)
  */
-const DEMO_KEY = "olfia.demo.v1";
 const PREFS_KEY = "olfia.prefs.v1";
 
 function shelfItem(productId: string, routine: ShelfItem["routine"], note: string, daysAgo: number): ShelfItem | null {
@@ -19,11 +20,9 @@ function shelfItem(productId: string, routine: ShelfItem["routine"], note: strin
   return { id: newId(), createdAt: d.toISOString(), name: p.name, brand: p.brand, kind: p.type, families: p.families, routine, note, url: p.url, productId: p.id };
 }
 
-/** Seeds once. Preferences and shelf right away (pages read them on mount); pages once the Atlas has loaded. */
-export function seedDemo(): void {
+/** Preferences and shelf right away (pages read them on mount); pages once the Atlas has loaded. */
+export function loadSample(): void {
   try {
-    if (window.localStorage.getItem(DEMO_KEY)) return;
-    window.localStorage.setItem(DEMO_KEY, new Date().toISOString());
     if (!window.localStorage.getItem(PREFS_KEY)) {
       window.localStorage.setItem(PREFS_KEY, JSON.stringify({ families: ["woody", "citrus", "green"], sources: ["candle", "diffuser"] }));
     }

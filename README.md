@@ -2,7 +2,7 @@
 
 **Scent is an afterimage.** Olfia is a website for keeping the scents of the rooms you live in and designing the ones you imagine. A USC DSM596 capstone project by Tiffany Liu.
 
-**Live site:** https://olfia-nine.vercel.app
+**Live site:** https://www.olfia.studio (the submitted address, olfia-nine.vercel.app, forwards there)
 
 ## What you can do
 
