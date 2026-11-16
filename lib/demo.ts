@@ -20,8 +20,11 @@ function shelfItem(productId: string, routine: ShelfItem["routine"], note: strin
   return { id: newId(), createdAt: d.toISOString(), name: p.name, brand: p.brand, kind: p.type, families: p.families, routine, note, url: p.url, productId: p.id };
 }
 
-/** Preferences and shelf right away (pages read them on mount); pages once the Atlas has loaded. */
-export function loadSample(): void {
+/**
+ * Preferences and shelf right away (pages read them on mount); pages once the Atlas has loaded.
+ * `onDone(added)` reports whether sample pages went into the Atlas (false when it already held pages).
+ */
+export function loadSample(onDone?: (added: boolean) => void): void {
   try {
     if (!window.localStorage.getItem(PREFS_KEY)) {
       window.localStorage.setItem(PREFS_KEY, JSON.stringify({ families: ["woody", "citrus", "green"], sources: ["candle", "diffuser"] }));
@@ -36,10 +39,13 @@ export function loadSample(): void {
       saveShelf(items);
     }
   } catch {
+    onDone?.(false);
     return;
   }
   const fill = () => {
-    if (useAtlas.getState().entries.length === 0) useAtlas.setState({ entries: sampleEntries() });
+    const empty = useAtlas.getState().entries.length === 0;
+    if (empty) useAtlas.setState({ entries: sampleEntries() });
+    onDone?.(empty);
   };
   if (useAtlas.getState().hydrated) fill();
   else {

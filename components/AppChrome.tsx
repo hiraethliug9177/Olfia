@@ -97,9 +97,11 @@ export function Header() {
       if (url.searchParams.get("sample") !== "on") return;
       url.searchParams.delete("sample");
       window.history.replaceState(null, "", url.pathname + url.search + url.hash);
-      loadSample();
-      track("sample_loaded", { place: "link" });
-      showToast("Sample pages added");
+      loadSample((added) => {
+        if (!added) return;
+        track("sample_loaded", { place: "link" });
+        showToast("Sample pages added");
+      });
     } catch {
       // storage blocked: nothing to load
     }
