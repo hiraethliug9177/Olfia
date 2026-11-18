@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ARTICLES, articleBySlug, articleDate, relatedTo } from "@/lib/edit";
-import { familyById } from "@/lib/catalog";
 import { FAMILY_WASH } from "@/lib/colors";
 import type { FamilyId } from "@/lib/types";
 import { ArticleCover } from "@/components/edit/ArticleCover";
@@ -80,9 +79,8 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
           <div className="story-card" style={{ background: scentWash(a.families) }}>
             <h3 className="story-card__head">{a.tryThis.title}</h3>
             {a.tryThis.paras.map((p, i) => <p key={i}><Rich text={p} /></p>)}
-            <Link href={`/rooms?family=${a.families.join(",")}`} className="btn btn--primary btn--sm story-card__btn">
-              Build this room in {a.families.map((f) => familyById(f).label).join(" + ")}
-            </Link>
+            {/* 11/18 (Tiffany): the button says only this; the room still opens in the story's families */}
+            <Link href={`/rooms?family=${a.families.join(",")}`} className="btn btn--primary btn--sm story-card__btn">Build This Room</Link>
           </div>
         </aside>
 
