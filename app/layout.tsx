@@ -4,6 +4,7 @@ import { Analytics } from "@/components/Analytics";
 import { Backdrop, Footer, Header, Toaster } from "@/components/AppChrome";
 import { CutDefs } from "@/components/scene/Cutout";
 import { strings } from "@/lib/strings";
+import { SHARE_IMAGE } from "@/lib/share";
 
 /* Fonts load from the Google Fonts stylesheet; next/font failed on Vercel's loader earlier. */
 const fontsHref =
@@ -15,7 +16,8 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: { default: `Olfia — ${strings.brand.invitation}`, template: "%s · Olfia" },
   description: `${strings.brand.awareness} ${strings.brand.invitation}`,
-  openGraph: { title: "Olfia", description: strings.brand.cover, type: "website", siteName: "Olfia" },
+  openGraph: { title: "Olfia", description: strings.brand.cover, type: "website", siteName: "Olfia", images: [SHARE_IMAGE] },
+  twitter: { card: "summary_large_image" },
 };
 
 export const viewport: Viewport = { themeColor: "#F8F6F0", width: "device-width", initialScale: 1 };

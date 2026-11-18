@@ -2,24 +2,22 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { ARTICLES, IN_SEASON, TOPICS, articleMonth, byDate, byViews, reads, type Topic } from "@/lib/edit";
+import { ARTICLES, EDITORS_PICKS, IN_SEASON, TOPICS, articleBySlug, articleMonth, byDate, type Article, type Topic } from "@/lib/edit";
 import { ArticleCard } from "@/components/edit/ArticleCard";
 import Link from "next/link";
 
 /**
  * The Olfia Edit as a newspaper section front (Tiffany 11/10, after the New York Times):
- * the wide column runs by date or by what is being read, with topic and month tabs on top;
- * the narrow column keeps the most-read list, what is in season, and a few experiments to try,
- * and scrolls on its own.
+ * the wide column runs by date, with topic and month tabs on top; the narrow column keeps the
+ * editor's picks and what is in season, and scrolls on its own. No read counts: the old ones were
+ * made up for the prototype and were removed on 11/17, with the Trending order that used them.
  */
-type Sort = "latest" | "trending";
 
 export function EditList() {
   const params = useSearchParams();
   const initialTopic = params.get("topic");
   const [topic, setTopic] = useState<Topic | "All">(TOPICS.includes(initialTopic as Topic) ? (initialTopic as Topic) : "All");
   const [month, setMonth] = useState<string>("All");
-  const [sort, setSort] = useState<Sort>("latest");
 
   useEffect(() => {
     const t = params.get("topic");
@@ -31,11 +29,11 @@ export function EditList() {
 
   const list = useMemo(() => {
     const base = ARTICLES.filter((a) => (topic === "All" || a.topic === topic) && (month === "All" || articleMonth(a.date) === month));
-    return sort === "latest" ? byDate(base) : byViews(base);
-  }, [topic, month, sort]);
+    return byDate(base);
+  }, [topic, month]);
   const [lead, ...rest] = list;
 
-  const mostRead = byViews().slice(0, 3);
+  const picks = EDITORS_PICKS.map(articleBySlug).filter((a): a is Article => Boolean(a));
   const inSeason = byDate(ARTICLES.filter((a) => IN_SEASON.includes(a.slug)));
 
   return (
@@ -56,12 +54,7 @@ export function EditList() {
 
         <section id="latest" aria-label="Stories">
           <div className="np-head">
-            <h2 className="np-h">{sort === "latest" ? "Latest" : "Trending"}</h2>
-            <div role="tablist" aria-label="Order" className="seg np-sort">
-              <span className="seg__thumb" aria-hidden="true" style={{ left: sort === "latest" ? 5 : "50%", width: "calc(50% - 5px)" }} />
-              <button type="button" role="tab" aria-selected={sort === "latest"} className="seg__opt" onClick={() => setSort("latest")}>Latest</button>
-              <button type="button" role="tab" aria-selected={sort === "trending"} className="seg__opt" onClick={() => setSort("trending")}>Trending</button>
-            </div>
+            <h2 className="np-h">Latest</h2>
           </div>
           {lead ? (
             <div className="np-stories">
@@ -75,15 +68,15 @@ export function EditList() {
       </div>
 
       <aside className="np-rail" aria-label="More from The Edit">
-        <section id="most-read" className="np-box">
-          <h2 className="np-h">Most read</h2>
+        <section id="editors-picks" className="np-box">
+          <h2 className="np-h">Editor’s picks</h2>
           <ol className="np-rank">
-            {mostRead.map((a, i) => (
+            {picks.map((a, i) => (
               <li key={a.slug}>
                 <span className="np-rank__n" aria-hidden="true">{i + 1}</span>
                 <Link href={`/edit/${a.slug}`}>
                   <span className="np-rank__title">{a.title}</span>
-                  <span className="edit-card__foot">{a.topic} · {reads(a.views)}</span>
+                  <span className="edit-card__foot">{a.topic} · {a.readTime}</span>
                 </Link>
               </li>
             ))}

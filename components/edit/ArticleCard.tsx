@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { articleDate, reads, type Article } from "@/lib/edit";
+import { articleDate, type Article } from "@/lib/edit";
 import { ArticleCover } from "@/components/edit/ArticleCover";
 
 type Variant = "card" | "lead" | "row" | "mini";
@@ -15,7 +15,7 @@ export function ArticleCard({ a, lead = false, variant }: { a: Article; lead?: b
       <Link href={`/edit/${a.slug}`} className="edit-mini">
         <span className="edit-card__meta">{a.topic} · {articleDate(a.date)}</span>
         <span className="edit-mini__title">{a.title}</span>
-        <span className="edit-card__foot">{a.readTime} · {reads(a.views)}</span>
+        <span className="edit-card__foot">{a.readTime}</span>
       </Link>
     );
   }
@@ -26,7 +26,7 @@ export function ArticleCard({ a, lead = false, variant }: { a: Article; lead?: b
         <span className="edit-card__meta">{a.topic} · {articleDate(a.date)}</span>
         <span className="edit-card__title">{a.title}</span>
         <span className="edit-card__dek">{a.dek}</span>
-        <span className="edit-card__foot">{a.readTime} · {reads(a.views)}</span>
+        <span className="edit-card__foot">{a.readTime}</span>
       </span>
     </Link>
   );

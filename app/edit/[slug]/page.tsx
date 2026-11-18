@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ARTICLES, articleBySlug, articleDate, byDate, reads } from "@/lib/edit";
+import { ARTICLES, articleBySlug, articleDate, byDate } from "@/lib/edit";
 import { familyById } from "@/lib/catalog";
 import { ArticleCover } from "@/components/edit/ArticleCover";
 import { ArticleCard } from "@/components/edit/ArticleCard";
@@ -9,6 +9,7 @@ import { ObjectPhoto } from "@/components/edit/ObjectPhoto";
 import { Rich } from "@/components/edit/Rich";
 import { Icon } from "@/components/ui/Icon";
 import { ProductLink } from "@/components/products/ProductLink";
+import { shareImageFor } from "@/lib/share";
 
 export function generateStaticParams() {
   return ARTICLES.map((a) => ({ slug: a.slug }));
@@ -17,7 +18,14 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const a = articleBySlug(slug);
-  return { title: a ? a.title : "The Olfia Edit", description: a?.dek };
+  if (!a) return { title: "The Olfia Edit" };
+  const images = shareImageFor(a.image);
+  return {
+    title: a.title,
+    description: a.dek,
+    openGraph: { type: "article", title: a.title, description: a.dek, siteName: "Olfia", publishedTime: a.date, images },
+    twitter: { card: "summary_large_image", title: a.title, description: a.dek, images: images.map((i) => i.url) },
+  };
 }
 
 export default async function ArticlePage({ params }: { params: Promise<{ slug: string }> }) {
@@ -32,7 +40,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
         <p className="edit-card__meta" style={{ marginTop: 28 }}>{a.kicker}</p>
         <h1 className="h-page article__title" style={{ margin: "12px 0 16px" }}>{a.title}</h1>
         <p className="lead" style={{ maxWidth: "none" }}>{a.dek}</p>
-        <p className="article__byline">{articleDate(a.date)} · {a.readTime} · {reads(a.views)}</p>
+        <p className="article__byline">{articleDate(a.date)} · {a.readTime}</p>
 
         <figure className="article__figure">
           <ArticleCover a={a} ratio="16 / 9" eager />

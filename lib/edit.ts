@@ -25,8 +25,6 @@ export interface Article {
   readTime: string;
   /** ISO date, yyyy-mm-dd */
   date: string;
-  /** sample read count for the prototype */
-  views: number;
   title: string;
   dek: string;
   families: FamilyId[];
@@ -45,6 +43,10 @@ export const TOPICS: Topic[] = ["Culture", "History", "Science", "Design", "Plac
 /** Stories for this time of year, shown in the side rail. */
 export const IN_SEASON = ["christmas-smells-like-a-trade-route", "vanilla-is-anything-but-basic", "incense-timekeeping"];
 
+/** Editor's picks in the side rail, in this order. Tiffany chooses them; until she does, these are the three
+ * that topped the old sample list (the made-up read counts were removed 11/17). */
+export const EDITORS_PICKS = ["if-barbie-land-had-a-smell", "coffee-smells-better", "the-most-expensive-thing-in-a-hotel-lobby"];
+
 export const ARTICLES: Article[] = [
   {
     "slug": "if-barbie-land-had-a-smell",
@@ -55,7 +57,6 @@ export const ARTICLES: Article[] = [
     ],
     "fallback": "pool",
     "date": "2026-11-03",
-    "views": 5820,
     "image": {
       "src": "https://assets.vogue.com/photos/64ba6becc65c9f68561f660e/master/w_1600%2Cc_limit/MCDBARB_WB005.jpg",
       "alt": "Barbie Land, a film still from Barbie (2023)",
@@ -226,7 +227,6 @@ export const ARTICLES: Article[] = [
     ],
     "fallback": "lobby",
     "date": "2026-10-30",
-    "views": 4610,
     "image": {
       "src": "/assets/edit/hotel-courtyard.webp",
       "alt": "A hotel courtyard of plaster arches around a still reflecting pool",
@@ -418,7 +418,6 @@ export const ARTICLES: Article[] = [
     ],
     "fallback": "pomander",
     "date": "2026-11-10",
-    "views": 3480,
     "image": {
       "src": "https://collectionapi.metmuseum.org/api/collection/v1/iiif/196980/1679616/main-image",
       "alt": "Pomander, German, 16th century",
@@ -623,7 +622,6 @@ export const ARTICLES: Article[] = [
     ],
     "fallback": "books",
     "date": "2026-10-23",
-    "views": 2760,
     "image": {
       "src": "https://images.unsplash.com/photo-1671612428381-a9688c4c39bf?auto=format&fit=crop&w=1600&q=80",
       "alt": "A bookshop with a large arched window",
@@ -800,7 +798,6 @@ export const ARTICLES: Article[] = [
     ],
     "fallback": "rain",
     "date": "2026-11-06",
-    "views": 2140,
     "image": {
       "src": "https://images.unsplash.com/photo-1589803196988-17b417281773?auto=format&fit=crop&w=1600&q=80",
       "alt": "A city street with puddles of water on the ground",
@@ -999,7 +996,6 @@ export const ARTICLES: Article[] = [
     ],
     "fallback": "tomato",
     "date": "2026-10-16",
-    "views": 1540,
     "image": {
       "src": "https://images.unsplash.com/photo-1596199050105-6d5d32222916?auto=format&fit=crop&w=1600&q=80",
       "alt": "Green and red tomatoes on green leaves",
@@ -1197,7 +1193,6 @@ export const ARTICLES: Article[] = [
     ],
     "fallback": "vanilla",
     "date": "2026-10-27",
-    "views": 1930,
     "image": {
       "src": "https://images.unsplash.com/photo-1592788174877-3f99727fd23d?auto=format&fit=crop&w=1600&q=80",
       "alt": "A vanilla bean on a yellow background",
@@ -1401,7 +1396,6 @@ export const ARTICLES: Article[] = [
     ],
     "fallback": "families",
     "date": "2026-11-08",
-    "views": 3920,
     "image": {
       "src": "https://images.unsplash.com/photo-1620177088258-c84147ee601f?auto=format&fit=crop&w=1600&q=80",
       "alt": "Popcorn in striped paper bags in a cinema",
@@ -1488,7 +1482,6 @@ export const ARTICLES: Article[] = [
     ],
     "fallback": "families",
     "date": "2026-10-02",
-    "views": 1680,
     "image": {
       "src": "https://images.unsplash.com/photo-1606819717115-9159c900370b?auto=format&fit=crop&w=1600&q=80",
       "alt": "A visitor standing in front of paintings",
@@ -1603,7 +1596,6 @@ export const ARTICLES: Article[] = [
     ],
     "fallback": "families",
     "date": "2026-11-01",
-    "views": 4380,
     "image": {
       "src": "https://images.unsplash.com/photo-1615108395437-df128ad79e80?auto=format&fit=crop&w=1600&q=80",
       "alt": "A clear glass perfume bottle with white flowers",
@@ -1714,7 +1706,6 @@ export const ARTICLES: Article[] = [
     ],
     "fallback": "families",
     "date": "2026-10-20",
-    "views": 3340,
     "image": {
       "src": "https://images.unsplash.com/photo-1764057145780-3ba9929822ba?auto=format&fit=crop&w=1600&q=80",
       "alt": "A traditional Japanese hot spring with steam rising",
@@ -1823,7 +1814,6 @@ export const ARTICLES: Article[] = [
     ],
     "fallback": "families",
     "date": "2026-10-25",
-    "views": 5210,
     "image": {
       "src": "https://images.unsplash.com/photo-1511920170033-f8396924c348?auto=format&fit=crop&w=1600&q=80",
       "alt": "Coffee, ground coffee and coffee beans from above",
@@ -1936,7 +1926,6 @@ export const ARTICLES: Article[] = [
     ],
     "fallback": "families",
     "date": "2026-09-19",
-    "views": 1450,
     "image": {
       "src": "https://images.unsplash.com/photo-1566734568560-e510de3d6da0?auto=format&fit=crop&w=1600&q=80",
       "alt": "White flowers in soft focus",
@@ -2045,7 +2034,6 @@ export const ARTICLES: Article[] = [
     ],
     "fallback": "families",
     "date": "2026-10-28",
-    "views": 2950,
     "image": {
       "src": "https://images.unsplash.com/photo-1500916434205-0c77489c6cf7?auto=format&fit=crop&w=1600&q=80",
       "alt": "A yellow cab on a New York street",
@@ -2154,7 +2142,6 @@ export const ARTICLES: Article[] = [
     ],
     "fallback": "families",
     "date": "2026-10-13",
-    "views": 2480,
     "image": {
       "src": "https://images.unsplash.com/photo-1547104442-044448b73426?auto=format&fit=crop&w=1600&q=80",
       "alt": "A bed with white sheets and pillows",
@@ -2273,7 +2260,6 @@ export const ARTICLES: Article[] = [
     ],
     "fallback": "families",
     "date": "2026-09-12",
-    "views": 1990,
     "image": {
       "src": "https://images.unsplash.com/photo-1572450775448-4af18fd45a0d?auto=format&fit=crop&w=1600&q=80",
       "alt": "A red rose in a vase",
@@ -2386,7 +2372,6 @@ export const ARTICLES: Article[] = [
     ],
     "fallback": "families",
     "date": "2026-11-04",
-    "views": 1760,
     "image": {
       "src": "https://images.unsplash.com/photo-1551690935-a9e6f0a7e788?auto=format&fit=crop&w=1600&q=80",
       "alt": "A lighted incense stick",
@@ -2509,7 +2494,6 @@ export const ARTICLES: Article[] = [
     ],
     "fallback": "families",
     "date": "2026-10-09",
-    "views": 3060,
     "image": {
       "src": "https://images.unsplash.com/photo-1707839568938-f9b50bb88454?auto=format&fit=crop&w=1600&q=80",
       "alt": "Two white candles on a table",
@@ -2622,7 +2606,6 @@ export const ARTICLES: Article[] = [
     ],
     "fallback": "families",
     "date": "2026-09-26",
-    "views": 2210,
     "image": {
       "src": "https://images.unsplash.com/photo-1544047161-b06a6b279e3d?auto=format&fit=crop&w=1600&q=80",
       "alt": "Sea waves at the shore",
@@ -2736,8 +2719,6 @@ export const articleBySlug = (slug: string): Article | undefined => ARTICLES.fin
 
 /** Newest first. */
 export const byDate = (list: Article[] = ARTICLES): Article[] => [...list].sort((a, b) => b.date.localeCompare(a.date));
-/** Most read first. */
-export const byViews = (list: Article[] = ARTICLES): Article[] => [...list].sort((a, b) => b.views - a.views);
 
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const SHORT = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -2751,9 +2732,5 @@ export function articleDate(iso: string): string {
 export function articleMonth(iso: string): string {
   const [y, m] = iso.split("-").map(Number);
   return `${MONTHS[m - 1]} ${y}`;
-}
-/** 5820 -> "5.8k reads" */
-export function reads(n: number): string {
-  return n >= 1000 ? `${(n / 1000).toFixed(1).replace(/\.0$/, "")}k reads` : `${n} reads`;
 }
 

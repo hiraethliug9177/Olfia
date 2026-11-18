@@ -55,7 +55,7 @@ const NAV: NavItem[] = [
     href: "/edit", label: "The Edit", sub: [
       { href: "/library", label: "Scent Library", dot: "#4C527A" },
       { href: "/edit#latest", label: "Latest stories", dot: "#E7B49F" },
-      { href: "/edit#most-read", label: "Most read", dot: "#A0A6C8" },
+      { href: "/edit#editors-picks", label: "Editor’s picks", dot: "#A0A6C8" },
       { href: "/edit#topics", label: "Browse by topic", dot: "#4C527A" },
     ],
   },
