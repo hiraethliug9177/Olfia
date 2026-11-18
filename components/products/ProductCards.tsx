@@ -45,7 +45,7 @@ const WHEN_FILTER: Record<When, { season?: Season; daypart?: Daypart }> = {
   cold: { season: "winter" },
 };
 
-export function ProductCard({ p, match, onSimilar }: { p: Product; match?: FamilyId[]; onSimilar?: (id: string) => void }) {
+export function ProductCard({ p, match, onSimilar, place }: { p: Product; match?: FamilyId[]; onSimilar?: (id: string) => void; place?: string }) {
   const f = familyById(p.families[0]);
   const shared = (match ?? []).filter((id) => p.families.includes(id));
   const why = shared.length ? `Shares ${shared.map((id) => familyById(id).label).join(" and ")} with this room` : p.families.map((id) => familyById(id).label).join(" and ");
@@ -63,7 +63,7 @@ export function ProductCard({ p, match, onSimilar }: { p: Product; match?: Famil
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
       {p.url ? (
-        <ProductLink className="pcard" href={p.url} product={{ id: p.id, brand: p.brand, family: p.families[0], tier: p.tier }} ariaLabel={`${p.brand} ${p.name}, opens the brand's site`}>
+        <ProductLink className="pcard" href={p.url} place={place} product={{ id: p.id, brand: p.brand, family: p.families[0], tier: p.tier }} ariaLabel={`${p.brand} ${p.name}, opens the brand's site`}>
           {body}
           <span className="pcard__out"><Icon name="external" size={18} /></span>
         </ProductLink>

@@ -62,4 +62,9 @@ Done 11/10 ~6:45 pm PT: all seven items are live on olfia-nine.vercel.app (main 
 - [x] Review 4: Rooms on phones: room first, tray as a bottom drawer
 - [x] Review 5 decided: the story text stays IBM Plex Mono; headings and the line under the title bold; story tags as icon pills
 - [x] The Edit: "Editor’s Picks" and "In Season" in title case, two stories each; on story pages the tag, date and read time share one line above the title
-- [ ] Review 7 Picks and 8 Gifts (before 11/26), then 9 (story share, sign-up, related); 11–14 wait for Tiffany's decisions and words
+- [x] Review 7: Picks page (/picks), filters by family, room and price
+- [x] Review 8: Gifts (/gifts) by scent family, three price tiers (Tiffany chose families over characters)
+- [x] Review 9: story share row, "Recreate this at home" (families + three products), sign-up box, related "Keep reading"
+- [ ] Check every price tier on the brand sites (several look off: Diptyque classic candles, Otherland, the Vitruvi diffuser, Aesop room spray); Gifts picks may move with them
+- [ ] Tiffany: sign-up heading; any intro lines for Picks and Gifts; reword the new labels if wanted
+- [ ] 11–14 wait for Tiffany's decisions and words

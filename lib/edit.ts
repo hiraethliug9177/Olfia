@@ -2721,6 +2721,15 @@ export const articleBySlug = (slug: string): Article | undefined => ARTICLES.fin
 /** Newest first. */
 export const byDate = (list: Article[] = ARTICLES): Article[] => [...list].sort((a, b) => b.date.localeCompare(a.date));
 
+/** "Keep reading" (11/17): stories that share a scent family (2 each) or the topic (1) come first, newest first among equals. */
+export function relatedTo(a: Article, n = 3): Article[] {
+  return byDate(ARTICLES.filter((x) => x.slug !== a.slug))
+    .map((x, i) => ({ x, i, s: x.families.filter((f) => a.families.includes(f)).length * 2 + (x.topic === a.topic ? 1 : 0) }))
+    .sort((p, q) => q.s - p.s || p.i - q.i)
+    .slice(0, n)
+    .map(({ x }) => x);
+}
+
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const SHORT = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 

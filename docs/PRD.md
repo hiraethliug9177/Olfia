@@ -105,6 +105,8 @@ Research-informed rules (6 interviews, 46-response survey; directions, not valid
 | `/atlas/[entryId]` | Entry detail: content, Scene Card preview, export, edit (Capture) / reopen (Rooms), delete |
 | `/about` | What Olfia is, who made it, course context, how data is handled (short) |
 | `/privacy` | Privacy note: local-only storage, analytics, no accounts |
+| `/picks` | Picks (11/17): every recommended product, filtered by scent family, room and price |
+| `/gifts` | Gifts (11/17): three gifts per scent family, one per price tier |
 | `/notes`, `/notes/[slug]` | Should: Notes on Scent & Space |
 | `/api/suggest` | Could: LLM suggestions |
 

@@ -4,6 +4,9 @@
  * elsewhere: free-licence photos (Unsplash, the Met) and Olfia's own files. Other covers stay on the page
  * with their credit, and a shared link shows the Olfia picture instead.
  */
+/** The public address of the site; shared and copied links always point here, also from a preview build. */
+export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.olfia.studio").replace(/\/$/, "");
+
 export const SHARE_IMAGE = {
   url: "/og.png",
   width: 1200,

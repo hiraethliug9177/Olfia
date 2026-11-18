@@ -1,0 +1,50 @@
+import Link from "next/link";
+import { familyById, texture } from "@/lib/catalog";
+import { FAMILY_WASH } from "@/lib/colors";
+import { storyFor } from "@/lib/library";
+import { storyPicks } from "@/lib/picks";
+import { ProductCard } from "@/components/products/ProductCards";
+import type { FamilyId } from "@/lib/types";
+
+/**
+ * The end of a story (11/17, review item 9): the story's scent families, each opening its Scent Library
+ * story, then three products in those families that can be bought online (lib/picks.ts storyPicks). The heading is the existing
+ * "Recreate this at home" line of the product cards.
+ */
+export function StoryRelated({ families }: { families: FamilyId[] }) {
+  const products = storyPicks(families);
+  return (
+    <section className="story-rel" aria-labelledby="story-rel-h">
+      <h2 id="story-rel-h" className="h-section">Recreate this at home</h2>
+      <div className="story-rel__fams">
+        {families.map((id) => {
+          const f = familyById(id);
+          const lib = storyFor(id);
+          return (
+            <Link key={id} href={`/library#${id}`} className="story-fam" style={{ background: FAMILY_WASH[id] }}>
+              <span className="story-fam__head">
+                <span className="chip__dot" style={{ background: f.hex }} aria-hidden="true" />
+                {f.label}
+              </span>
+              <span className="story-fam__mats" aria-hidden="true">
+                {f.materials.map((m) =>
+                  m.asset ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img key={m.id} src={m.asset} alt="" width={64} height={64} />
+                  ) : (
+                    <span key={m.id} className="story-fam__swatch" style={{ background: texture(m.colors) }} />
+                  ),
+                )}
+              </span>
+              {lib ? <span className="story-fam__title">{lib.title}</span> : null}
+            </Link>
+          );
+        })}
+      </div>
+      {products.length ? (
+        <div className="pcard-grid">{products.map((p) => <ProductCard key={p.id} p={p} place="story" />)}</div>
+      ) : null}
+      <Link href={`/picks?family=${families[0]}`} className="hero__link" style={{ alignSelf: "flex-start" }}>More picks</Link>
+    </section>
+  );
+}

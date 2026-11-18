@@ -3,7 +3,7 @@
 import {
   ArrowLeft, ArrowRight, BookOpen, Check, ChevronDown, ChevronLeft, ChevronRight, CircleUserRound, Copy, Download,
   Drama, ExternalLink, Flame, FlaskConical, FlipHorizontal2, House, ImagePlus, Instagram, Layers, Link2, Mail, MapPin,
-  Menu, Minus, Pause, PencilRuler, Play, Plus, Redo2, RotateCcw, RotateCw, Scroll, SendToBack, Share2, Trash2, Undo2, X,
+  Menu, Minus, Pause, PencilRuler, Pin, Play, Plus, Redo2, RotateCcw, RotateCw, Scroll, SendToBack, Share2, Trash2, Undo2, X,
   type LucideIcon,
 } from "lucide-react";
 
@@ -50,6 +50,8 @@ const ICONS = {
   pencilRuler: PencilRuler,
   mapPin: MapPin,
   flame: Flame,
+  // Pinterest has no Lucide mark; the share row uses a pin (11/17)
+  pin: Pin,
 } satisfies Record<string, LucideIcon>;
 
 export type IconName = keyof typeof ICONS;

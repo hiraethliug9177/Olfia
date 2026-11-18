@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ARTICLES, articleBySlug, articleDate, byDate } from "@/lib/edit";
+import { ARTICLES, articleBySlug, articleDate, relatedTo } from "@/lib/edit";
 import { familyById } from "@/lib/catalog";
 import { ArticleCover } from "@/components/edit/ArticleCover";
 import { ArticleCard } from "@/components/edit/ArticleCard";
@@ -10,7 +10,10 @@ import { ObjectPhoto } from "@/components/edit/ObjectPhoto";
 import { Rich } from "@/components/edit/Rich";
 import { Icon } from "@/components/ui/Icon";
 import { ProductLink } from "@/components/products/ProductLink";
-import { shareImageFor } from "@/lib/share";
+import { SITE_URL, shareImageFor } from "@/lib/share";
+import { ShareRow } from "@/components/edit/ShareRow";
+import { StoryRelated } from "@/components/edit/StoryRelated";
+import { SignupForm } from "@/components/SignupForm";
 
 export function generateStaticParams() {
   return ARTICLES.map((a) => ({ slug: a.slug }));
@@ -33,7 +36,8 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
   const { slug } = await params;
   const a = articleBySlug(slug);
   if (!a) notFound();
-  const others = byDate(ARTICLES.filter((x) => x.slug !== a.slug)).slice(0, 3);
+  const others = relatedTo(a);
+  const pinImage = shareImageFor(a.image)[0].url;
   return (
     <div className="wrap page">
       <article className="article">
@@ -95,7 +99,24 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
             ))}
           </ol>
         </section>
+
+        <ShareRow
+          url={`${SITE_URL}/edit/${a.slug}`}
+          title={a.title}
+          image={pinImage.startsWith("/") ? `${SITE_URL}${pinImage}` : pinImage}
+          slug={a.slug}
+        />
       </article>
+
+      <StoryRelated families={a.families} />
+
+      <section className="story-signup" aria-label="Email sign-up">
+        <div className="story-signup__brand">
+          <span className="story-signup__mark">Olfia</span>
+          <span className="muted">For the rooms you live in, and the ones you imagine.</span>
+        </div>
+        <SignupForm place="story" />
+      </section>
 
       <section style={{ marginTop: 72 }}>
         <h2 className="h-section" style={{ marginBottom: 28 }}>Keep reading</h2>

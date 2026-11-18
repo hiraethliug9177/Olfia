@@ -26,6 +26,10 @@ type EventMap = {
   sample_loaded: { place: "atlas" | "link" };
   /** The sign-up form is sent (components/SignupForm.tsx): where it sat, and the "found us" answer. */
   email_signup: { place: string; found?: string };
+  /** A family is chosen in the Gifts guide (11/17). */
+  gift_family: { family: string };
+  /** A story's share row is used (11/17): copy the link, save to Pinterest, or the phone's own share sheet. */
+  story_share: { method: "copy" | "pinterest" | "native"; slug: string };
   /** The partner contact is used (wired when the partners page lands). */
   partner_inquiry: { place: string };
 };
