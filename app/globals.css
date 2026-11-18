@@ -694,7 +694,8 @@ body::after {
 .np-rank { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; }
 .np-rank li { display: flex; gap: 14px; padding: 12px 0; border-top: 1px solid rgba(41,42,49,0.12); }
 .np-rank li:first-child { border-top: 0; padding-top: 0; }
-.np-rank__n { flex: none; width: 30px; font-family: var(--font-display); font-size: 34px; font-weight: 700; line-height: 1; color: var(--deep); }
+/* 11/17: the Editor's Picks numbers are set in IBM Plex Mono (Tiffany); 600 is its heaviest loaded weight */
+.np-rank__n { flex: none; width: 30px; font-family: var(--font-ui); font-size: 30px; font-weight: 600; line-height: 1; color: var(--deep); }
 .np-rank a { display: flex; flex-direction: column; gap: 8px; color: var(--ink); text-decoration: none; }
 .np-rank a:hover .np-rank__title { text-decoration: underline; text-underline-offset: 4px; }
 .np-rank__title { font-family: var(--font-display); font-size: 19px; font-weight: 600; line-height: 1.18; }
