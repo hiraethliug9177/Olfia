@@ -8,7 +8,7 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       // Picks was folded into Gifts on 11/17; old links land on the full list, their filters kept.
-      { source: "/picks", destination: "/gifts#all", permanent: true },
+      { source: "/picks", destination: "/gifts", permanent: true },
       {
         source: "/:path*",
         has: [{ type: "host", value: "olfia-nine.vercel.app" }],

@@ -105,8 +105,9 @@ Research-informed rules (6 interviews, 46-response survey; directions, not valid
 | `/atlas/[entryId]` | Entry detail: content, Scene Card preview, export, edit (Capture) / reopen (Rooms), delete |
 | `/about` | What Olfia is, who made it, course context, how data is handled (short) |
 | `/privacy` | Privacy note: local-only storage, analytics, no accounts |
-| `/gifts` | Gifts (11/17): three gifts per scent family, then "All gifts": every recommended product, filtered by scent family, room and price |
-| `/picks` | Forwards to `/gifts#all` (Picks was folded into Gifts on 11/17) |
+| `/gifts` | Gifts (11/18): a For me / For someone switch; three gifts (one per price tier), each drawn into a room. For someone: their name and scent family, then a gift card, a save to the Scent Atlas, or the brand's page. For me: from the quiz and the Scent Atlas, then My shelf, a Scent Card, or the brand's page |
+| `/gifts/card` | Gift card (11/18) for one product (`?p=`): name, note and sender stay in the browser tab and never in the query; download, share, copy link, save to the Scent Atlas |
+| `/picks` | Forwards to `/gifts` (Picks folded into Gifts on 11/17; the full list was removed on 11/18) |
 | `/notes`, `/notes/[slug]` | Should: Notes on Scent & Space |
 | `/api/suggest` | Could: LLM suggestions |
 

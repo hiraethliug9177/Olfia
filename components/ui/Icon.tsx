@@ -1,8 +1,8 @@
 "use client";
 
 import {
-  ArrowLeft, ArrowRight, BookOpen, CalendarDays, Check, ChevronDown, ChevronLeft, ChevronRight, CircleUserRound, Clock, Copy, Download,
-  Drama, ExternalLink, Flame, FlaskConical, FlipHorizontal2, House, ImagePlus, Instagram, Layers, Link2, Mail, MapPin,
+  ArrowLeft, ArrowRight, BookOpen, Bookmark, BookmarkCheck, CalendarDays, Check, ChevronDown, ChevronLeft, ChevronRight, CircleUserRound, Clock, Copy, Download,
+  Drama, ExternalLink, Flame, FlaskConical, FlipHorizontal2, Gift, House, Image, ImagePlus, Instagram, Layers, Link2, Mail, MapPin,
   Menu, Minus, Pause, PencilRuler, Pin, Play, Plus, Redo2, RotateCcw, RotateCw, Scroll, SendToBack, Share2, Trash2, Undo2, X,
   type LucideIcon,
 } from "lucide-react";
@@ -55,6 +55,11 @@ const ICONS = {
   // 11/18: time of day and season on the detailed product cards (Rooms)
   clock: Clock,
   calendar: CalendarDays,
+  // 11/18: Gifts (gift card, saving, Scent Card)
+  gift: Gift,
+  bookmark: Bookmark,
+  bookmarkCheck: BookmarkCheck,
+  image: Image,
 } satisfies Record<string, LucideIcon>;
 
 export type IconName = keyof typeof ICONS;

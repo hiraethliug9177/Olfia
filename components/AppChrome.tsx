@@ -13,7 +13,7 @@ import { Icon, MenuMorph } from "@/components/ui/Icon";
 
 const isActive = (path: string, href: string) => (href === "/" ? path === "/" : path === href || path.startsWith(`${href}/`));
 
-/** narrow: shown only where the header has no room for the "Make a Scent Card" button (≤1180px, not phones). */
+/** narrow: shown only where the header has no room for the "Make a Scent Card" button (≤1220px since the Gifts tab, not phones). */
 type Sub = { href: string; label: string; dot: string; narrow?: boolean };
 type NavItem = { href: string; label: string; icon?: "home" | "user"; sub: Sub[] };
 
@@ -22,9 +22,10 @@ type NavItem = { href: string; label: string; icon?: "home" | "user"; sub: Sub[]
  * middle row, and every tab opens a small menu of the sections on that page when hovered or focused.
  * 11/18 (Tiffany): menus trimmed to what is worth a click. Capture lost "Make a Scent Card" (the button on the
  * right does that), which left it one entry pointing at itself, so Capture has no menu where that button shows; where
- * the button has no room (≤1180px) the entry stays, and phones get the button at the foot of their menu. Rooms lost "Your rooms" and
+ * the button has no room (≤1220px) the entry stays, and phones get the button at the foot of their menu. Rooms lost "Your rooms" and
  * "Room presets"; The Edit lost "Latest stories", "Editor's Picks" and "Browse by topic"; My Account is renamed
  * My Page and lost "Preferences" and "Personal info".
+ * 11/18 (Tiffany): Gifts has its own tab, after Scent Atlas, with For me and For someone; it left The Edit's menu.
  */
 const NAV: NavItem[] = [
   {
@@ -32,6 +33,7 @@ const NAV: NavItem[] = [
       { href: "/#quiz", label: "Scent quiz", dot: "#E7B49F" },
       { href: "/#families", label: "Seven scent families", dot: "#A0A6C8" },
       { href: "/#presets", label: "Room presets", dot: "#4C527A" },
+      { href: "/#gifts", label: "Gifts", dot: "#A0A6C8" },
       { href: "/#edit", label: "The Olfia Edit", dot: "#E7B49F" },
     ],
   },
@@ -55,9 +57,14 @@ const NAV: NavItem[] = [
     ],
   },
   {
+    href: "/gifts", label: "Gifts", sub: [
+      { href: "/gifts?for=me", label: "For me", dot: "#A0A6C8" },
+      { href: "/gifts?for=someone", label: "For someone", dot: "#E7B49F" },
+    ],
+  },
+  {
     href: "/edit", label: "The Edit", sub: [
       { href: "/library", label: "Scent Library", dot: "#4C527A" },
-      { href: "/gifts", label: "Gifts", dot: "#E7B49F" },
     ],
   },
   {
@@ -113,7 +120,7 @@ export function Header() {
   }, [showToast]);
   useEffect(() => setOpen(false), [path]);
   // the Scent Library is part of The Edit since 11/10
-  const cur = (href: string) => (isActive(path, href) || (href === "/edit" && ["/library", "/gifts"].some((p) => isActive(path, p))) ? "page" : undefined);
+  const cur = (href: string) => (isActive(path, href) || (href === "/edit" && isActive(path, "/library")) ? "page" : undefined);
 
   return (
     <header className="hd">

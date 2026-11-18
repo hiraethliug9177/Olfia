@@ -81,13 +81,13 @@ const cap = (t: string) => t.charAt(0).toUpperCase() + t.slice(1);
 const joinAnd = (xs: string[]) => (xs.length > 1 ? `${xs.slice(0, -1).join(", ")} and ${xs[xs.length - 1]}` : xs[0] ?? "");
 
 /** "Evening and night", "Any time of day" */
-function dayText(d: Daypart[]): string {
+export function dayText(d: Daypart[]): string {
   const list = DAYPART_ORDER.filter((x) => d.includes(x));
   return list.length === 4 ? "Any time of day" : cap(joinAnd(list));
 }
 
 /** "Autumn and winter", "All year" */
-function seasonText(s: Season[]): string {
+export function seasonText(s: Season[]): string {
   const list = SEASON_ORDER.filter((x) => s.includes(x));
   return list.length === 4 ? "All year" : cap(joinAnd(list));
 }

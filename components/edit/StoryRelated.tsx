@@ -44,7 +44,7 @@ export function StoryRelated({ families }: { families: FamilyId[] }) {
       {products.length ? (
         <div className="story-side__products">{products.map((p) => <ProductCard key={p.id} p={p} place="story" />)}</div>
       ) : null}
-      <Link href={`/gifts?family=${families[0]}#all`} className="hero__link story-side__more">More in Gifts</Link>
+      <Link href={`/gifts?for=someone&family=${families[0]}`} className="hero__link story-side__more">More in Gifts</Link>
     </aside>
   );
 }

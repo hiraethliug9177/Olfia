@@ -200,8 +200,11 @@ textarea.input { padding: 14px 16px; min-height: 96px; resize: vertical; }
 .hd__sub a { display: flex; align-items: center; gap: 10px; min-height: 42px; padding: 0 14px; border-radius: 12px; color: var(--ink); text-decoration: none; font-size: 15px; white-space: nowrap; }
 .hd__sub a:hover { background: var(--mist); color: var(--ink); }
 .hd__dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
-@media (max-width: 1180px) { .hd__cta { display: none !important; } }
-@media (min-width: 1181px) { .hd__sub--narrow, .hd__sub-narrow { display: none !important; } }
+/* 11/18: the Gifts tab widened the menu, so the button needs 1221px and the phone menu takes over below 901px */
+@media (max-width: 1220px) { .hd__cta { display: none !important; } }
+@media (min-width: 1221px) { .hd__sub--narrow, .hd__sub-narrow { display: none !important; } }
+/* below 1101px the My Page menu, centred under its tab, would run past the right edge: line it up with the tab's right side */
+@media (max-width: 1100px) { .hd__item:last-child > .hd__sub { left: auto; right: 0; translate: none; } }
 .hd__burger { width: 48px; height: 48px; align-items: center; justify-content: center; border: 0; border-radius: 50%; background: rgba(255,255,255,0.75); color: var(--ink); box-shadow: 0 8px 28px rgba(41,42,49,0.08); }
 .ft__h { font-size: 13px; font-weight: 600; color: var(--slate); }
 .hd__link--icon { padding: 0; }
@@ -223,7 +226,7 @@ textarea.input { padding: 14px 16px; min-height: 96px; resize: vertical; }
 .hd__menu > * { flex-shrink: 0; }
 .hd__menu .hd__menu-cta { justify-content: center; margin-top: 4px; color: var(--ivory); }
 .hd__menu .hd__menu-cta:hover { color: var(--ivory); }
-@media (max-width: 860px) {
+@media (max-width: 900px) {
   .hd__full { display: none !important; }
   .hd__mob { display: flex; }
   .hd__link { padding: 0 12px; font-size: 15px; }
@@ -670,22 +673,88 @@ a.pcard:hover { color: var(--ink); transform: translateY(-3px); }
   .story-side__products { grid-template-columns: minmax(0, 1fr); }
 }
 
-/* 11/17: Picks and Gifts */
-.picks-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 12px 24px; margin-bottom: 32px; }
-.picks, .gifts { display: flex; flex-direction: column; gap: 28px; }
-@media (min-width: 701px) { .picks .np-tabs, .gifts .np-tabs { flex-wrap: wrap; } }
-/* the eight family tabs fit one line on a laptop */
-.picks .np-tabs:first-child .np-tab { font-size: 14px; padding: 0 13px; }
-.picks .np-tab--dot { gap: 7px; }
-.gifts__you { font-size: 19px; line-height: 1; margin-left: 2px; }
-.gifts__panel { display: flex; flex-direction: column; gap: 20px; padding: 36px; border-radius: 32px; }
-.gifts__head { display: flex; align-items: center; gap: 14px; }
-.gifts__head h2 { font-size: clamp(32px, 3.4vw, 44px); line-height: 1.05; }
-.gifts__dot { width: 22px; height: 22px; border-radius: 50%; flex: none; box-shadow: 0 0 0 4px #fff; }
-.gifts__what { max-width: 40em; }
-.gifts-intro { margin-top: 14px; }
-.gifts-all { display: flex; flex-direction: column; gap: 24px; margin-top: 72px; }
-@media (max-width: 640px) { .gifts__panel { padding: 24px 20px; border-radius: 24px; } }
+/* 11/18 (Tiffany): Gifts, for me and for someone, each pick drawn into a room from Rooms */
+/* a pick's room: the scene page cropped to its stage, so no page title, date or torn edge shows */
+.gift-room { position: relative; aspect-ratio: 780 / 927; overflow: hidden; background: var(--paper); }
+.gift-room .scene-sheet { margin-top: -17.04%; filter: none; }
+.gifts-page__head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px 28px; margin-bottom: 32px; }
+.gift-toggle { display: inline-flex; gap: 4px; padding: 5px; border-radius: 999px; background: var(--mist); }
+.gift-toggle button { height: 44px; padding: 0 22px; border: 0; border-radius: 999px; background: transparent; font-family: var(--font-ui); font-size: 15px; font-weight: 500; color: var(--ink); cursor: pointer; }
+.gift-toggle button[aria-pressed="true"] { background: var(--deep); color: #fff; }
+.gift-choose, .gift-me { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 20px 32px; padding: 24px 28px; border-radius: 24px; background: #fff; box-shadow: var(--shadow-card); }
+.gift-choose__to { display: flex; flex-direction: column; gap: 8px; flex: 0 1 240px; }
+.gift-choose__to label, .gift-choose__fams legend, .gift-field label { font-size: 14px; color: var(--slate); }
+.gift-choose__fams { flex: 1 1 560px; min-width: 0; margin: 0; padding: 0; border: 0; }
+.gift-choose__fams legend { padding: 0; margin-bottom: 8px; }
+.gift-choose__chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.gift-chip { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line); background: #fff; font-family: var(--font-ui); font-size: 14px; color: var(--ink); cursor: pointer; }
+.gift-chip:hover { border-color: var(--deep); }
+.gift-chip[aria-pressed="true"] { border: 2px solid var(--deep); padding: 0 15px; background: var(--mist); font-weight: 600; }
+/* "For" and "Their scent" start on one line; the quiz button sits level with the chips */
+.gift-choose { align-items: flex-start; }
+.gift-choose__quiz { margin-left: auto; align-self: flex-end; }
+.gift-me { align-items: center; padding: 22px 28px; }
+.gift-me__fig { flex: none; display: flex; align-items: flex-end; justify-content: center; width: 124px; height: 124px; border-radius: 50%; overflow: hidden; }
+.gift-me__fig img { display: block; width: 104px; height: auto; }
+.gift-me__text { flex: 1 1 360px; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.gift-me__name { font-family: var(--font-display); font-size: 34px; line-height: 1.1; }
+.gift-me__voice { font-size: 15px; color: var(--slate); }
+.gift-me__fams { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 4px; font-size: 14px; }
+.gift-me__fams > span { display: inline-flex; align-items: center; gap: 8px; }
+.gift-me__side { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; margin-left: auto; font-size: 14px; color: var(--slate); text-align: right; }
+.gift-me__side a { font-size: 15px; }
+.gift-picks { display: flex; flex-wrap: wrap; gap: 24px; margin-top: 32px; }
+.gift-pick { flex: 1 1 300px; min-width: 0; display: flex; flex-direction: column; border-radius: 24px; overflow: hidden; background: #fff; box-shadow: var(--shadow-card); }
+.gift-pick__body { flex: 1; display: flex; flex-direction: column; gap: 10px; padding: 20px 22px 22px; }
+.gift-pick__brand { display: block; font-size: 14px; color: var(--slate); }
+.gift-pick__name { font-family: var(--font-display); font-weight: 500; font-size: 26px; line-height: 1.15; }
+.gift-pick__price { display: block; font-size: 15px; font-weight: 600; }
+.gift-pick__notes { display: flex; flex-wrap: wrap; gap: 6px; }
+.gift-pick__when { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--slate); }
+.gift-pick__when .ico { flex: none; }
+.gift-pick__fams { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 14px; }
+.gift-pick__fams .chip__dot + .chip__dot { margin-left: -2px; }
+.gift-pick__fams .chip__dot:last-of-type { margin-right: 2px; }
+.gift-pick__actions { display: flex; gap: 8px; margin-top: auto; padding-top: 8px; }
+.gift-pick__main { flex: 1; justify-content: center; gap: 8px; }
+.gift-pick__icon { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 999px; border: 1px solid var(--line); background: #fff; color: var(--ink); cursor: pointer; }
+.gift-pick__icon:hover { color: var(--deep); border-color: var(--deep); }
+.gift-pick__icon:disabled { cursor: default; color: var(--deep); border-color: var(--deep); }
+/* Home */
+.home-gifts__ctas { display: flex; flex-wrap: wrap; gap: 10px; }
+.home-gifts { display: flex; flex-wrap: wrap; gap: 24px; }
+.home-gift { flex: 1 1 300px; min-width: 0; display: flex; flex-direction: column; border-radius: 24px; overflow: hidden; background: #fff; color: var(--ink); text-decoration: none; box-shadow: var(--shadow-card); transition: transform 0.3s var(--ease); }
+.home-gift:hover { transform: translateY(-3px); color: var(--ink); }
+.home-gift__body { display: flex; flex-direction: column; gap: 6px; padding: 18px 22px 22px; }
+.home-gift__name { font-family: var(--font-display); font-size: 26px; line-height: 1.15; }
+.home-gift__row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 12px; margin-top: 4px; }
+.home-gift__fams { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: var(--slate); }
+/* the gift card */
+.gift-card-layout { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: center; gap: 56px 72px; margin-top: 28px; }
+.gift-card-tilt { flex: 0 1 440px; min-width: 0; margin-top: 12px; transform: rotate(-1.5deg); }
+.gift-card { margin: 0; display: flex; flex-direction: column; gap: 14px; padding: 18px 18px 22px; border-radius: 6px; background: #fff; box-shadow: 0 2px 4px rgba(41,42,49,0.08), 0 28px 60px rgba(41,42,49,0.16); }
+.gift-card .scene-sheet { filter: none; }
+.gift-card__caption { display: flex; flex-direction: column; gap: 6px; padding: 0 6px; }
+.gift-card__note { font-family: var(--font-hand); font-size: 30px; line-height: 1.15; color: var(--ink); overflow-wrap: anywhere; }
+.gift-card__from { font-family: var(--font-hand); font-size: 24px; line-height: 1.1; color: var(--slate); }
+.gift-card__meta { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; margin-top: 2px; font-size: 13px; color: var(--slate); }
+.gift-card-panel { flex: 1 1 420px; max-width: 560px; min-width: 0; display: flex; flex-direction: column; gap: 20px; padding: 32px; border-radius: 24px; background: #fff; box-shadow: var(--shadow-card); }
+.gift-card-panel__title { font-family: var(--font-display); font-weight: 500; font-size: 44px; line-height: 1.05; overflow-wrap: anywhere; }
+.gift-field { display: flex; flex-direction: column; gap: 8px; }
+.gift-field textarea { resize: vertical; min-height: 88px; padding-top: 12px; line-height: 1.5; }
+.gift-card-panel__product { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; padding: 16px 18px; border-radius: 16px; background: var(--mist); }
+.gift-card-panel__product > span { display: flex; flex-direction: column; }
+.gift-card-panel__name { font-family: var(--font-display); font-size: 24px; line-height: 1.2; }
+.gift-card-panel__out { display: inline-flex; align-items: center; gap: 8px; font-size: 15px; }
+.gift-card-panel__actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.gift-card-panel__actions .btn { gap: 8px; }
+@media (max-width: 640px) {
+  .gift-choose, .gift-me { padding: 20px; }
+  .gift-me__side { align-items: flex-start; margin-left: 0; text-align: left; }
+  .gift-choose__quiz { margin-left: 0; }
+  .gift-card-panel { padding: 22px; }
+  .gift-card-panel__title { font-size: 36px; }
+}
 .todo { padding: 18px 22px; border-radius: 16px; background: var(--mist); color: var(--slate); font-size: 15px; }
 
 /* ---------- backdrop: the three brand colours drifting into each other (2026-11-09) ---------- */
@@ -757,8 +826,6 @@ body::after {
 .np-tabs--quiet .np-tab { min-height: 34px; font-size: 14px; color: var(--slate); }
 .np-tabs--quiet .np-tab[aria-pressed="true"] { background: var(--deep); color: #fff; }
 /* 11/17: tabs that carry a family dot (Picks, Gifts); the dot keeps a white ring on the dark selected tab */
-.np-tab--dot { display: inline-flex; align-items: center; gap: 8px; }
-.np-tab--dot[aria-pressed="true"] .chip__dot { box-shadow: 0 0 0 2px #fff; }
 .np-h { font-family: var(--font-display); font-size: 30px; font-weight: 700; line-height: 1.05; letter-spacing: -0.01em; }
 .np-stories { display: flex; flex-direction: column; gap: 28px; }
 .np-rail { position: sticky; top: 20px; max-height: calc(100vh - 40px); overflow-y: auto; display: flex; flex-direction: column; gap: 20px; padding-right: 4px; scrollbar-width: thin; }

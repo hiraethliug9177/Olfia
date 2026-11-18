@@ -28,6 +28,12 @@ type EventMap = {
   email_signup: { place: string; found?: string };
   /** A family is chosen in the Gifts guide (11/17). */
   gift_family: { family: string };
+  /** Gifts switches between For me and For someone (11/18). */
+  gift_mode: { mode: "me" | "someone" };
+  /** A gift pick is kept (11/18): as a page in the Scent Atlas, or on My shelf. */
+  gift_save: { to: "atlas" | "shelf"; product: string };
+  /** The gift card (11/18): opened, downloaded, shared, its link copied, or saved to the Scent Atlas. */
+  gift_card: { action: "open" | "download" | "share" | "link" | "save"; product: string };
   /** A story's share row is used (11/17): copy the link, save to Pinterest, or the phone's own share sheet. */
   story_share: { method: "copy" | "pinterest" | "native"; slug: string };
   /** The partner contact is used (wired when the partners page lands). */
