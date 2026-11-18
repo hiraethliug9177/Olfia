@@ -73,6 +73,7 @@ Done 11/10 ~6:45 pm PT: all seven items are live on olfia-nine.vercel.app (main 
 - [x] Header menus trimmed; My Account renamed My Page (11/18)
 - [x] Rooms: four matched products with price, size, notes, time of day and season (11/18)
 - [x] Class demo copy: `demo` branch with the full sample data, quiz result included (11/18)
-- [ ] Picks/Gifts rethink: keep one of the two, a Home section, its own header tab (waiting for Tiffany's direction)
+- [x] Picks/Gifts rethink, direction set (11/18): Gifts only, for me and for someone, link + card + save, illustrated rooms
+- [ ] Gifts sketch review (Design canvas "Olfia Gifts — sketch"), then build: Gifts tab, Home section, For me / For someone, gift card
 - [ ] Publish the 11/17 late-night and 11/18 changes when Tiffany says "发布" (on the v3-design preview)
 - [ ] 11–14 wait for Tiffany's decisions and words
