@@ -19,8 +19,9 @@ export const strings = {
   },
   /** Email sign-up (Kit). Button and note: Tiffany 11/15. */
   signup: {
-    // TODO(Tiffany): the line above the email box. Hidden while empty.
-    heading: "",
+    // The line above the email box (footer and story pages). Written by Claude on 11/17 at Tiffany's request
+    // ("你写就行"); hers to change. Hidden while empty.
+    heading: "Let the scent stay a little longer.",
     button: "Count me in",
     note: "Occasional inspirations from Olfia. Unsubscribe anytime.",
     found: "Where did you find Olfia?",

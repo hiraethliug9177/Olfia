@@ -13,8 +13,9 @@ import { useTabInView } from "@/components/picks/useTabInView";
 import type { FamilyId } from "@/lib/types";
 
 /**
- * Gifts by scent family, one gift per price tier (Tiffany 11/17). Someone who has taken the quiz opens on
- * their own family, marked "you"; no quiz characters are shown (her 11/10 rule). ?family= picks a family.
+ * Gifts by scent family, three gifts from lower to higher price (Tiffany 11/17). Someone who has taken the quiz
+ * opens on their own family, marked "you"; no quiz characters are shown (her 11/10 rule). The family travels as
+ * ?for=, so the full list further down the page keeps its own ?family=.
  */
 const isFamily = (v: string | null): v is FamilyId => FAMILIES.some((f) => f.id === v);
 
@@ -28,14 +29,16 @@ export function GiftGuide() {
     setMine(loadQuiz()?.family ?? null);
   }, []);
 
-  const asked = params.get("family");
+  const asked = params.get("for");
   const family: FamilyId = isFamily(asked) ? asked : (mine ?? FAMILIES[0].id);
   const f = familyById(family);
   const tabs = useRef<HTMLDivElement>(null);
   useTabInView(tabs, family);
 
   const choose = (id: FamilyId) => {
-    router.replace(`${path}?family=${id}`, { scroll: false });
+    const next = new URLSearchParams(params.toString());
+    next.set("for", id);
+    router.replace(`${path}?${next.toString()}`, { scroll: false });
     track("gift_family", { family: id });
   };
 
@@ -58,9 +61,9 @@ export function GiftGuide() {
         </div>
         <p className="gifts__what">{f.what}</p>
         <div className="pcard-grid">
-          {giftsFor(family).map((p) => <ProductCard key={p.id} p={p} />)}
+          {giftsFor(family).map((p) => <ProductCard key={p.id} p={p} place="gifts" />)}
         </div>
-        <Link href={`/picks?family=${family}`} className="hero__link" style={{ alignSelf: "flex-start" }}>More {f.label} picks</Link>
+        <Link href={`/gifts?for=${family}&family=${family}#all`} className="hero__link" style={{ alignSelf: "flex-start" }}>All {f.label} gifts</Link>
       </section>
     </div>
   );

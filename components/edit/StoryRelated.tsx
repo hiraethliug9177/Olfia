@@ -44,7 +44,7 @@ export function StoryRelated({ families }: { families: FamilyId[] }) {
       {products.length ? (
         <div className="pcard-grid">{products.map((p) => <ProductCard key={p.id} p={p} place="story" />)}</div>
       ) : null}
-      <Link href={`/picks?family=${families[0]}`} className="hero__link" style={{ alignSelf: "flex-start" }}>More picks</Link>
+      <Link href={`/gifts?family=${families[0]}#all`} className="hero__link" style={{ alignSelf: "flex-start" }}>More in Gifts</Link>
     </section>
   );
 }

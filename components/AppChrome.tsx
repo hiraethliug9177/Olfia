@@ -57,8 +57,7 @@ const NAV: NavItem[] = [
       { href: "/edit#latest", label: "Latest stories", dot: "#E7B49F" },
       { href: "/edit#editors-picks", label: "Editor’s Picks", dot: "#A0A6C8" },
       { href: "/edit#topics", label: "Browse by topic", dot: "#4C527A" },
-      { href: "/picks", label: "Picks", dot: "#E7B49F" },
-      { href: "/gifts", label: "Gifts", dot: "#A0A6C8" },
+      { href: "/gifts", label: "Gifts", dot: "#E7B49F" },
     ],
   },
   {
@@ -111,7 +110,7 @@ export function Header() {
   }, [showToast]);
   useEffect(() => setOpen(false), [path]);
   // the Scent Library is part of The Edit since 11/10
-  const cur = (href: string) => (isActive(path, href) || (href === "/edit" && ["/library", "/picks", "/gifts"].some((p) => isActive(path, p))) ? "page" : undefined);
+  const cur = (href: string) => (isActive(path, href) || (href === "/edit" && ["/library", "/gifts"].some((p) => isActive(path, p))) ? "page" : undefined);
 
   return (
     <header className="hd">

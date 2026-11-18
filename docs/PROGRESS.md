@@ -65,6 +65,8 @@ Done 11/10 ~6:45 pm PT: all seven items are live on olfia-nine.vercel.app (main 
 - [x] Review 7: Picks page (/picks), filters by family, room and price
 - [x] Review 8: Gifts (/gifts) by scent family, three price tiers (Tiffany chose families over characters)
 - [x] Review 9: story share row, "Recreate this at home" (families + three products), sign-up box, related "Keep reading"
-- [ ] Check every price tier on the brand sites (several look off: Diptyque classic candles, Otherland, the Vitruvi diffuser, Aesop room spray); Gifts picks may move with them
-- [ ] Tiffany: sign-up heading; any intro lines for Picks and Gifts; reword the new labels if wanted
+- [x] Price tiers checked on the brand sites (11/17); Diptyque and Yankee Candle tiers corrected, Westin address and Vitruvi item fixed; Gifts re-picked
+- [x] Picks folded into Gifts ("All gifts"); /picks forwards there
+- [x] Sign-up line and Gifts line written (Tiffany: "你写就行")
+- [ ] Publish the 11/17 late-night changes when Tiffany says "发布" (on the v3-design preview)
 - [ ] 11–14 wait for Tiffany's decisions and words

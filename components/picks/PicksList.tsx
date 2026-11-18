@@ -9,8 +9,9 @@ import { useTabInView } from "@/components/picks/useTabInView";
 import type { FamilyId } from "@/lib/types";
 
 /**
- * Picks: every recommended product, filtered by scent family, room and price. The choice lives in the
- * address (?family=woody&room=kitchen&price=2), so a filtered list can be linked from a story or a family.
+ * Every recommended product, filtered by scent family, room and price: the "All gifts" part of the Gifts page
+ * (Picks until Tiffany folded it into Gifts on 11/17). The choice lives in the address
+ * (?family=woody&room=kitchen&price=2), so a filtered list can be linked from a story or from a gift family.
  */
 const isFamily = (v: string | null): v is FamilyId => FAMILIES.some((f) => f.id === v);
 
@@ -63,7 +64,7 @@ export function PicksList() {
 
       {list.length ? (
         <div className="pcard-grid" aria-live="polite">
-          {list.map((p) => <ProductCard key={p.id} p={p} />)}
+          {list.map((p) => <ProductCard key={p.id} p={p} place="gifts-all" />)}
         </div>
       ) : (
         <p className="muted">Nothing matches that combination yet.</p>
