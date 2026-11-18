@@ -173,8 +173,8 @@ export function Footer() {
     <footer className="ft">
       <div className="wrap"><div className="ft__panel">
       <div className="ft__grid">
-        <div className="ft__col" style={{ flex: "1.6 1 240px", gap: 10 }}>
-          <Link href="/" style={{ fontFamily: "var(--font-display)", fontStyle: "italic", fontSize: 34, lineHeight: 1 }}>Olfia</Link>
+        <div className="ft__col" style={{ flex: "1.6 1 240px", gap: 6 }}>
+          <Link href="/" style={{ fontFamily: "var(--font-display)", fontStyle: "italic", fontSize: 28, lineHeight: 1 }}>Olfia</Link>
           <span className="muted" style={{ maxWidth: "24em" }}>{strings.brand.invitation}</span>
         </div>
         <nav aria-label="Make" className="ft__col">
