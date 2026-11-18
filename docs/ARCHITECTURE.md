@@ -98,6 +98,7 @@ Catalog types (`Scene`, `Slot`, `Option`, `LightPreset`, `Mood`) mirror `DESIGN-
 | `NEXT_PUBLIC_GA_ID` | public | GA4 measurement id (G-…) |
 | `NEXT_PUBLIC_SITE_URL` | public | Canonical URL for metadata, `app/sitemap.ts` and `app/robots.ts` (https://www.olfia.studio since 11/15) |
 | `NEXT_PUBLIC_FEEDBACK_URL` | public | Feedback form link |
+| `NEXT_PUBLIC_DEMO` | public | `on` only for builds of the `demo` branch (Vercel preview, branch-scoped, 11/18): the class demo copy opens with the full sample data (`lib/demo.ts`). Never set for production |
 | `OLFIA_LLM_API_KEY` | server | Only if the LLM route ships |
 
 Set in Vercel project settings; never committed. `.env.example` lists them.
@@ -108,6 +109,7 @@ Set in Vercel project settings; never committed. `.env.example` lists them.
 - Until the GitHub connection exists, deployments go through the Vercel API from source files (how the first placeholder was published).
 - Release tags: `v0.1-preview` (11/4), `v0.9-submission` (11/9), `v1.0-public` (after revision week).
 - Custom domain: add in Vercel → Domains when bought; set `NEXT_PUBLIC_SITE_URL`.
+- Class demo copy (11/18): the `demo` branch, kept at the same commit as `v3-design` (or frozen for a class), deploys to its own preview address, https://olfia-git-demo-hiraethliug9177s-projects.vercel.app, which opens with the sample data because of `NEXT_PUBLIC_DEMO`. Like every preview it asks for the Vercel login.
 
 ## 7. Performance and quality budgets
 

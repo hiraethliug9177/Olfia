@@ -70,5 +70,9 @@ Done 11/10 ~6:45 pm PT: all seven items are live on olfia-nine.vercel.app (main 
 - [x] Sign-up line and Gifts line written (Tiffany: "你写就行")
 - [x] Story pages in three columns on a computer: Recreate This at Home, the story, Try This (same card design); one page scroll; story sign-up box removed (11/18)
 - [x] The Edit: the line on the date's row on a Mist ground; "Latest" heading removed (11/18)
+- [x] Header menus trimmed; My Account renamed My Page (11/18)
+- [x] Rooms: four matched products with price, size, notes, time of day and season (11/18)
+- [x] Class demo copy: `demo` branch with the full sample data, quiz result included (11/18)
+- [ ] Picks/Gifts rethink: keep one of the two, a Home section, its own header tab (waiting for Tiffany's direction)
 - [ ] Publish the 11/17 late-night and 11/18 changes when Tiffany says "发布" (on the v3-design preview)
 - [ ] 11–14 wait for Tiffany's decisions and words
