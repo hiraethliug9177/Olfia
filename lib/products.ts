@@ -4,7 +4,8 @@ import type { Daypart, FamilyId, Season, SourceKind } from "@/lib/types";
  * Recommended products (B tier, 2026-11-09). Candidate list approved by Tiffany 11/8
  * (claude/olfia-feedback-plan.md). Notes come from retailer and editor pages and are to be
  * verified on each brand's site before the public launch; prices are tiers, not figures.
- * No product photos: cards use the family colour and link out. Links are plain (no affiliate yet).
+ * No product photos: cards use the family colour and link out. Links are plain (no affiliate yet) and, since
+ * 11/17, go to each product's own page on the brand's US site (Trader Joe's sells in store only: no link).
  */
 
 export type PriceTier = "$" | "$$" | "$$$";
@@ -40,36 +41,36 @@ export const PRODUCTS: Product[] = [
   { id: "jomalone-lime-basil", brand: "Jo Malone London", name: "Lime Basil & Mandarin", type: "diffuser", families: ["citrus", "green"], tier: "$$$", notes: "lime · basil · mandarin", seasons: warm, dayparts: day, url: "https://www.jomalone.com/product/25969/22262/home/lime-basil-mandarin-reed-diffuser" },
   { id: "saje-liquid-sunshine", brand: "Saje", name: "Liquid Sunshine", type: "oil", families: ["citrus"], tier: "$", notes: "grapefruit · lime · lemon", seasons: warm, dayparts: day, url: "https://www.saje.com/products/liquid-sunshine-cheerful-diffuser-blend" },
   { id: "muji-yuzu", brand: "MUJI", name: "Yuzu essential oil", type: "oil", families: ["citrus"], tier: "$", notes: "yuzu · orange", seasons: all, dayparts: day, url: "https://www.muji.us/products/essential-oil-yuzu" },
-  { id: "diptyque-figuier", brand: "Diptyque", name: "Figuier", type: "candle", families: ["citrus", "green"], tier: "$$", notes: "fig · fig leaf · wood", seasons: warm, dayparts: day, url: "https://www.diptyqueparis.com" },
+  { id: "diptyque-figuier", brand: "Diptyque", name: "Figuier", type: "candle", families: ["citrus", "green"], tier: "$$", notes: "fig · fig leaf · wood", seasons: warm, dayparts: day, url: "https://us.diptyqueparis.com/en-us/products/classic-candle-figuier-fig-tree-fi2" },
   { id: "tj-grapefruit", brand: "Trader Joe's", name: "Grapefruit candle", type: "candle", families: ["citrus"], tier: "$", notes: "grapefruit (seasonal)", seasons: ["spring", "summer"], dayparts: day },
   // Floral
-  { id: "diptyque-roses", brand: "Diptyque", name: "Roses", type: "candle", families: ["floral"], tier: "$$", notes: "fresh rose", seasons: warm, dayparts: any, url: "https://www.diptyqueparis.com" },
-  { id: "jomalone-pear-freesia", brand: "Jo Malone London", name: "English Pear & Freesia", type: "spray", families: ["floral", "citrus"], tier: "$$$", notes: "pear · freesia", seasons: warm, dayparts: day, url: "https://www.jomalone.com" },
+  { id: "diptyque-roses", brand: "Diptyque", name: "Roses", type: "candle", families: ["floral"], tier: "$$", notes: "fresh rose", seasons: warm, dayparts: any, url: "https://us.diptyqueparis.com/en-us/products/classic-candle-roses-ro3" },
+  { id: "jomalone-pear-freesia", brand: "Jo Malone London", name: "English Pear & Freesia", type: "spray", families: ["floral", "citrus"], tier: "$$$", notes: "pear · freesia", seasons: warm, dayparts: day, url: "https://www.jomalone.com/product/25969/100397/home/english-pear-freesia-room-spray" },
   { id: "yankee-midsummer", brand: "Yankee Candle", name: "Midsummer's Night", type: "candle", families: ["floral", "woody"], tier: "$", notes: "lavender · musk", seasons: all, dayparts: eve, url: "https://www.yankeecandle.com/yankee-candle/candles/candle-styles/signature-tumbler-candles/signature-large-tumbler-candles/midsummers-night/SAP_1630036.html" },
   { id: "otherland-rattan", brand: "Otherland", name: "Rattan", type: "candle", families: ["floral", "citrus"], tier: "$", notes: "rattan · bergamot · white florals", seasons: warm, dayparts: day, url: "https://www.otherland.com/products/rattan" },
-  { id: "westin-white-tea", brand: "Westin", name: "White Tea", type: "diffuser", families: ["floral", "fresh"], tier: "$$$", notes: "white tea · freesia", seasons: all, dayparts: any, url: "https://www.westinstore.com" },
+  { id: "westin-white-tea", brand: "Westin", name: "White Tea", type: "diffuser", families: ["floral", "fresh"], tier: "$$$", notes: "white tea · freesia", seasons: all, dayparts: any, url: "https://www.westinstore.com/product.aspx?Reed-Diffuser" },
   // Green & Herbal
-  { id: "aesop-olous", brand: "Aesop", name: "Olous room spray", type: "spray", families: ["green", "spicy"], tier: "$$$", notes: "basil · cardamom · green", seasons: all, dayparts: day, url: "https://www.aesop.com" },
-  { id: "saje-tranquility", brand: "Saje", name: "Tranquility", type: "oil", families: ["green"], tier: "$", notes: "lavender · chamomile", seasons: all, dayparts: eve, url: "https://www.saje.com" },
-  { id: "muji-lavender", brand: "MUJI", name: "Lavender essential oil", type: "oil", families: ["green"], tier: "$", notes: "lavender", seasons: all, dayparts: eve, url: "https://www.muji.us" },
-  { id: "diptyque-baies", brand: "Diptyque", name: "Baies", type: "candle", families: ["green", "floral"], tier: "$$", notes: "blackcurrant leaf · rose", seasons: all, dayparts: any, url: "https://www.diptyqueparis.com" },
+  { id: "aesop-olous", brand: "Aesop", name: "Olous room spray", type: "spray", families: ["green", "spicy"], tier: "$$$", notes: "basil · cardamom · green", seasons: all, dayparts: day, url: "https://www.aesop.com/home-fragrance/room-sprays/olous-aromatique-room-spray/FR19.html" },
+  { id: "saje-tranquility", brand: "Saje", name: "Tranquility", type: "oil", families: ["green"], tier: "$", notes: "lavender · chamomile", seasons: all, dayparts: eve, url: "https://www.saje.com/products/tranquility-relaxing-diffuser-blend" },
+  { id: "muji-lavender", brand: "MUJI", name: "Lavender essential oil", type: "oil", families: ["green"], tier: "$", notes: "lavender", seasons: all, dayparts: eve, url: "https://www.muji.us/products/essential-oil-french-lavender" },
+  { id: "diptyque-baies", brand: "Diptyque", name: "Baies", type: "candle", families: ["green", "floral"], tier: "$$", notes: "blackcurrant leaf · rose", seasons: all, dayparts: any, url: "https://us.diptyqueparis.com/en-us/products/classic-candle-baies-berries-b2" },
   { id: "tj-cedar-balsam", brand: "Trader Joe's", name: "Cedar Balsam candle", type: "candle", families: ["green", "woody"], tier: "$", notes: "balsam · cedar (seasonal)", seasons: ["winter"], dayparts: eve },
   // Gourmand
   { id: "yankee-vanilla-cupcake", brand: "Yankee Candle", name: "Vanilla Cupcake", type: "candle", families: ["gourmand"], tier: "$", notes: "vanilla · butter", seasons: all, dayparts: eve, url: "https://www.yankeecandle.com/yankee-candle/candles/candle-styles/original-jar-candles/vanilla-cupcake/SAP_2654292W.html" },
   { id: "otherland-cinnamon-musk", brand: "Otherland", name: "Cinnamon Musk", type: "candle", families: ["gourmand", "spicy"], tier: "$", notes: "cinnamon · almond · amber", seasons: cold, dayparts: eve, url: "https://www.otherland.com/products/cinnamon-musk" },
-  { id: "snif-gingerbread", brand: "Snif", name: "Half Baked Gingerbread Smash", type: "candle", families: ["gourmand", "spicy"], tier: "$$", notes: "gingerbread · chai", seasons: ["winter"], dayparts: eve, url: "https://snif.co" },
+  { id: "snif-gingerbread", brand: "Snif", name: "Half Baked Gingerbread Smash", type: "candle", families: ["gourmand", "spicy"], tier: "$$", notes: "gingerbread · chai", seasons: ["winter"], dayparts: eve, url: "https://snif.co/products/half-baked-gingerbread-smash-candle" },
   { id: "replica-lazy-sunday", brand: "Maison Margiela Replica", name: "Lazy Sunday Morning", type: "candle", families: ["gourmand", "fresh"], tier: "$$$", notes: "linen · lily · musk", seasons: all, dayparts: day, url: "https://www.maisonmargiela-fragrances.us/candles/replica-lazy-sunday-morning-scented-candle/MM020.html" },
   // Warm & Spicy
-  { id: "nest-holiday", brand: "NEST New York", name: "Holiday", type: "candle", families: ["spicy", "citrus"], tier: "$$", notes: "pomegranate · pine · clove · cinnamon", seasons: ["winter"], dayparts: eve, url: "https://www.nestnewyork.com" },
+  { id: "nest-holiday", brand: "NEST New York", name: "Holiday", type: "candle", families: ["spicy", "citrus"], tier: "$$", notes: "pomegranate · pine · clove · cinnamon", seasons: ["winter"], dayparts: eve, url: "https://www.nestnewyork.com/products/holiday-classic-candle-2" },
   { id: "yankee-sparkling-cinnamon", brand: "Yankee Candle", name: "Sparkling Cinnamon", type: "candle", families: ["spicy"], tier: "$", notes: "cinnamon · clove", seasons: cold, dayparts: eve, url: "https://www.yankeecandle.com/yankee-candle/candles/candle-styles/original-jar-candles/sparkling-cinnamon/SAP_1100952W.html" },
-  { id: "lelabo-palo-santo", brand: "Le Labo", name: "Palo Santo 14", type: "candle", families: ["spicy", "woody"], tier: "$$$", notes: "palo santo · cardamom", seasons: cold, dayparts: eve, url: "https://www.lelabofragrances.com" },
-  { id: "voluspa-baltic-amber", brand: "Voluspa", name: "Baltic Amber", type: "candle", families: ["spicy", "gourmand"], tier: "$$", notes: "amber · vanilla · sandalwood", seasons: cold, dayparts: eve, url: "https://www.voluspa.com" },
+  { id: "lelabo-palo-santo", brand: "Le Labo", name: "Palo Santo 14", type: "candle", families: ["spicy", "woody"], tier: "$$$", notes: "palo santo · cardamom", seasons: cold, dayparts: eve, url: "https://www.lelabofragrances.com/palo-santo-14-402.html" },
+  { id: "voluspa-baltic-amber", brand: "Voluspa", name: "Baltic Amber", type: "candle", families: ["spicy", "gourmand"], tier: "$$", notes: "amber · vanilla · sandalwood", seasons: cold, dayparts: eve, url: "https://voluspa.com/products/baltic-amber-classic-candle" },
   { id: "replica-fireplace", brand: "Maison Margiela Replica", name: "By the Fireplace", type: "candle", families: ["spicy", "woody"], tier: "$$$", notes: "chestnut · smoke · vanilla", seasons: ["winter"], dayparts: eve, url: "https://www.maisonmargiela-fragrances.us/fragrances/replica-by-the-fireplace-ceramic-candle/MM165.html" },
   // Fresh & Clean
-  { id: "yankee-clean-cotton", brand: "Yankee Candle", name: "Clean Cotton", type: "candle", families: ["fresh"], tier: "$", notes: "cotton · white florals", seasons: all, dayparts: day, url: "https://www.yankeecandle.com" },
-  { id: "bbw-eucalyptus-spearmint", brand: "Bath & Body Works", name: "Eucalyptus Spearmint", type: "candle", families: ["fresh", "green"], tier: "$", notes: "eucalyptus · mint", seasons: all, dayparts: day, url: "https://www.bathandbodyworks.com" },
-  { id: "vitruvi-eucalyptus", brand: "Vitruvi", name: "Stone diffuser + eucalyptus", type: "diffuser", families: ["fresh", "green"], tier: "$$", notes: "eucalyptus · tea tree", seasons: all, dayparts: day, url: "https://vitruvi.com" },
-  { id: "mrsmeyers-basil", brand: "Mrs. Meyer's", name: "Basil candle", type: "candle", families: ["fresh", "green"], tier: "$", notes: "basil · clean", seasons: all, dayparts: day, url: "https://www.mrsmeyers.com" },
+  { id: "yankee-clean-cotton", brand: "Yankee Candle", name: "Clean Cotton", type: "candle", families: ["fresh"], tier: "$", notes: "cotton · white florals", seasons: all, dayparts: day, url: "https://www.yankeecandle.com/yankee-candle/candles/candle-styles/original-jar-candles/clean-cotton/SAP_2654258.html" },
+  { id: "bbw-eucalyptus-spearmint", brand: "Bath & Body Works", name: "Eucalyptus Spearmint", type: "candle", families: ["fresh", "green"], tier: "$", notes: "eucalyptus · mint", seasons: all, dayparts: day, url: "https://www.bathandbodyworks.com/p/eucalyptus-spearmint-3-wick-candle-028016790" },
+  { id: "vitruvi-eucalyptus", brand: "Vitruvi", name: "Stone diffuser + eucalyptus", type: "diffuser", families: ["fresh", "green"], tier: "$$", notes: "eucalyptus · tea tree", seasons: all, dayparts: day, url: "https://vitruvi.com/products/essential-oil-diffuser-eucalyptus" },
+  { id: "mrsmeyers-basil", brand: "Mrs. Meyer's", name: "Basil candle", type: "candle", families: ["fresh", "green"], tier: "$", notes: "basil · clean", seasons: all, dayparts: day, url: "https://mrsmeyers.com/products/large-candle-basil" },
 ];
 
 export interface ProductFilter {
