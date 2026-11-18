@@ -324,6 +324,11 @@ section[id] { scroll-margin-top: 24px; }
 .split-head__side { display: flex; flex-direction: column; align-items: flex-start; gap: 16px; }
 .split-head .lead { max-width: 30em; }
 @media (max-width: 860px) { .split-head { grid-template-columns: minmax(0, 1fr); } }
+/* 11/17: a section head on one line: title, its line on the same baseline, the button at the right edge (Home, The Olfia Edit) */
+.row-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px 28px; margin-bottom: 40px; }
+.row-head .lead { margin: 0; }
+.row-head__cta { margin-left: auto; }
+@media (max-width: 640px) { .row-head__cta { margin-left: 0; } }
 /* coloured section panels; text keeps its charcoal and slate */
 .panel { position: relative; padding: 48px; border-radius: 36px; }
 .panel--apricot { background: rgba(246,225,215,0.86); }

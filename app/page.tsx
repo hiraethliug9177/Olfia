@@ -54,12 +54,11 @@ export default function HomePage() {
 
       <section id="edit" className="wrap section">
         <div className="panel panel--white">
-          <div className="split-head">
+          {/* 11/17 (Tiffany): the line sits beside the title on its baseline; the button goes to the right edge */}
+          <div className="row-head">
             <h2 className="h-section">The Olfia Edit</h2>
-            <div className="split-head__side">
-              <p className="lead">Culture, fragrance, and the art of living.</p>
-              <Link href="/edit" className="btn btn--primary btn--sm">Read the Edit</Link>
-            </div>
+            <p className="lead">Culture, fragrance, and the art of living.</p>
+            <Link href="/edit" className="btn btn--primary btn--sm row-head__cta">Read the Edit</Link>
           </div>
           <div className="edit-grid">
             {latest.map((a) => <ArticleCard key={a.slug} a={a} />)}
