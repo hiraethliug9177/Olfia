@@ -22,8 +22,8 @@ type EventMap = {
   shelf_item_added: { mode: "photo" | "link" };
   /** A recommended product link opens: which product, its family, and where on the site. */
   product_click: { product_id: string; place: string; brand?: string; family?: string; tier?: string };
-  /** The sample pages are loaded: from the Scent Atlas button, or from a ?sample=on link. */
-  sample_loaded: { place: "atlas" | "link" };
+  /** The sample pages are loaded: from the Scent Atlas button, a ?sample=on link, or the class demo copy. */
+  sample_loaded: { place: "atlas" | "link" | "demo" };
   /** The sign-up form is sent (components/SignupForm.tsx): where it sat, and the "found us" answer. */
   email_signup: { place: string; found?: string };
   /** A family is chosen in the Gifts guide (11/17). */

@@ -112,7 +112,7 @@ export function AccountView() {
       <section className="card" style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 24, background: "var(--peri-soft)" }}>
         <span aria-hidden="true" style={{ width: 88, height: 88, borderRadius: "50%", background: "radial-gradient(circle at 35% 30%, #DADDF0, #A0A6C8)", boxShadow: "0 0 0 5px #fff" }} />
         <div style={{ flex: "1 1 240px", display: "flex", flexDirection: "column", gap: 4 }}>
-          <h1 className="h-page" style={{ fontSize: "clamp(36px, 4.4vw, 56px)" }}>My Account</h1>
+          <h1 className="h-page" style={{ fontSize: "clamp(36px, 4.4vw, 56px)" }}>My Page</h1>
           <span className="muted">Accounts come later. For now, everything lives in this browser.</span>
         </div>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>

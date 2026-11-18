@@ -13,12 +13,18 @@ import { Icon, MenuMorph } from "@/components/ui/Icon";
 
 const isActive = (path: string, href: string) => (href === "/" ? path === "/" : path === href || path.startsWith(`${href}/`));
 
-type Sub = { href: string; label: string; dot: string };
+/** narrow: shown only where the header has no room for the "Make a Scent Card" button (≤1180px, not phones). */
+type Sub = { href: string; label: string; dot: string; narrow?: boolean };
 type NavItem = { href: string; label: string; icon?: "home" | "user"; sub: Sub[] };
 
 /**
- * Main navigation (Tiffany 11/10): the house icon stands for Home again, My Account sits in the
+ * Main navigation (Tiffany 11/10): the house icon stands for Home again, My Page sits in the
  * middle row, and every tab opens a small menu of the sections on that page when hovered or focused.
+ * 11/18 (Tiffany): menus trimmed to what is worth a click. Capture lost "Make a Scent Card" (the button on the
+ * right does that), which left it one entry pointing at itself, so Capture has no menu where that button shows; where
+ * the button has no room (≤1180px) the entry stays, and phones get the button at the foot of their menu. Rooms lost "Your rooms" and
+ * "Room presets"; The Edit lost "Latest stories", "Editor's Picks" and "Browse by topic"; My Account is renamed
+ * My Page and lost "Preferences" and "Personal info".
  */
 const NAV: NavItem[] = [
   {
@@ -31,16 +37,13 @@ const NAV: NavItem[] = [
   },
   {
     href: "/capture", label: "Capture", sub: [
-      { href: "/capture", label: "Capture a scent", dot: "#A0A6C8" },
-      { href: "/card", label: "Make a Scent Card", dot: "#4C527A" },
+      { href: "/card", label: "Make a Scent Card", dot: "#4C527A", narrow: true },
     ],
   },
   {
     href: "/rooms", label: "Rooms", sub: [
       { href: "/rooms#editor", label: "Room editor", dot: "#E7B49F" },
-      { href: "/rooms#your-rooms", label: "Your rooms", dot: "#A0A6C8" },
-      { href: "/rooms#products", label: "Matches this room", dot: "#4C527A" },
-      { href: "/#presets", label: "Room presets", dot: "#E7B49F" },
+      { href: "/rooms#products", label: "Matches this room", dot: "#A0A6C8" },
     ],
   },
   {
@@ -54,20 +57,15 @@ const NAV: NavItem[] = [
   {
     href: "/edit", label: "The Edit", sub: [
       { href: "/library", label: "Scent Library", dot: "#4C527A" },
-      { href: "/edit#latest", label: "Latest stories", dot: "#E7B49F" },
-      { href: "/edit#editors-picks", label: "Editor’s Picks", dot: "#A0A6C8" },
-      { href: "/edit#topics", label: "Browse by topic", dot: "#4C527A" },
       { href: "/gifts", label: "Gifts", dot: "#E7B49F" },
     ],
   },
   {
-    href: "/account", label: "My Account", icon: "user", sub: [
+    href: "/account", label: "My Page", icon: "user", sub: [
       { href: "/account#profile", label: "Your profile", dot: "#E7B49F" },
-      { href: "/account#preferences", label: "Preferences", dot: "#A0A6C8" },
-      { href: "/account#info", label: "Personal info", dot: "#4C527A" },
-      { href: "/account#settings", label: "Settings", dot: "#E7B49F" },
-      { href: "/account#quiz", label: "Quiz result", dot: "#A0A6C8" },
-      { href: "/about", label: "About Olfia", dot: "#4C527A" },
+      { href: "/account#settings", label: "Settings", dot: "#A0A6C8" },
+      { href: "/account#quiz", label: "Quiz result", dot: "#4C527A" },
+      { href: "/about", label: "About Olfia", dot: "#E7B49F" },
     ],
   },
 ];
@@ -92,17 +90,22 @@ export function Header() {
   const [open, setOpen] = useState(false);
   useRehydrateAtlas();
   const showToast = useToast((s) => s.show);
-  // ?sample=on loads the sample pages (the professor's link, lib/demo.ts); first visits otherwise start clean
+  // ?sample=on loads the sample pages (the professor's link, lib/demo.ts); first visits otherwise start clean.
+  // The class demo copy (11/18: the `demo` branch, built with NEXT_PUBLIC_DEMO=on) opens with them already in.
   useEffect(() => {
     try {
       const url = new URL(window.location.href);
-      if (url.searchParams.get("sample") !== "on") return;
-      url.searchParams.delete("sample");
-      window.history.replaceState(null, "", url.pathname + url.search + url.hash);
+      const asked = url.searchParams.get("sample") === "on";
+      const demo = process.env.NEXT_PUBLIC_DEMO === "on";
+      if (!asked && !demo) return;
+      if (asked) {
+        url.searchParams.delete("sample");
+        window.history.replaceState(null, "", url.pathname + url.search + url.hash);
+      }
       loadSample((added) => {
         if (!added) return;
-        track("sample_loaded", { place: "link" });
-        showToast("Sample pages added");
+        track("sample_loaded", { place: asked ? "link" : "demo" });
+        if (asked) showToast("Sample pages added");
       });
     } catch {
       // storage blocked: nothing to load
@@ -131,13 +134,15 @@ export function Header() {
                   {n.icon === "user" ? <Icon name="user" size={24} /> : null}
                   {n.icon === "home" ? null : n.label}
                 </Link>
-                <ul className="hd__sub" aria-label={`${n.label} sections`}>
-                  {n.sub.map((s) => (
-                    <li key={s.href + s.label}>
-                      <Link href={s.href}><span className="hd__dot" style={{ background: s.dot }} aria-hidden="true" />{s.label}</Link>
-                    </li>
-                  ))}
-                </ul>
+                {n.sub.length ? (
+                  <ul className={`hd__sub${n.sub.every((s) => s.narrow) ? " hd__sub--narrow" : ""}`} aria-label={`${n.label} sections`}>
+                    {n.sub.map((s) => (
+                      <li key={s.href + s.label} className={s.narrow ? "hd__sub-narrow" : undefined}>
+                        <Link href={s.href}><span className="hd__dot" style={{ background: s.dot }} aria-hidden="true" />{s.label}</Link>
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
               </li>
             ))}
           </ul>
@@ -156,13 +161,17 @@ export function Header() {
           {NAV.map((n) => (
             <div key={n.href} className="hd__menu-group">
               <Link href={n.href} aria-current={cur(n.href)} className="hd__menu-main">{n.label}</Link>
-              <div className="hd__menu-sub">
-                {n.sub.map((s) => (
-                  <Link key={s.href + s.label} href={s.href}><span className="hd__dot" style={{ background: s.dot }} aria-hidden="true" />{s.label}</Link>
-                ))}
-              </div>
+              {n.sub.some((s) => !s.narrow) ? (
+                <div className="hd__menu-sub">
+                  {n.sub.filter((s) => !s.narrow).map((s) => (
+                    <Link key={s.href + s.label} href={s.href}><span className="hd__dot" style={{ background: s.dot }} aria-hidden="true" />{s.label}</Link>
+                  ))}
+                </div>
+              ) : null}
             </div>
           ))}
+          {/* the right-hand button of wide screens, for phones and tablets */}
+          <Link href="/card" className="btn btn--ink btn--sm hd__menu-cta" aria-current={cur("/card")}>Make a Scent Card</Link>
         </nav>
       ) : null}
     </header>

@@ -3,7 +3,7 @@ import { ARTICLES } from "@/lib/edit";
 
 const site = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.olfia.studio").replace(/\/$/, "");
 
-/** Public pages for search engines. My Account, the Scent Atlas and the card studio hold a visitor's own pages, so they stay out. */
+/** Public pages for search engines. My Page, the Scent Atlas and the card studio hold a visitor's own pages, so they stay out. */
 export default function sitemap(): MetadataRoute.Sitemap {
   const pages = ["", "/quiz", "/rooms", "/capture", "/edit", "/gifts", "/library", "/about", "/privacy"];
   return [

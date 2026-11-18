@@ -75,7 +75,69 @@ export function ProductCard({ p, match, onSimilar, place }: { p: Product; match?
   );
 }
 
-export function ProductCards({ families, title = "Recreate this at home", limit = 6, compact = false }: { families: FamilyId[]; title?: string; limit?: number; compact?: boolean }) {
+const DAYPART_ORDER: Daypart[] = ["morning", "afternoon", "evening", "night"];
+const SEASON_ORDER: Season[] = ["spring", "summer", "autumn", "winter"];
+const cap = (t: string) => t.charAt(0).toUpperCase() + t.slice(1);
+const joinAnd = (xs: string[]) => (xs.length > 1 ? `${xs.slice(0, -1).join(", ")} and ${xs[xs.length - 1]}` : xs[0] ?? "");
+
+/** "Evening and night", "Any time of day" */
+function dayText(d: Daypart[]): string {
+  const list = DAYPART_ORDER.filter((x) => d.includes(x));
+  return list.length === 4 ? "Any time of day" : cap(joinAnd(list));
+}
+
+/** "Autumn and winter", "All year" */
+function seasonText(s: Season[]): string {
+  const list = SEASON_ORDER.filter((x) => s.includes(x));
+  return list.length === 4 ? "All year" : cap(joinAnd(list));
+}
+
+/**
+ * The detailed card of Rooms' "Matches this room" (Tiffany 11/18: four products, more about each): what it is and
+ * its size and price (checked on the brand's site 11/17), its notes, when it suits, and the families it shares with
+ * the room. Facts only; nothing here is written as Olfia copy.
+ */
+export function ProductDetailCard({ p, match, onSimilar }: { p: Product; match: FamilyId[]; onSimilar?: (id: string) => void }) {
+  const f = familyById(p.families[0]);
+  const shared = match.filter((id) => p.families.includes(id));
+  const dots = shared.length ? shared : p.families;
+  const why = shared.length ? `Shares ${shared.map((id) => familyById(id).label).join(" and ")} with this room` : p.families.map((id) => familyById(id).label).join(" and ");
+  const price = p.price ? [p.price, p.size].filter(Boolean).join(" · ") : p.url ? null : "In stores only";
+  const body = (
+    <>
+      <NameTile brand={p.brand} kind={sourceLabel(p.type)} family={f.id} />
+      <span className="pcard__body pdetail">
+        <span className="pcard__brand">{p.brand} · {sourceLabel(p.type)}</span>
+        <span className="pcard__name">{p.name}</span>
+        {price ? <span className="pdetail__price">{price}</span> : null}
+        <span className="pdetail__notes">
+          {p.notes.split(" · ").map((n) => <span key={n} className="pdetail__note">{n}</span>)}
+        </span>
+        <span className="pdetail__row"><Icon name="clock" size={18} />{dayText(p.dayparts)}</span>
+        <span className="pdetail__row"><Icon name="calendar" size={18} />{seasonText(p.seasons)}</span>
+        <span className="pcard__why">
+          <span className="pdetail__dots" aria-hidden="true">{dots.map((id) => <span key={id} className="chip__dot" style={{ background: familyById(id).hex }} />)}</span>
+          {why}
+        </span>
+      </span>
+    </>
+  );
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 10, minWidth: 0 }}>
+      {p.url ? (
+        <ProductLink className="pcard" href={p.url} product={{ id: p.id, brand: p.brand, family: p.families[0], tier: p.tier }} ariaLabel={`${p.brand} ${p.name}, opens the brand's site`}>
+          {body}
+          <span className="pcard__out"><Icon name="external" size={18} /></span>
+        </ProductLink>
+      ) : (
+        <div className="pcard">{body}</div>
+      )}
+      {onSimilar ? <button type="button" className="hero__link" onClick={() => onSimilar(p.id)} style={{ alignSelf: "flex-start", border: 0, background: "transparent", padding: 0, fontSize: 15 }}>More like this</button> : null}
+    </div>
+  );
+}
+
+export function ProductCards({ families, title = "Recreate this at home", limit = 4, compact = false }: { families: FamilyId[]; title?: string; limit?: number; compact?: boolean }) {
   const [when, setWhen] = useState<When>("any");
   const [similar, setSimilar] = useState<string | null>(null);
 
@@ -98,8 +160,8 @@ export function ProductCards({ families, title = "Recreate this at home", limit 
         </div>
       ) : null}
       {list.length ? (
-        <div className="pcard-grid">
-          {list.map((p) => <ProductCard key={p.id} p={p} match={families} onSimilar={compact ? undefined : setSimilar} />)}
+        <div className="pcard-grid pcard-grid--four">
+          {list.map((p) => <ProductDetailCard key={p.id} p={p} match={families} onSimilar={compact ? undefined : setSimilar} />)}
         </div>
       ) : (
         <p className="muted">Nothing matches that combination yet.</p>

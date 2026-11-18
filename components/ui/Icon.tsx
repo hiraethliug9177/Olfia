@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  ArrowLeft, ArrowRight, BookOpen, Check, ChevronDown, ChevronLeft, ChevronRight, CircleUserRound, Copy, Download,
+  ArrowLeft, ArrowRight, BookOpen, CalendarDays, Check, ChevronDown, ChevronLeft, ChevronRight, CircleUserRound, Clock, Copy, Download,
   Drama, ExternalLink, Flame, FlaskConical, FlipHorizontal2, House, ImagePlus, Instagram, Layers, Link2, Mail, MapPin,
   Menu, Minus, Pause, PencilRuler, Pin, Play, Plus, Redo2, RotateCcw, RotateCw, Scroll, SendToBack, Share2, Trash2, Undo2, X,
   type LucideIcon,
@@ -52,6 +52,9 @@ const ICONS = {
   flame: Flame,
   // Pinterest has no Lucide mark; the share row uses a pin (11/17)
   pin: Pin,
+  // 11/18: time of day and season on the detailed product cards (Rooms)
+  clock: Clock,
+  calendar: CalendarDays,
 } satisfies Record<string, LucideIcon>;
 
 export type IconName = keyof typeof ICONS;

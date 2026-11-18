@@ -201,6 +201,7 @@ textarea.input { padding: 14px 16px; min-height: 96px; resize: vertical; }
 .hd__sub a:hover { background: var(--mist); color: var(--ink); }
 .hd__dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
 @media (max-width: 1180px) { .hd__cta { display: none !important; } }
+@media (min-width: 1181px) { .hd__sub--narrow, .hd__sub-narrow { display: none !important; } }
 .hd__burger { width: 48px; height: 48px; align-items: center; justify-content: center; border: 0; border-radius: 50%; background: rgba(255,255,255,0.75); color: var(--ink); box-shadow: 0 8px 28px rgba(41,42,49,0.08); }
 .ft__h { font-size: 13px; font-weight: 600; color: var(--slate); }
 .hd__link--icon { padding: 0; }
@@ -218,6 +219,10 @@ textarea.input { padding: 14px 16px; min-height: 96px; resize: vertical; }
 .hd__menu-main { min-height: 46px; padding: 0 14px; border-radius: 14px; font-weight: 600; }
 .hd__menu-main[aria-current="page"] { background: var(--mist); }
 .hd__menu-sub a { min-height: 38px; padding: 0 14px 0 22px; font-size: 14px; color: var(--slate); }
+/* 11/18: phones and tablets get the "Make a Scent Card" button at the foot of the menu (it left the Capture menu) */
+.hd__menu > * { flex-shrink: 0; }
+.hd__menu .hd__menu-cta { justify-content: center; margin-top: 4px; color: var(--ivory); }
+.hd__menu .hd__menu-cta:hover { color: var(--ivory); }
 @media (max-width: 860px) {
   .hd__full { display: none !important; }
   .hd__mob { display: flex; }
@@ -535,6 +540,25 @@ a.pcard:hover { color: var(--ink); transform: translateY(-3px); }
 .pcard__name { font-family: var(--font-display); font-size: 26px; line-height: 1.15; }
 .pcard__why { display: inline-flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 500; }
 .pcard__out { position: absolute; right: 14px; top: 14px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(255,255,255,0.9); color: var(--ink); }
+/* 11/18 (Tiffany): Rooms shows four matched products, each with more about it */
+.pcard-grid--four { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; }
+@media (max-width: 1100px) { .pcard-grid--four { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px) { .pcard-grid--four { grid-template-columns: minmax(0, 1fr); } }
+.pcard-grid--four .ptile { height: 132px; }
+.pcard-grid--four .ptile__brand { font-size: 20px; }
+.pcard-grid--four .ptile__label { max-width: 62%; }
+/* equal card heights, so "More like this" lines up under all four */
+.pcard-grid--four > div > .pcard { flex: 1; }
+.pdetail { gap: 10px; padding: 18px 20px 20px; }
+.pdetail .pcard__name { font-size: 23px; }
+.pdetail__price { font-size: 15px; font-weight: 600; }
+.pdetail__notes { display: flex; flex-wrap: wrap; gap: 6px; }
+.pdetail__note { padding: 3px 10px; border-radius: 999px; background: var(--mist); font-size: 13px; line-height: 1.5; color: var(--ink); }
+.pdetail__row { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--slate); }
+.pdetail__row .ico { flex: none; }
+.pdetail .pcard__why { align-items: flex-start; font-size: 14px; line-height: 1.5; }
+.pdetail__dots { display: inline-flex; gap: 4px; padding-top: 4px; flex: none; }
+.pdetail__dots .chip__dot { width: 12px; height: 12px; }
 
 /* ---------- edit (articles) ---------- */
 .edit-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 36px 28px; }
