@@ -81,6 +81,7 @@ Done 11/10 ~6:45 pm PT: all seven items are live on olfia-nine.vercel.app (main 
 - [x] My Page: title case, Try Next on one line with equal cards, preference tags on one line with a clear chosen state, pixel scene placeholder (11/18)
 - [x] The Edit: date and reading time on one line, rail proportions by box width, today's date on the masthead, full-width story head (11/18)
 - [x] Rooms: the room choice moved below the name as a setting like Time of day (11/18)
+- [x] Home, Seven scent families: "Turn the dial." only, dial turns every 5 s with the card, bold name, full-width line, larger materials without labels (11/18)
 - [ ] Demo copy: add the 11/18 evening changes when she asks
 - [ ] Publish the 11/17 late-night and 11/18 changes when Tiffany says "发布" (on the v3-design preview)
 - [ ] 11–14 wait for Tiffany's decisions and words

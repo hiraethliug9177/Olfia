@@ -39,7 +39,8 @@ export default function HomePage() {
       <section id="families" className="wrap section">
         <div className="split-head">
           <h2 className="h-section">Seven scent families</h2>
-          <p className="lead">Turn the dial. Each family changes the light, the materials and the air of a room.</p>
+          {/* 11/18 (Tiffany): only the reminder stays, at the right */}
+          <p className="lead split-head__end">Turn the dial.</p>
         </div>
         <FamilyWheel />
       </section>

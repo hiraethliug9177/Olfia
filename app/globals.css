@@ -331,6 +331,9 @@ section[id] { scroll-margin-top: 24px; }
 .split-head { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); align-items: end; gap: 24px 48px; margin-bottom: 40px; }
 .split-head__side { display: flex; flex-direction: column; align-items: flex-start; gap: 16px; }
 .split-head .lead { max-width: 30em; }
+/* a short line set at the right edge, level with the title's last line (Seven scent families, 11/18) */
+.split-head__end { justify-self: end; text-align: right; }
+@media (max-width: 860px) { .split-head__end { justify-self: start; text-align: left; } }
 @media (max-width: 860px) { .split-head { grid-template-columns: minmax(0, 1fr); } }
 /* 11/17: a section head on one line: title, its line on the same baseline, the button at the right edge (Home, The Olfia Edit) */
 .row-head { display: flex; flex-wrap: wrap; align-items: baseline; align-items: last baseline; gap: 12px 28px; margin-bottom: 40px; }
@@ -383,6 +386,12 @@ section[id] { scroll-margin-top: 24px; }
 .rotary__stop { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
 @media (prefers-reduced-motion: reduce) { .rotary__wheel, .rotary__hole { transition: none; } }
 .dial-panel { position: relative; overflow: hidden; padding: 32px; border-radius: 28px; background: rgba(255,255,255,0.86); box-shadow: var(--shadow-card); }
+/* 11/18 (Tiffany): bold family name; the three materials larger, spread over the card's width, without labels */
+.dial-panel__title { font-size: 30px; font-weight: 600; }
+.dial-panel__mats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.dial-panel__mat { height: clamp(110px, 11vw, 150px); }
+/* the family's long button name wraps on phones instead of running out of the card */
+.dial-panel .btn { max-width: 100%; height: auto; min-height: 48px; padding-top: 10px; padding-bottom: 10px; white-space: normal; line-height: 1.35; }
 @media (max-width: 900px) { .dial-wrap { grid-template-columns: minmax(0, 1fr); } .rotary { max-width: 340px; } }
 .quiz-invite { display: flex; flex-wrap: wrap; align-items: center; gap: 48px; padding: 48px; border-radius: 36px; background: rgba(227,229,241,0.8); backdrop-filter: blur(10px); }
 .quiz-invite__card { flex: 0 1 300px; min-width: 240px; rotate: -3deg; }
