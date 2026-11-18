@@ -176,7 +176,6 @@ export function Footer() {
         <div className="ft__col" style={{ flex: "1.6 1 240px", gap: 10 }}>
           <Link href="/" style={{ fontFamily: "var(--font-display)", fontStyle: "italic", fontSize: 34, lineHeight: 1 }}>Olfia</Link>
           <span className="muted" style={{ maxWidth: "24em" }}>{strings.brand.invitation}</span>
-          <span className="muted" style={{ fontSize: 14 }}>{strings.common.persistenceNotice}</span>
         </div>
         <nav aria-label="Make" className="ft__col">
           <span className="ft__h">Make</span>
@@ -191,7 +190,6 @@ export function Footer() {
           <Link href="/edit">The Olfia Edit</Link>
           <Link href="/library">Scent Library</Link>
           <Link href="/about">About Olfia</Link>
-          <Link href="/privacy">Privacy</Link>
         </nav>
         <div className="ft__col" style={{ flex: "1 1 200px" }}>
           <span className="ft__h">Contact</span>
@@ -204,7 +202,7 @@ export function Footer() {
       </div>
       <div className="ft__signup"><SignupForm place="footer" /></div>
       <div className="ft__base">
-        <span>© 2026 Olfia</span>
+        <span className="ft__legal"><span>© 2026 Olfia</span><Link href="/privacy">Privacy</Link></span>
         <span>A USC DSM596 capstone project</span>
       </div>
       </div></div>

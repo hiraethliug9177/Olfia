@@ -50,3 +50,7 @@ Done 11/10 ~6:45 pm PT: all seven items are live on olfia-nine.vercel.app (main 
 - [x] User guide: Claude Docs document "Olfia User Guide" (features and design logic, for the presentation handout)
 - [x] Feedback history in one note: `claude/olfia-feedback-and-changes.md` (Capstone project and the Mac's `Olfia notes/`)
 - [x] Mac folder sorted: `Olfia notes/`, `Research and references/` (was `GPT/`); old copies in `_to_delete/` until Tiffany confirms
+
+## 11/17
+
+- [x] Footer: Tiffany's halftone image as the background; "Entries are saved in this browser only." removed; Privacy in the bottom row beside © 2026 Olfia; the found-us menu in the same row as the email field (stacked on phones)

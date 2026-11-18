@@ -7,8 +7,9 @@ import { track } from "@/lib/analytics";
 /**
  * Email sign-up. Posts straight from the browser to Kit's public form address (form "Olfia website
  * sign-up", id 10196062), the same way Kit's own embed does; no API key. Kit answers HTTP 200 even when it
- * refuses an address, so success is read from the JSON `status`. Kit then sends its confirmation email
- * (double opt-in). The "found us" answer goes to GA4 with email_signup.
+ * refuses an address, so success is read from the JSON `status`. The form is single opt-in: no
+ * confirmation email (Tiffany 11/15). The "found us" answer goes to GA4 with email_signup.
+ * The found-us menu sits in the same row as the email field and button (Tiffany 11/17).
  */
 const KIT_FORM = "https://app.kit.com/forms/10196062/subscriptions";
 
@@ -56,11 +57,11 @@ export function SignupForm({ place }: { place: string }) {
           onChange={(e) => setEmail(e.target.value)}
         />
         <button type="submit" className="btn btn--primary" disabled={state === "sending"}>{s.button}</button>
+        <select className="input signup__found" value={found} onChange={(e) => setFound(e.target.value)} aria-label={s.found}>
+          <option value="">{s.found}</option>
+          {s.foundOptions.map((o) => <option key={o} value={o}>{o}</option>)}
+        </select>
       </div>
-      <select className="input signup__found" value={found} onChange={(e) => setFound(e.target.value)} aria-label={s.found}>
-        <option value="">{s.found}</option>
-        {s.foundOptions.map((o) => <option key={o} value={o}>{o}</option>)}
-      </select>
       <input type="text" tabIndex={-1} autoComplete="off" aria-hidden="true" className="signup__trap" value={trap} onChange={(e) => setTrap(e.target.value)} name="website" />
       <p className="signup__note">{state === "failed" ? s.failed : s.note}</p>
     </form>

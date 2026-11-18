@@ -226,9 +226,9 @@ textarea.input { padding: 14px 16px; min-height: 96px; resize: vertical; }
 }
 
 /* ---------- footer ---------- */
-/* 11/10: a halftone sky over rolling hills (scripts/footer.py), with the links on a paper panel */
-.ft { position: relative; padding: 104px 0 52px; background: var(--mist) url(/assets/footer/sky.webp) center bottom / cover no-repeat; }
-.ft__panel { max-width: 960px; margin: 0 auto; border-radius: 26px; background: rgba(248,246,240,0.9); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); box-shadow: 0 18px 44px rgba(41,42,49,0.16); padding: 0 32px; }
+/* 11/17: Tiffany's own halftone image behind the footer (replaces the 11/10 sky and hills), with the links on a paper panel */
+.ft { position: relative; padding: 104px 0 52px; background: var(--ink) url(/assets/footer/halftone.webp) center top / cover no-repeat; }
+.ft__panel { max-width: 960px; margin: 0 auto; border-radius: 26px; background: rgba(248,246,240,0.95); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); box-shadow: 0 18px 44px rgba(41,42,49,0.16); padding: 0 32px; }
 @media (max-width: 640px) { .ft { padding: 64px 0 36px; } .ft__panel { padding: 0 20px; border-radius: 22px; } }
 .ft a { color: var(--ink); text-decoration: none; }
 .ft a:hover { color: var(--deep); text-decoration: underline; }
@@ -236,14 +236,19 @@ textarea.input { padding: 14px 16px; min-height: 96px; resize: vertical; }
 .ft__col { display: flex; flex-direction: column; gap: 8px; font-size: 15px; flex: 1 1 120px; }
 .ft__icon { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--mist); }
 .ft__signup { padding-bottom: 24px; }
-.signup { display: flex; flex-direction: column; gap: 10px; max-width: 540px; }
+.signup { display: flex; flex-direction: column; gap: 10px; max-width: 820px; }
 .signup__heading { margin: 0; font-family: var(--font-display); font-size: 22px; }
+/* email, button and the found-us menu share one row (11/17); on phones they stack */
 .signup__row { display: flex; flex-wrap: wrap; gap: 10px; }
 .signup__row .input { flex: 1 1 220px; }
-.signup__found { max-width: 300px; min-height: 44px; font-size: 15px; color: var(--slate); }
+.signup__row .signup__found { flex: 0 1 296px; }
+@media (max-width: 640px) { .signup__row > *, .signup__row .signup__found { flex: 1 1 100%; } }
+.signup__found { min-height: 44px; font-size: 15px; color: var(--slate); }
 .signup__note { margin: 0; font-size: 14px; color: var(--slate); }
 .signup__trap { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
 .ft__base { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; padding-top: 14px; padding-bottom: 18px; border-top: 1px solid rgba(41,42,49,0.12); font-size: 14px; color: var(--slate); }
+.ft__legal { display: flex; flex-wrap: wrap; gap: 8px 20px; }
+.ft__base a { color: inherit; }
 
 /* ---------- scene page ---------- */
 .scene-sheet {
