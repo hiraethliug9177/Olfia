@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ARTICLES, articleBySlug, articleDate, relatedTo } from "@/lib/edit";
+import { ARTICLES, articleBySlug, relatedTo } from "@/lib/edit";
 import { FAMILY_WASH } from "@/lib/colors";
 import type { FamilyId } from "@/lib/types";
 import { ArticleCover } from "@/components/edit/ArticleCover";
 import { ArticleCard } from "@/components/edit/ArticleCard";
 import { TopicTag } from "@/components/edit/TopicTag";
+import { StoryWhen } from "@/components/edit/StoryWhen";
 import { ObjectPhoto } from "@/components/edit/ObjectPhoto";
 import { Rich } from "@/components/edit/Rich";
 import { Icon } from "@/components/ui/Icon";
@@ -47,13 +48,14 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
   return (
     <div className="wrap page">
       {/* 11/18 (Tiffany): on a computer the story sits in the middle, Recreate This at Home on the left and Try This
-          on the right, all in one page scroll. On narrower screens they stack: story, Try This, the rest, Recreate. */}
+          on the right, all in one page scroll. On narrower screens they stack: story, Try This, the rest, Recreate.
+          Later on 11/18: on a computer the back link, title and line above the picture run the full page width. */}
       <article className="article">
         <header className="article__head">
           <Link href="/edit" className="article__back"><Icon name="arrowLeft" size={18} />The Olfia Edit</Link>
           <div className="article__meta">
             <TopicTag topic={a.topic} label={a.kicker} />
-            <span>{articleDate(a.date)} · {a.readTime}</span>
+            <StoryWhen a={a} />
           </div>
           <h1 className="h-page article__title">{a.title}</h1>
           <p className="lead article__dek">{a.dek}</p>

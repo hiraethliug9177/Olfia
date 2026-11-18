@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { articleDate, type Article } from "@/lib/edit";
+import type { Article } from "@/lib/edit";
 import { ArticleCover } from "@/components/edit/ArticleCover";
 import { TopicTag } from "@/components/edit/TopicTag";
+import { StoryWhen } from "@/components/edit/StoryWhen";
 
 type Variant = "card" | "lead" | "row" | "mini";
 
@@ -14,9 +15,10 @@ export function ArticleCard({ a, lead = false, variant }: { a: Article; lead?: b
   if (v === "mini") {
     return (
       <Link href={`/edit/${a.slug}`} className="edit-mini">
-        <span className="edit-meta"><TopicTag topic={a.topic} /><span>{articleDate(a.date)}</span></span>
+        {/* 11/18 (Tiffany): in the side rail, the title first and then one line of tag, date and reading time,
+            the same as Editor's Picks */}
         <span className="edit-mini__title">{a.title}</span>
-        <span className="edit-card__foot">{a.readTime}</span>
+        <span className="edit-meta"><TopicTag topic={a.topic} /><StoryWhen a={a} /></span>
       </Link>
     );
   }
@@ -24,10 +26,10 @@ export function ArticleCard({ a, lead = false, variant }: { a: Article; lead?: b
     <Link href={`/edit/${a.slug}`} className={`edit-card edit-card--${v}`}>
       <ArticleCover a={a} ratio={v === "lead" ? "16 / 10" : v === "row" ? "4 / 3" : "4 / 3"} eager={v === "lead"} />
       <span className="edit-card__text">
-        <span className="edit-meta"><TopicTag topic={a.topic} /><span>{articleDate(a.date)}</span></span>
+        {/* 11/18 (Tiffany): the reading time joins the date's line */}
+        <span className="edit-meta"><TopicTag topic={a.topic} /><StoryWhen a={a} /></span>
         <span className="edit-card__title">{a.title}</span>
         <span className="edit-card__dek">{a.dek}</span>
-        <span className="edit-card__foot">{a.readTime}</span>
       </span>
     </Link>
   );

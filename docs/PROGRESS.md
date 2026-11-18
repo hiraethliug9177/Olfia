@@ -76,6 +76,11 @@ Done 11/10 ~6:45 pm PT: all seven items are live on olfia-nine.vercel.app (main 
 - [x] Picks/Gifts rethink, direction set (11/18): Gifts only, for me and for someone, link + card + save, illustrated rooms
 - [x] Gifts sketch approved and built on the preview (11/18): Gifts tab, Home section, For me / For someone, gift card; names kept out of analytics; header widths rechecked
 - [ ] Tiffany to replace or keep the draft Gifts lines (listed in DECISIONS, 11/18)
-- [ ] After class: decide whether the demo copy gets the new Gifts too
+- [x] Demo copy has the new Gifts (11/18, during class, at her request)
+- [x] Home: The Edit moved up, Room presets head like The Edit's, three presets (living room, bedroom, study) (11/18)
+- [x] My Page: title case, Try Next on one line with equal cards, preference tags on one line with a clear chosen state, pixel scene placeholder (11/18)
+- [x] The Edit: date and reading time on one line, rail proportions by box width, today's date on the masthead, full-width story head (11/18)
+- [x] Rooms: the room choice moved below the name as a setting like Time of day (11/18)
+- [ ] Demo copy: add the 11/18 evening changes when she asks
 - [ ] Publish the 11/17 late-night and 11/18 changes when Tiffany says "发布" (on the v3-design preview)
 - [ ] 11–14 wait for Tiffany's decisions and words

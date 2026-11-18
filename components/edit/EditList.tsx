@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { ARTICLES, EDITORS_PICKS, IN_SEASON, TOPICS, articleBySlug, articleMonth, byDate, type Article, type Topic } from "@/lib/edit";
 import { ArticleCard } from "@/components/edit/ArticleCard";
 import { TopicTag } from "@/components/edit/TopicTag";
+import { StoryWhen } from "@/components/edit/StoryWhen";
 import Link from "next/link";
 
 /**
@@ -12,6 +13,8 @@ import Link from "next/link";
  * the wide column runs by date, with topic and month tabs on top; the narrow column keeps the
  * editor's picks and what is in season, and scrolls on its own. No read counts: the old ones were
  * made up for the prototype and were removed on 11/17, with the Trending order that used them.
+ * 11/18 (Tiffany): both rail boxes size their words to the box's own width, so a title takes the same share of the
+ * box on a phone, a tablet or a computer; on tablets the two boxes sit side by side.
  */
 
 export function EditList() {
@@ -75,7 +78,7 @@ export function EditList() {
                 <span className="np-rank__n" aria-hidden="true">{i + 1}</span>
                 <Link href={`/edit/${a.slug}`}>
                   <span className="np-rank__title">{a.title}</span>
-                  <span className="edit-meta edit-meta--foot"><TopicTag topic={a.topic} /><span>{a.readTime}</span></span>
+                  <span className="edit-meta"><TopicTag topic={a.topic} /><StoryWhen a={a} /></span>
                 </Link>
               </li>
             ))}

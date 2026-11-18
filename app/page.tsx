@@ -19,6 +19,10 @@ export const revalidate = 86400;
  * apricot for the room presets, sage for The Edit, deep periwinkle for the closing invite — and each
  * opens with a large title on the left and a short line on the right.
  */
+// 11/18 (Tiffany): Home shows three of the six presets, in this order; Rooms keeps all six
+const HOME_PRESET_IDS = ["living-night", "bedroom-morning", "study-afternoon"];
+const HOME_PRESETS = HOME_PRESET_IDS.map((id) => ROOM_PRESETS.find((r) => r.id === id)).filter((r): r is (typeof ROOM_PRESETS)[number] => Boolean(r));
+
 export default function HomePage() {
   const latest = byDate().slice(0, 3);
   // 11/18 (Tiffany): Gifts on Home, the season's family drawn into three rooms
@@ -40,23 +44,16 @@ export default function HomePage() {
         <FamilyWheel />
       </section>
 
-      <section id="presets" className="wrap section">
-        <div className="panel panel--apricot">
-          <div className="split-head">
-            <h2 className="h-section">{strings.brand.explore}</h2>
-            <div className="split-head__side">
-              <p className="lead">Start from a room that is already set, then make it yours.</p>
-              <Link href="/rooms" className="btn btn--primary btn--sm">Open Rooms</Link>
-            </div>
+      <section id="edit" className="wrap section">
+        <div className="panel panel--white">
+          {/* 11/17 (Tiffany): the line sits beside the title on its baseline; the button goes to the right edge */}
+          <div className="row-head">
+            <h2 className="h-section">The Olfia Edit</h2>
+            <p className="lead">Culture, fragrance, and the art of living.</p>
+            <Link href="/edit" className="btn btn--primary btn--sm row-head__cta">Read the Edit</Link>
           </div>
-          <div className="preset-grid">
-            {ROOM_PRESETS.map((r) => (
-              <Link key={r.id} href={`/rooms?preset=${r.id}`} className="preset">
-                <ScenePage items={r.items} families={r.families} title={r.name} time={r.time} showLabels={false} prefix={`pre-${r.id}`} />
-                <span className="preset__name">{r.name}</span>
-                {r.line.startsWith("TODO(") ? null : <span className="preset__line">{r.line}</span>}
-              </Link>
-            ))}
+          <div className="edit-grid">
+            {latest.map((a) => <ArticleCard key={a.slug} a={a} />)}
           </div>
         </div>
       </section>
@@ -90,16 +87,22 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="edit" className="wrap section">
-        <div className="panel panel--white">
-          {/* 11/17 (Tiffany): the line sits beside the title on its baseline; the button goes to the right edge */}
+      <section id="presets" className="wrap section">
+        <div className="panel panel--apricot">
+          {/* 11/18 (Tiffany): the same head as The Olfia Edit: the line beside the title, the button at the right edge */}
           <div className="row-head">
-            <h2 className="h-section">The Olfia Edit</h2>
-            <p className="lead">Culture, fragrance, and the art of living.</p>
-            <Link href="/edit" className="btn btn--primary btn--sm row-head__cta">Read the Edit</Link>
+            <h2 className="h-section">{strings.brand.explore}</h2>
+            <p className="lead">Start from a room that is already set, then make it yours.</p>
+            <Link href="/rooms" className="btn btn--primary btn--sm row-head__cta">Open Rooms</Link>
           </div>
-          <div className="edit-grid">
-            {latest.map((a) => <ArticleCard key={a.slug} a={a} />)}
+          <div className="preset-grid">
+            {HOME_PRESETS.map((r) => (
+              <Link key={r.id} href={`/rooms?preset=${r.id}`} className="preset">
+                <ScenePage items={r.items} families={r.families} title={r.name} time={r.time} showLabels={false} prefix={`pre-${r.id}`} />
+                <span className="preset__name">{r.name}</span>
+                {r.line.startsWith("TODO(") ? null : <span className="preset__line">{r.line}</span>}
+              </Link>
+            ))}
           </div>
         </div>
       </section>

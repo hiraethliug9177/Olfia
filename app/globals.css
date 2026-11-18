@@ -333,8 +333,10 @@ section[id] { scroll-margin-top: 24px; }
 .split-head .lead { max-width: 30em; }
 @media (max-width: 860px) { .split-head { grid-template-columns: minmax(0, 1fr); } }
 /* 11/17: a section head on one line: title, its line on the same baseline, the button at the right edge (Home, The Olfia Edit) */
-.row-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px 28px; margin-bottom: 40px; }
-.row-head .lead { margin: 0; }
+.row-head { display: flex; flex-wrap: wrap; align-items: baseline; align-items: last baseline; gap: 12px 28px; margin-bottom: 40px; }
+/* 11/18: a long title takes two balanced lines, and the line and button sit level with its last line */
+.row-head > .h-section { max-width: 6.8em; text-wrap: balance; }
+.row-head .lead { flex: 1 1 260px; margin: 0; text-wrap: balance; }
 .row-head__cta { margin-left: auto; }
 @media (max-width: 640px) { .row-head__cta { margin-left: 0; } }
 /* coloured section panels; text keeps its charcoal and slate */
@@ -391,7 +393,8 @@ section[id] { scroll-margin-top: 24px; }
 .preset:hover .scene-sheet { transform: translateY(-4px); }
 .preset__name { font-family: var(--font-display); font-size: 26px; font-weight: 600; line-height: 1.1; letter-spacing: -0.01em; }
 .preset__line { font-size: 15px; color: var(--slate); line-height: 1.5; }
-@media (max-width: 1000px) { .preset-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+/* 11/18: three rooms on Home, so they stay in one row until phones */
+@media (max-width: 760px) { .preset-grid { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 520px) { .preset-grid { grid-template-columns: minmax(0, 1fr); } .quiz-invite { padding: 24px; gap: 28px; } }
 .window { border-radius: 50%; box-shadow: 0 0 0 4px #fff, 0 6px 14px rgba(41,42,49,0.18); }
 .masonry { columns: 3 320px; column-gap: 28px; }
@@ -580,7 +583,12 @@ a.pcard:hover { color: var(--ink); transform: translateY(-3px); }
 /* the tag and the date (or read time) share one line */
 .edit-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; font-size: 14px; font-weight: 600; color: var(--slate); }
 .edit-meta--foot { font-size: 13px; font-weight: 400; }
-.edit-card__title { font-family: var(--font-display); font-size: 26px; font-weight: 600; line-height: 1.12; letter-spacing: -0.01em; }
+/* 11/18 (Tiffany): the date and the reading time never part; the reading time is lighter and has a clock */
+.edit-when { display: inline-flex; align-items: center; gap: 10px; white-space: nowrap; }
+.edit-when__date { font-weight: 600; color: var(--ink); }
+.edit-when__read { display: inline-flex; align-items: center; gap: 5px; font-weight: 400; color: var(--slate); }
+.edit-when__read .ico { flex: none; opacity: 0.85; }
+.edit-card__title { font-family: var(--font-display); font-size: 26px; font-weight: 600; line-height: 1.12; letter-spacing: -0.01em; text-wrap: balance; }
 .edit-card__dek { font-size: 15px; color: var(--slate); line-height: 1.55; }
 .edit-card__foot { font-family: var(--font-ui); font-size: 13px; color: var(--slate); }
 .edit-card--lead .edit-card__title { font-size: clamp(34px, 3.6vw, 52px); font-weight: 700; line-height: 1.02; letter-spacing: -0.02em; }
@@ -659,10 +667,12 @@ a.pcard:hover { color: var(--ink); transform: translateY(-3px); }
     max-width: none;
     grid-template-columns: 270px minmax(0, 1fr) 270px;
     grid-template-rows: auto auto 1fr;
-    grid-template-areas: ". head ." "rel body try" "rel end try";
+    grid-template-areas: "head head head" "rel body try" "rel end try";
     column-gap: 40px;
   }
   .article__head .article__title { font-size: clamp(44px, 4vw, 60px); }
+  /* 11/18 (Tiffany): back link and title as wide as the rest of the site; the line under the title keeps a reading width */
+  .article__head .article__dek { max-width: 46em; }
   .article__try, .article__rel { margin: 0; align-self: start; }
   /* smaller than the story's own subtitles, and each on one line so both columns' cards start level */
   .story-side__h { font-size: 26px; white-space: nowrap; }
@@ -810,11 +820,11 @@ body::after {
 .np-mast { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 16px 0 22px; margin-bottom: 40px; border-top: 3px solid var(--ink); border-bottom: 1px solid var(--ink); text-align: center; }
 /* 11/18 (Tiffany): the line sits on the date's row, set apart on a solid Mist ground */
 .np-mast__line { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 14px; }
-.np-mast__date { font-size: 14px; color: var(--slate); }
+.np-mast__date { min-width: 29ch; font-size: 14px; color: var(--slate); text-align: right; }
 .np-mast__title { font-family: var(--font-display); font-size: clamp(52px, 8vw, 120px); font-weight: 700; line-height: 0.95; letter-spacing: -0.03em; }
 .np-mast__tag { padding: 3px 12px; border-radius: 999px; background: var(--mist); font-size: 14px; color: var(--ink); }
 .np-mast__br { display: none; }
-@media (max-width: 560px) { .np-mast__tag { padding: 5px 14px; border-radius: 14px; font-size: 13px; text-align: center; } .np-mast__br { display: inline; } }
+@media (max-width: 560px) { .np-mast__tag { padding: 5px 14px; border-radius: 14px; font-size: 13px; text-align: center; } .np-mast__br { display: inline; } .np-mast__date { min-width: 0; text-align: center; } }
 .np-grid { display: grid; grid-template-columns: minmax(0, 2.1fr) minmax(280px, 1fr); gap: 48px; align-items: start; margin-top: 56px; }
 .np-main { display: flex; flex-direction: column; gap: 28px; min-width: 0; }
 .np-filters { display: flex; flex-direction: column; gap: 10px; padding-bottom: 18px; border-bottom: 1px solid var(--ink); }
@@ -840,6 +850,20 @@ body::after {
 .np-rank__title { font-family: var(--font-display); font-size: 19px; font-weight: 600; line-height: 1.18; }
 .np-mini-list { display: flex; flex-direction: column; }
 @media (max-width: 960px) { .np-grid { grid-template-columns: minmax(0, 1fr); } .np-rail { position: static; max-height: none; overflow: visible; } }
+/* 11/18 (Tiffany): every word in the two rail boxes keeps the same share of its box at any screen width. The boxes are
+   size containers; their titles, numbers and headings are measured in box widths (cqi), with floors so nothing falls
+   under 13px. Titles balance their lines, so no word is left alone on the last one. Tablets get the boxes side by side,
+   so a box is about as wide on a tablet as on a phone or a computer. */
+.np-box { container-type: inline-size; }
+.np-box .np-h { font-size: clamp(24px, 9.4cqi, 34px); }
+.np-rank li { gap: 4cqi; }
+.np-rank__n { width: 1.05em; font-size: clamp(24px, 9.4cqi, 34px); }
+.np-rank a { gap: 10px; }
+.np-rank__title, .edit-mini__title { font-size: clamp(17px, 6.3cqi, 22px); line-height: 1.18; text-wrap: balance; }
+.edit-mini { gap: 10px; }
+/* in a rail box the tag and the date line always take a line each, so every entry has the same shape at any width */
+.np-box .edit-meta { flex-direction: column; align-items: flex-start; gap: 8px; font-size: clamp(13px, 4.1cqi, 14px); }
+@media (min-width: 640px) and (max-width: 960px) { .np-rail { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; } }
 
 /* Scent Library block on The Edit, and the library page */
 .lib-block { display: flex; flex-direction: column; gap: 14px; padding: 24px 28px; border-radius: 28px; background: rgba(255,255,255,0.9); box-shadow: var(--shadow-card); }
@@ -947,6 +971,29 @@ body::after {
 .account-quiz__figure { flex: 0 1 230px; min-width: 170px; }
 .account-quiz__text { flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 14px; }
 .account-quiz__fam { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; white-space: nowrap; }
+/* 11/18 (Tiffany): My Page. Try Next: the suggestion on the title's line, three cards of one size */
+.try-next { display: flex; flex-direction: column; gap: 16px; }
+.try-next__head { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; }
+.try-next__grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.try-next__grid > div > .pcard { flex: 1; }
+@media (max-width: 760px) { .try-next__grid { grid-template-columns: minmax(0, 1fr); } }
+/* My Preferences: each group on one line that fills the width; chosen tags filled in periwinkle deep.
+   Where a line can no longer fit (tablets, phones) it scrolls sideways instead of wrapping. */
+.pref-chips { container-type: inline-size; display: flex; flex-wrap: nowrap; gap: 8px; overflow-x: auto; scrollbar-width: thin; padding-bottom: 4px; }
+.pref-chip {
+  flex: 1 1 auto; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 14px;
+  border-radius: 999px; border: 1px solid var(--line); background: #fff; color: var(--slate);
+  font-family: var(--font-ui); font-size: 14px; font-weight: 500; white-space: nowrap; cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+.pref-chip:hover { border-color: var(--deep); color: var(--ink); }
+.pref-chip[aria-pressed="true"] { border-color: var(--deep); background: var(--deep); color: #fff; font-weight: 600; }
+.pref-chip[aria-pressed="true"] .chip__dot { box-shadow: 0 0 0 2px #fff; }
+@container (max-width: 1120px) { .pref-chip { gap: 6px; padding: 0 10px; font-size: 13px; } }
+@media (max-width: 560px) { .pref-chips { margin: 0 -20px; padding: 0 20px 4px; scroll-padding: 0 20px; } }
+/* the picture of a person's preferences (a placeholder drawn from the sample data for now) */
+.pref-scene { margin: 6px 0 0; border-radius: 18px; overflow: hidden; background: var(--deep); }
+.pref-scene img { display: block; width: 100%; height: auto; image-rendering: pixelated; }
 
 /* ---------- Scent Atlas: the month's record, drawn as a ticket with a stub (11/10) ---------- */
 .record { position: relative; display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(260px, 1fr); border-radius: 22px; background: var(--paper); box-shadow: 0 10px 26px rgba(41,42,49,0.1); }
@@ -1049,9 +1096,9 @@ body::after {
 .sc-post__line--notes { font-weight: 600; color: var(--ink); }
 .sc-post__sig { position: absolute; right: 0; bottom: 1.6cqw; }
 
-/* Rooms: the three rooms as tabs above the controls (11/10: kitchen and bathroom) */
-.room-tabs { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 18px; }
-.room-tabs__opt { padding: 4px 0; border: 0; border-bottom: 2px solid transparent; background: none; font-family: var(--font-display); font-size: 24px; line-height: 1.15; color: var(--slate); cursor: pointer; transition: color 0.2s, border-color 0.2s; }
-.room-tabs__opt:hover { color: var(--ink); }
-.room-tabs__opt[aria-checked="true"] { color: var(--ink); border-bottom-color: var(--deep); }
-.room-tabs__opt:focus-visible { outline: 2px solid var(--deep); outline-offset: 3px; border-radius: 4px; }
+/* Rooms: the three rooms as one more setting in the panel (11/18, Tiffany: same style as Time of day, below the name).
+   Same control as Time of day; in a narrow panel "Reading Corner" takes two lines rather than shrinking. */
+.seg--wrap .seg__opt { min-height: 42px; padding: 4px 6px; line-height: 1.15; white-space: normal; }
+/* in the narrow panel beside the stage (laptops), both choices step down to 13px so "Afternoon" and "Bathroom" fit */
+.editor__panel { container-type: inline-size; }
+@container (max-width: 300px) { .editor__panel .seg__opt { font-size: 13px; } }

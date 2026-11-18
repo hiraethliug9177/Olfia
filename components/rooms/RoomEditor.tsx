@@ -352,16 +352,20 @@ export function RoomEditor() {
         </div>
 
         <div className="card editor__panel" style={{ padding: 22 }}>
+          <label className="field">
+            Your name for it
+            <input className="input hand" style={{ fontSize: 22 }} type="text" value={nickname} maxLength={40} onChange={(e) => setNickname(e.target.value)} placeholder="rain, chapter three" />
+          </label>
+
+          {/* 11/18 (Tiffany): the room is one more setting, below the name and in the same style as Time of day */}
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            <div role="radiogroup" aria-label="Room" className="room-tabs">
+            <span style={{ fontSize: 17, fontWeight: 600 }}>Room</span>
+            <div role="radiogroup" aria-label="Room" className="seg seg--wrap">
+              <span className="seg__thumb" aria-hidden="true" style={{ left: `calc(5px + (100% - 10px) * ${Math.max(0, SCENES.findIndex((x) => x.id === sceneId)) / SCENES.length})`, width: `calc((100% - 10px) / ${SCENES.length})` }} />
               {SCENES.map((x) => (
-                <button key={x.id} type="button" role="radio" aria-checked={sceneId === x.id} className="room-tabs__opt" onClick={() => openScene(x.id)}>{x.name}</button>
+                <button key={x.id} type="button" role="radio" aria-checked={sceneId === x.id} className="seg__opt" onClick={() => openScene(x.id)}>{x.name}</button>
               ))}
             </div>
-            <label className="field" style={{ fontSize: 15, color: "var(--slate)" }}>
-              Your name for it
-              <input className="input hand" style={{ fontSize: 22 }} type="text" value={nickname} maxLength={40} onChange={(e) => setNickname(e.target.value)} placeholder="rain, chapter three" />
-            </label>
           </div>
 
           <label className="field">

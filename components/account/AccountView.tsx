@@ -24,7 +24,7 @@ function AccountQuiz() {
   if (!r) {
     return (
       <section id="quiz" className="card anchor" style={{ display: "flex", flexDirection: "column", gap: 14, alignItems: "flex-start" }}>
-        <h2 className="h-section" style={{ fontSize: 40 }}>Which scent is you?</h2>
+        <h2 className="h-section" style={{ fontSize: 40 }}>Which Scent Is You?</h2>
         <p className="lead">Twenty questions about how you live. You get one of sixteen characters, the scent family that fits, and a room to start from.</p>
         <Link href="/quiz" className="btn btn--primary">Take the quiz</Link>
       </section>
@@ -39,7 +39,7 @@ function AccountQuiz() {
         <Character code={r.code} alt={`${r.archetype.name}, the ${r.code} character`} eager />
       </div>
       <div className="account-quiz__text">
-        <h2 className="h-section" style={{ fontSize: 40 }}>You are {r.archetype.name}.</h2>
+        <h2 className="h-section" style={{ fontSize: 40 }}>You Are {r.archetype.name}.</h2>
         <p className="lead">{r.archetype.voice}</p>
         <p style={{ margin: 0 }}>
           Your scent is <span className="account-quiz__fam"><span className="chip__dot" style={{ background: fam.hex }} aria-hidden="true" />{fam.label}</span>
@@ -125,19 +125,20 @@ export function AccountView() {
       <div id="profile" className="anchor"><ScentSummary /></div>
 
       <section id="preferences" className="card anchor" style={{ display: "flex", flexDirection: "column", gap: 18, background: "var(--apricot-soft)" }}>
-        <h2 className="h-section" style={{ fontSize: 34 }}>My preferences</h2>
-        <span className="label-mono">Preferred scent styles</span>
-        <div className="chips">
+        <h2 className="h-section" style={{ fontSize: 34 }}>My Preferences</h2>
+        {/* 11/18 (Tiffany): each group of tags on one line, sized to fit; the chosen ones filled so they stand out */}
+        <span className="label-mono">Preferred Scent Styles</span>
+        <div className="pref-chips" role="group" aria-label="Preferred scent styles">
           {FAMILIES.map((f) => (
-            <button key={f.id} type="button" className="chip" aria-pressed={prefs.families.includes(f.id)} onClick={() => savePrefs({ ...prefs, families: flip(prefs.families, f.id) })}>
-              <span className="chip__dot" style={{ background: f.hex }} />{f.label}
+            <button key={f.id} type="button" className="pref-chip" aria-pressed={prefs.families.includes(f.id)} onClick={() => savePrefs({ ...prefs, families: flip(prefs.families, f.id) })}>
+              <span className="chip__dot" style={{ background: f.hex }} aria-hidden="true" />{f.label}
             </button>
           ))}
         </div>
-        <span className="label-mono">Preferred products</span>
-        <div className="chips">
+        <span className="label-mono">Preferred Products</span>
+        <div className="pref-chips" role="group" aria-label="Preferred products">
           {SOURCE_OPTIONS.filter((s) => s.id !== "other").map((s) => (
-            <button key={s.id} type="button" className="chip" aria-pressed={prefs.sources.includes(s.id)} onClick={() => savePrefs({ ...prefs, sources: flip(prefs.sources, s.id) })}>{s.label}</button>
+            <button key={s.id} type="button" className="pref-chip" aria-pressed={prefs.sources.includes(s.id)} onClick={() => savePrefs({ ...prefs, sources: flip(prefs.sources, s.id) })}>{s.label}</button>
           ))}
         </div>
         {night || morning ? (
@@ -148,10 +149,20 @@ export function AccountView() {
             {morning ? <><span className="hl" style={{ "--hl": `${familyById(morning).hex}66` } as CSSProperties}>{familyById(morning).label.toLowerCase()}</span> in the morning</> : null}.
           </p>
         ) : null}
+        {/* 11/18 (Tiffany): room for a picture made from each person's preferences later on. For now one pixel
+            scene drawn from the sample data (scripts/pixel_scene.py): woody, citrus and green, candle and diffuser. */}
+        <figure className="pref-scene">
+          <img
+            src="/assets/preferences/sample-scene.png"
+            width={192}
+            height={108}
+            alt="Pixel picture: a timber cabin among cedar trees at dusk, a candle in its window, mist from the chimney and an orange tree beside it"
+          />
+        </figure>
       </section>
 
       <section id="info" className="card anchor" style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-        <h2 className="h-section" style={{ fontSize: 34 }}>Personal info</h2>
+        <h2 className="h-section" style={{ fontSize: 34 }}>Personal Info</h2>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 14 }}>
           {["Username", "Email", "City, country"].map((l) => (
             <label key={l} className="field">{l}<input className="input" disabled placeholder="Available with accounts" /></label>

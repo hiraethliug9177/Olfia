@@ -32,9 +32,9 @@ const NAV: NavItem[] = [
     href: "/", label: "Home", icon: "home", sub: [
       { href: "/#quiz", label: "Scent quiz", dot: "#E7B49F" },
       { href: "/#families", label: "Seven scent families", dot: "#A0A6C8" },
-      { href: "/#presets", label: "Room presets", dot: "#4C527A" },
-      { href: "/#gifts", label: "Gifts", dot: "#A0A6C8" },
       { href: "/#edit", label: "The Olfia Edit", dot: "#E7B49F" },
+      { href: "/#gifts", label: "Gifts", dot: "#A0A6C8" },
+      { href: "/#presets", label: "Room presets", dot: "#4C527A" },
     ],
   },
   {
