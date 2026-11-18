@@ -5,6 +5,7 @@ import { ARTICLES, articleBySlug, articleDate, byDate } from "@/lib/edit";
 import { familyById } from "@/lib/catalog";
 import { ArticleCover } from "@/components/edit/ArticleCover";
 import { ArticleCard } from "@/components/edit/ArticleCard";
+import { TopicTag } from "@/components/edit/TopicTag";
 import { ObjectPhoto } from "@/components/edit/ObjectPhoto";
 import { Rich } from "@/components/edit/Rich";
 import { Icon } from "@/components/ui/Icon";
@@ -37,10 +38,12 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
     <div className="wrap page">
       <article className="article">
         <Link href="/edit" className="article__back"><Icon name="arrowLeft" size={18} />The Olfia Edit</Link>
-        <p className="edit-card__meta" style={{ marginTop: 28 }}>{a.kicker}</p>
-        <h1 className="h-page article__title" style={{ margin: "12px 0 16px" }}>{a.title}</h1>
-        <p className="lead" style={{ maxWidth: "none" }}>{a.dek}</p>
-        <p className="article__byline">{articleDate(a.date)} · {a.readTime}</p>
+        <div className="article__meta">
+          <TopicTag topic={a.topic} label={a.kicker} />
+          <span>{articleDate(a.date)} · {a.readTime}</span>
+        </div>
+        <h1 className="h-page article__title" style={{ margin: "16px 0" }}>{a.title}</h1>
+        <p className="lead article__dek" style={{ maxWidth: "none" }}>{a.dek}</p>
 
         <figure className="article__figure">
           <ArticleCover a={a} ratio="16 / 9" eager />

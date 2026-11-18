@@ -40,12 +40,13 @@ export interface Article {
 
 export const TOPICS: Topic[] = ["Culture", "History", "Science", "Design", "Places", "Rituals"];
 
-/** Stories for this time of year, shown in the side rail. */
-export const IN_SEASON = ["christmas-smells-like-a-trade-route", "vanilla-is-anything-but-basic", "incense-timekeeping"];
+/** Stories for this time of year, shown in the side rail. Two only (Tiffany 11/17); the first two of the
+ * old three were kept, Vanilla Is Anything But Basic left the list. */
+export const IN_SEASON = ["christmas-smells-like-a-trade-route", "incense-timekeeping"];
 
-/** Editor's picks in the side rail, in this order. Tiffany chooses them; until she does, these are the three
- * that topped the old sample list (the made-up read counts were removed 11/17). */
-export const EDITORS_PICKS = ["if-barbie-land-had-a-smell", "coffee-smells-better", "the-most-expensive-thing-in-a-hotel-lobby"];
+/** Editor's Picks in the side rail, in this order. Tiffany 11/17: two for now, the first two of the earlier
+ * three ("现在前两个就可以"); she may name a third later. */
+export const EDITORS_PICKS = ["if-barbie-land-had-a-smell", "coffee-smells-better"];
 
 export const ARTICLES: Article[] = [
   {

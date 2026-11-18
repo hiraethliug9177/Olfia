@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { ARTICLES, EDITORS_PICKS, IN_SEASON, TOPICS, articleBySlug, articleMonth, byDate, type Article, type Topic } from "@/lib/edit";
 import { ArticleCard } from "@/components/edit/ArticleCard";
+import { TopicTag } from "@/components/edit/TopicTag";
 import Link from "next/link";
 
 /**
@@ -69,14 +70,14 @@ export function EditList() {
 
       <aside className="np-rail" aria-label="More from The Edit">
         <section id="editors-picks" className="np-box">
-          <h2 className="np-h">Editor’s picks</h2>
+          <h2 className="np-h">Editor’s Picks</h2>
           <ol className="np-rank">
             {picks.map((a, i) => (
               <li key={a.slug}>
                 <span className="np-rank__n" aria-hidden="true">{i + 1}</span>
                 <Link href={`/edit/${a.slug}`}>
                   <span className="np-rank__title">{a.title}</span>
-                  <span className="edit-card__foot">{a.topic} · {a.readTime}</span>
+                  <span className="edit-meta edit-meta--foot"><TopicTag topic={a.topic} /><span>{a.readTime}</span></span>
                 </Link>
               </li>
             ))}
@@ -84,7 +85,7 @@ export function EditList() {
         </section>
 
         <section className="np-box">
-          <h2 className="np-h">In season</h2>
+          <h2 className="np-h">In Season</h2>
           <div className="np-mini-list">
             {inSeason.map((a) => <ArticleCard key={a.slug} a={a} variant="mini" />)}
           </div>

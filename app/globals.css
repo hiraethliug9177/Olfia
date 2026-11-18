@@ -508,6 +508,10 @@ section[id] { scroll-margin-top: 24px; }
 .swatch[aria-pressed="true"] { transform: scale(1.14); box-shadow: 0 0 0 4px #fff, 0 0 0 7px var(--deep); }
 .tag { display: inline-flex; align-items: center; min-height: 32px; padding: 0 12px; border-radius: 999px; background: var(--mist); color: var(--ink); font-family: var(--font-ui); font-size: 14px; }
 .tag--on { background: var(--deep); color: #fff; }
+/* 11/17: a story's tag, a small pill with its topic's icon (Tiffany: "文章标签换成类似icon的表达方式") */
+.tag--story { gap: 6px; min-height: 0; padding: 4px 11px 4px 9px; border-radius: 14px; background: #fff; box-shadow: 0 1px 2px rgba(41,42,49,0.06); font-size: 13px; font-weight: 500; line-height: 1.4; }
+.np-box .tag--story, .panel--white .tag--story { background: var(--mist); box-shadow: none; }
+.tag--story .ico { flex: none; align-self: flex-start; margin-top: 1.5px; }
 
 /* ---------- product cards ---------- */
 .pcard-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; }
@@ -539,6 +543,9 @@ a.pcard:hover { color: var(--ink); transform: translateY(-3px); }
 .edit-cover img, .edit-cover svg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s var(--ease); }
 .edit-card__text { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
 .edit-card__meta { font-size: 14px; font-weight: 600; color: var(--slate); }
+/* the tag and the date (or read time) share one line */
+.edit-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; font-size: 14px; font-weight: 600; color: var(--slate); }
+.edit-meta--foot { font-size: 13px; font-weight: 400; }
 .edit-card__title { font-family: var(--font-display); font-size: 26px; font-weight: 600; line-height: 1.12; letter-spacing: -0.01em; }
 .edit-card__dek { font-size: 15px; color: var(--slate); line-height: 1.55; }
 .edit-card__foot { font-family: var(--font-ui); font-size: 13px; color: var(--slate); }
@@ -554,17 +561,20 @@ a.pcard:hover { color: var(--ink); transform: translateY(-3px); }
 .edit-mini:hover .edit-mini__title { text-decoration: underline; text-underline-offset: 4px; }
 .edit-mini__title { font-family: var(--font-display); font-size: 20px; font-weight: 600; line-height: 1.15; }
 .article__title { font-weight: 700; }
-.article__byline { margin-top: 14px; font-size: 14px; color: var(--slate); }
+/* 11/17: tag, date and read time on one line above the title; the line under the title is bold (Tiffany) */
+.article__meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin-top: 28px; font-size: 14px; color: var(--slate); }
+.article__dek { font-weight: 600; }
 .article { max-width: 720px; margin: 0 auto; }
 .article__back { display: inline-flex; align-items: center; gap: 8px; color: var(--ink); text-decoration: none; font-size: 15px; font-weight: 500; }
 .article__figure { margin: 32px 0 40px; }
 .article__figure figcaption, .article__object-photo figcaption { margin-top: 10px; font-size: 14px; color: var(--slate); }
 .prose { font-size: 17px; line-height: 1.75; }
 .prose p { margin: 0 0 1.15em; }
-.prose h2 { font-family: var(--font-display); font-size: 30px; line-height: 1.15; margin: 1.7em 0 0.6em; }
+.prose h2 { font-family: var(--font-display); font-size: 30px; font-weight: 700; line-height: 1.15; margin: 1.7em 0 0.6em; }
 .prose a, .article__refs a, .article__figure a { color: var(--deep); }
 .article__try { display: flex; flex-direction: column; gap: 12px; margin: 48px 0; padding: 32px; border-radius: 24px; background: #fff; box-shadow: var(--shadow-card); font-size: 18px; line-height: 1.65; }
-.article__try h2 { font-size: 30px; }
+.article__try h2 { font-size: 30px; font-weight: 700; }
+.article__object h2 { font-weight: 700; }
 .article__object { display: flex; flex-wrap: wrap; gap: 32px; align-items: flex-start; margin: 48px 0; padding-top: 40px; border-top: 1px solid var(--line); font-size: 18px; line-height: 1.65; }
 .article__object-photo { flex: 0 1 260px; margin: 0; }
 .article__object-photo img { display: block; width: 100%; border-radius: 16px; background: #fff; }
@@ -647,7 +657,7 @@ body::after {
 .np-rank li { display: flex; gap: 14px; padding: 12px 0; border-top: 1px solid rgba(41,42,49,0.12); }
 .np-rank li:first-child { border-top: 0; padding-top: 0; }
 .np-rank__n { flex: none; width: 30px; font-family: var(--font-display); font-size: 34px; font-weight: 700; line-height: 1; color: var(--deep); }
-.np-rank a { display: flex; flex-direction: column; gap: 4px; color: var(--ink); text-decoration: none; }
+.np-rank a { display: flex; flex-direction: column; gap: 8px; color: var(--ink); text-decoration: none; }
 .np-rank a:hover .np-rank__title { text-decoration: underline; text-underline-offset: 4px; }
 .np-rank__title { font-family: var(--font-display); font-size: 19px; font-weight: 600; line-height: 1.18; }
 .np-mini-list { display: flex; flex-direction: column; }

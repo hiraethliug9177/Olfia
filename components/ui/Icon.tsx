@@ -2,8 +2,9 @@
 
 import {
   ArrowLeft, ArrowRight, BookOpen, Check, ChevronDown, ChevronLeft, ChevronRight, CircleUserRound, Copy, Download,
-  ExternalLink, FlipHorizontal2, House, ImagePlus, Instagram, Layers, Link2, Mail, Menu, Minus, Pause, Play, Plus,
-  Redo2, RotateCcw, RotateCw, SendToBack, Share2, Trash2, Undo2, X, type LucideIcon,
+  Drama, ExternalLink, Flame, FlaskConical, FlipHorizontal2, House, ImagePlus, Instagram, Layers, Link2, Mail, MapPin,
+  Menu, Minus, Pause, PencilRuler, Play, Plus, Redo2, RotateCcw, RotateCw, Scroll, SendToBack, Share2, Trash2, Undo2, X,
+  type LucideIcon,
 } from "lucide-react";
 
 /**
@@ -42,6 +43,13 @@ const ICONS = {
   copy: Copy,
   trash: Trash2,
   external: ExternalLink,
+  // the six story topics of The Olfia Edit (11/17), see components/edit/TopicTag.tsx
+  drama: Drama,
+  scroll: Scroll,
+  flask: FlaskConical,
+  pencilRuler: PencilRuler,
+  mapPin: MapPin,
+  flame: Flame,
 } satisfies Record<string, LucideIcon>;
 
 export type IconName = keyof typeof ICONS;
