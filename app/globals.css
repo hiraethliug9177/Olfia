@@ -226,11 +226,22 @@ textarea.input { padding: 14px 16px; min-height: 96px; resize: vertical; }
 }
 
 /* ---------- footer ---------- */
-/* 11/17: Tiffany's own halftone image behind the footer (replaces the 11/10 sky and hills), with the links on a paper panel */
-.ft { position: relative; padding: 104px 0 52px; background: var(--ink) url(/assets/footer/halftone.webp) center top / cover no-repeat; }
+/* 11/17: Tiffany's own halftone image behind the footer (replaces the 11/10 sky and hills), with the links on a paper panel.
+   Its top 196px dissolves into the page in halftone dots (dissolve.png: dots grow from nothing to solid), so the page
+   background shows through and the image appears dot by dot instead of at a hard edge. */
+.ft { position: relative; isolation: isolate; padding: 150px 0 52px; }
+.ft::before {
+  content: ""; position: absolute; inset: 0; z-index: -1;
+  background: var(--ink) url(/assets/footer/halftone.webp) center top / cover no-repeat;
+  -webkit-mask: url(/assets/footer/dissolve.png) left top / 336px 196px repeat-x, linear-gradient(#000, #000) left 196px / 100% 100% no-repeat;
+  mask: url(/assets/footer/dissolve.png) left top / 336px 196px repeat-x, linear-gradient(#000, #000) left 196px / 100% 100% no-repeat;
+}
 /* 11/17: the panel spans the page width and is shorter, with smaller type (Tiffany) */
 .ft__panel { max-width: none; margin: 0 auto; border-radius: 26px; background: rgba(248,246,240,0.95); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); box-shadow: 0 18px 44px rgba(41,42,49,0.16); padding: 0 32px; }
-@media (max-width: 640px) { .ft { padding: 64px 0 36px; } .ft__panel { padding: 0 20px; border-radius: 22px; } }
+@media (max-width: 640px) {
+  .ft { padding: 96px 0 36px; } .ft__panel { padding: 0 20px; border-radius: 22px; }
+  .ft::before { -webkit-mask-size: 240px 140px, 100% 100%; mask-size: 240px 140px, 100% 100%; -webkit-mask-position: left top, left 140px; mask-position: left top, left 140px; }
+}
 .ft a { color: var(--ink); text-decoration: none; }
 .ft a:hover { color: var(--deep); text-decoration: underline; }
 .ft__grid { display: flex; flex-wrap: wrap; gap: 18px 40px; padding-top: 24px; padding-bottom: 14px; }
