@@ -66,6 +66,8 @@ export function RoomEditor() {
   const [selected, setSelected] = useState<string | null>(null);
   const [snap, setSnap] = useState(true);
   const [tray, setTray] = useState(0);
+  /** Phones: the tray is a drawer under the room (11/17). Closed it shows only its tabs. */
+  const [drawer, setDrawer] = useState(false);
   const [past, setPast] = useState<PlacedItem[][]>([]);
   const [future, setFuture] = useState<PlacedItem[][]>([]);
   const [loadedFor, setLoadedFor] = useState<string | null>(null);
@@ -153,6 +155,8 @@ export function RoomEditor() {
     const it: PlacedItem = { uid: uid(), kind, x: pos.x, y: pos.y, scale: 1, rot: def.category === "material" ? Math.round(jitter * 60) : 0, flip: 1, z: topZ() + 1 };
     commit([...items, it]);
     setSelected(it.uid);
+    // on a phone, close the drawer so the new piece can be dragged into place
+    if (typeof window !== "undefined" && window.matchMedia("(max-width: 700px)").matches) setDrawer(false);
   };
 
   const toggleFamily = (f: FamilyId) => {
@@ -256,13 +260,17 @@ export function RoomEditor() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
       <section id="editor" aria-label="Room editor" className="editor anchor">
-        <div className="card editor__tray" style={{ padding: 18, display: "flex", flexDirection: "column", gap: 14 }}>
+        <div className={`card editor__tray${drawer ? " is-open" : ""}`}>
+          <button type="button" className="editor__handle" aria-expanded={drawer} aria-label={drawer ? "Close the drawer" : "Open the drawer"} onClick={() => setDrawer((v) => !v)}>
+            <span aria-hidden="true" />
+          </button>
           <div role="tablist" aria-label="Items" className="seg">
             <span className="seg__thumb" aria-hidden="true" style={{ left: `calc(5px + (100% - 10px) * ${tray / 3})`, width: "calc((100% - 10px) / 3)" }} />
             {TRAY.map((t, j) => (
-              <button key={t} type="button" role="tab" aria-selected={tray === j} className="seg__opt" style={{ fontSize: 13, padding: 0, letterSpacing: "-0.02em" }} onClick={() => setTray(j)}>{t}</button>
+              <button key={t} type="button" role="tab" aria-selected={tray === j} className="seg__opt" style={{ fontSize: 13, padding: 0, letterSpacing: "-0.02em" }} onClick={() => { setTray(j); setDrawer(true); }}>{t}</button>
             ))}
           </div>
+          <div className="editor__tray-body">
           {(() => {
             const btn = (it: (typeof trayItems)[number]) => (
               <button key={it.id} type="button" className="tray-item" onClick={() => addItem(it.id)} aria-label={`Add ${it.label}`}>
@@ -297,6 +305,7 @@ export function RoomEditor() {
             );
           })()}
           <span className="muted" style={{ fontSize: 15 }}>Tap to add, then drag it into place.</span>
+          </div>
         </div>
 
         <div className="editor__stage">

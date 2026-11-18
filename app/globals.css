@@ -390,7 +390,22 @@ section[id] { scroll-margin-top: 24px; }
 /* ---------- rooms editor ---------- */
 .strip { display: flex; gap: 16px; overflow-x: auto; padding: 4px 2px 16px; }
 .editor { display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start; }
-.editor__tray { flex: 1 1 230px; max-width: 280px; min-width: 220px; }
+.editor__tray { flex: 1 1 230px; max-width: 280px; min-width: 220px; padding: 18px; display: flex; flex-direction: column; gap: 14px; }
+.editor__tray-body { display: flex; flex-direction: column; gap: 14px; }
+.editor__handle { display: none; }
+/* Phones (11/17): the room comes first; furniture, scent and materials sit in a drawer pinned to the bottom of
+   the screen while the editor is in view. Closed it shows only its tabs; a tab or the handle opens it. */
+@media (max-width: 700px) {
+  .editor__stage { order: -1; }
+  .editor__tray { order: 2; flex-basis: 100%; max-width: none; min-width: 0; position: sticky; bottom: 0; z-index: 30;
+    padding: 4px 14px calc(12px + env(safe-area-inset-bottom)); gap: 10px; border-radius: 22px 22px 0 0;
+    box-shadow: 0 -12px 30px rgba(41,42,49,0.16); }
+  .editor__handle { display: flex; align-self: center; justify-content: center; align-items: center; width: 64px; height: 24px; padding: 0; border: 0; background: none; }
+  .editor__handle span { width: 40px; height: 4px; border-radius: 999px; background: rgba(41,42,49,0.28); }
+  .editor__tray:not(.is-open) .editor__tray-body { display: none; }
+  .editor__tray-body { max-height: 52vh; overflow-y: auto; overscroll-behavior: contain; }
+  .editor__tray .tray-groups { max-height: none; overflow: visible; }
+}
 .editor__stage { flex: 3 1 480px; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
 .editor__panel { flex: 1 1 280px; max-width: 340px; min-width: 260px; display: flex; flex-direction: column; gap: 22px; }
 .tool { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border: 0; border-radius: 12px; background: #fff; color: var(--ink); box-shadow: 0 2px 6px rgba(41,42,49,0.12); }
