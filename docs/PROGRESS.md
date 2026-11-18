@@ -54,3 +54,9 @@ Done 11/10 ~6:45 pm PT: all seven items are live on olfia-nine.vercel.app (main 
 ## 11/17
 
 - [x] Footer: Tiffany's halftone image as the background; "Entries are saved in this browser only." removed; Privacy in the bottom row beside © 2026 Olfia; the found-us menu in the same row as the email field (stacked on phones)
+- [x] Footer panel full width, shorter, smaller type
+- [x] Review 1: made-up read counts removed; Editor's picks (Tiffany to choose the three)
+- [x] Review 2: site icon, share picture, story covers as share pictures; [ ] quiz result picture (needs a link per result)
+- [x] Review 3: all 31 product links go to the product's own page
+- [x] Review 4: Rooms on phones: room first, tray as a bottom drawer
+- [ ] Review 7 Picks and 8 Gifts (before 11/26), then 9 (story share, sign-up, related); 5, 11–14 wait for Tiffany's decisions and words
