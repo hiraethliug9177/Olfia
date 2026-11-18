@@ -3,6 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ARTICLES, articleBySlug, articleDate, relatedTo } from "@/lib/edit";
 import { familyById } from "@/lib/catalog";
+import { FAMILY_WASH } from "@/lib/colors";
+import type { FamilyId } from "@/lib/types";
 import { ArticleCover } from "@/components/edit/ArticleCover";
 import { ArticleCard } from "@/components/edit/ArticleCard";
 import { TopicTag } from "@/components/edit/TopicTag";
@@ -13,7 +15,6 @@ import { ProductLink } from "@/components/products/ProductLink";
 import { SITE_URL, shareImageFor } from "@/lib/share";
 import { ShareRow } from "@/components/edit/ShareRow";
 import { StoryRelated } from "@/components/edit/StoryRelated";
-import { SignupForm } from "@/components/SignupForm";
 
 export function generateStaticParams() {
   return ARTICLES.map((a) => ({ slug: a.slug }));
@@ -32,6 +33,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   };
 }
 
+/** The Try This card takes the colour of the story's scent: its families' washes, blended the way a scene's glow is. */
+function scentWash(families: FamilyId[]): string {
+  const washes = families.map((id) => FAMILY_WASH[id]);
+  return washes.length > 1 ? `linear-gradient(135deg, ${washes.join(", ")})` : washes[0];
+}
+
 export default async function ArticlePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const a = articleBySlug(slug);
@@ -40,83 +47,85 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
   const pinImage = shareImageFor(a.image)[0].url;
   return (
     <div className="wrap page">
+      {/* 11/18 (Tiffany): on a computer the story sits in the middle, Recreate This at Home on the left and Try This
+          on the right, all in one page scroll. On narrower screens they stack: story, Try This, the rest, Recreate. */}
       <article className="article">
-        <Link href="/edit" className="article__back"><Icon name="arrowLeft" size={18} />The Olfia Edit</Link>
-        <div className="article__meta">
-          <TopicTag topic={a.topic} label={a.kicker} />
-          <span>{articleDate(a.date)} · {a.readTime}</span>
+        <header className="article__head">
+          <Link href="/edit" className="article__back"><Icon name="arrowLeft" size={18} />The Olfia Edit</Link>
+          <div className="article__meta">
+            <TopicTag topic={a.topic} label={a.kicker} />
+            <span>{articleDate(a.date)} · {a.readTime}</span>
+          </div>
+          <h1 className="h-page article__title">{a.title}</h1>
+          <p className="lead article__dek">{a.dek}</p>
+        </header>
+
+        <div className="article__body">
+          <figure className="article__figure">
+            <ArticleCover a={a} ratio="16 / 9" eager />
+            {a.image ? (
+              <figcaption>
+                {a.image.alt}. {a.image.creditHref ? <a href={a.image.creditHref} target="_blank" rel="noopener noreferrer">{a.image.credit}</a> : a.image.credit}.
+              </figcaption>
+            ) : null}
+          </figure>
+
+          <div className="prose">
+            {a.blocks.map((b, i) => (b.t === "h" ? <h2 key={i}><Rich text={b.text} /></h2> : <p key={i}><Rich text={b.text} /></p>))}
+          </div>
         </div>
-        <h1 className="h-page article__title" style={{ margin: "16px 0" }}>{a.title}</h1>
-        <p className="lead article__dek" style={{ maxWidth: "none" }}>{a.dek}</p>
 
-        <figure className="article__figure">
-          <ArticleCover a={a} ratio="16 / 9" eager />
-          {a.image ? (
-            <figcaption>
-              {a.image.alt}. {a.image.creditHref ? <a href={a.image.creditHref} target="_blank" rel="noopener noreferrer">{a.image.credit}</a> : a.image.credit}.
-            </figcaption>
-          ) : null}
-        </figure>
-
-        <div className="prose">
-          {a.blocks.map((b, i) => (b.t === "h" ? <h2 key={i}><Rich text={b.text} /></h2> : <p key={i}><Rich text={b.text} /></p>))}
-        </div>
-
-        <aside id="try" className="article__try anchor">
-          <span className="hand" style={{ fontSize: 26, color: "var(--deep)" }}>try this</span>
-          <h2>{a.tryThis.title}</h2>
-          {a.tryThis.paras.map((p, i) => <p key={i}><Rich text={p} /></p>)}
-          <Link href={`/rooms?family=${a.families.join(",")}`} className="btn btn--primary" style={{ alignSelf: "flex-start", marginTop: 6 }}>
-            Build this room in {a.families.map((f) => familyById(f).label).join(" + ")}
-          </Link>
+        <aside id="try" className="story-side article__try anchor" aria-labelledby="try-h">
+          <h2 id="try-h" className="story-side__h">Try This</h2>
+          <div className="story-card" style={{ background: scentWash(a.families) }}>
+            <h3 className="story-card__head">{a.tryThis.title}</h3>
+            {a.tryThis.paras.map((p, i) => <p key={i}><Rich text={p} /></p>)}
+            <Link href={`/rooms?family=${a.families.join(",")}`} className="btn btn--primary btn--sm story-card__btn">
+              Build this room in {a.families.map((f) => familyById(f).label).join(" + ")}
+            </Link>
+          </div>
         </aside>
 
-        <section className="article__object">
-          {a.objectImage ? <ObjectPhoto image={a.objectImage} /> : null}
-          <div style={{ display: "flex", flexDirection: "column", gap: 12, flex: "1 1 300px", minWidth: 0 }}>
-            <span className="edit-card__meta">The take-home edit</span>
-            <h2 style={{ fontSize: 30 }}><Rich text={a.object.name} /></h2>
-            {a.takeHome.paras.map((p, i) => <p key={i}><Rich text={p} /></p>)}
-            {a.object.notes ? <p className="muted" style={{ fontSize: 15 }}>{a.object.notes}</p> : null}
-            {a.object.meta ? <p style={{ fontSize: 15, fontWeight: 600 }}>{a.object.meta}</p> : null}
-            {a.object.href ? (
-              <ProductLink href={a.object.href} product={{ id: `edit-${a.slug}`, family: a.families[0] }} place="edit" className="btn btn--ghost" style={{ alignSelf: "flex-start" }}>
-                {a.object.cta ?? "Discover it"}<Icon name="external" size={18} />
-              </ProductLink>
-            ) : null}
-          </div>
-        </section>
+        <div className="article__end">
+          <section className="article__object">
+            {a.objectImage ? <ObjectPhoto image={a.objectImage} /> : null}
+            <div style={{ display: "flex", flexDirection: "column", gap: 12, flex: "1 1 300px", minWidth: 0 }}>
+              <span className="edit-card__meta">The take-home edit</span>
+              <h2 style={{ fontSize: 30 }}><Rich text={a.object.name} /></h2>
+              {a.takeHome.paras.map((p, i) => <p key={i}><Rich text={p} /></p>)}
+              {a.object.notes ? <p className="muted" style={{ fontSize: 15 }}>{a.object.notes}</p> : null}
+              {a.object.meta ? <p style={{ fontSize: 15, fontWeight: 600 }}>{a.object.meta}</p> : null}
+              {a.object.href ? (
+                <ProductLink href={a.object.href} product={{ id: `edit-${a.slug}`, family: a.families[0] }} place="edit" className="btn btn--ghost" style={{ alignSelf: "flex-start" }}>
+                  {a.object.cta ?? "Discover it"}<Icon name="external" size={18} />
+                </ProductLink>
+              ) : null}
+            </div>
+          </section>
 
-        <section className="article__refs">
-          <h2>References</h2>
-          <ol>
-            {a.references.map((r, i) => (
-              <li key={i}>
-                <Rich text={r.before} />{r.before && r.label ? " " : null}
-                {r.label && r.href ? <a href={r.href} target="_blank" rel="noopener noreferrer">{r.label}</a> : r.label ?? null}
-                {r.after ? <Rich text={r.after} /> : null}
-              </li>
-            ))}
-          </ol>
-        </section>
+          <section className="article__refs">
+            <h2>References</h2>
+            <ol>
+              {a.references.map((r, i) => (
+                <li key={i}>
+                  <Rich text={r.before} />{r.before && r.label ? " " : null}
+                  {r.label && r.href ? <a href={r.href} target="_blank" rel="noopener noreferrer">{r.label}</a> : r.label ?? null}
+                  {r.after ? <Rich text={r.after} /> : null}
+                </li>
+              ))}
+            </ol>
+          </section>
 
-        <ShareRow
-          url={`${SITE_URL}/edit/${a.slug}`}
-          title={a.title}
-          image={pinImage.startsWith("/") ? `${SITE_URL}${pinImage}` : pinImage}
-          slug={a.slug}
-        />
-      </article>
-
-      <StoryRelated families={a.families} />
-
-      <section className="story-signup" aria-label="Email sign-up">
-        <div className="story-signup__brand">
-          <span className="story-signup__mark">Olfia</span>
-          <span className="muted">For the rooms you live in, and the ones you imagine.</span>
+          <ShareRow
+            url={`${SITE_URL}/edit/${a.slug}`}
+            title={a.title}
+            image={pinImage.startsWith("/") ? `${SITE_URL}${pinImage}` : pinImage}
+            slug={a.slug}
+          />
         </div>
-        <SignupForm place="story" />
-      </section>
+
+        <StoryRelated families={a.families} />
+      </article>
 
       <section style={{ marginTop: 72 }}>
         <h2 className="h-section" style={{ marginBottom: 28 }}>Keep reading</h2>

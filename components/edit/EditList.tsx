@@ -53,10 +53,8 @@ export function EditList() {
           </div>
         </div>
 
+        {/* 11/18 (Tiffany): no "Latest" heading; the id stays for the menu's "Latest stories" link */}
         <section id="latest" aria-label="Stories">
-          <div className="np-head">
-            <h2 className="np-h">Latest</h2>
-          </div>
           {lead ? (
             <div className="np-stories">
               <ArticleCard a={lead} variant="lead" />

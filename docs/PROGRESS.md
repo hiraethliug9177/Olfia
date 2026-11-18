@@ -64,9 +64,11 @@ Done 11/10 ~6:45 pm PT: all seven items are live on olfia-nine.vercel.app (main 
 - [x] The Edit: "Editor’s Picks" and "In Season" in title case, two stories each; on story pages the tag, date and read time share one line above the title
 - [x] Review 7: Picks page (/picks), filters by family, room and price
 - [x] Review 8: Gifts (/gifts) by scent family, three price tiers (Tiffany chose families over characters)
-- [x] Review 9: story share row, "Recreate this at home" (families + three products), sign-up box, related "Keep reading"
+- [x] Review 9: story share row, "Recreate this at home" (families + three products), sign-up box (removed 11/18), related "Keep reading"
 - [x] Price tiers checked on the brand sites (11/17); Diptyque and Yankee Candle tiers corrected, Westin address and Vitruvi item fixed; Gifts re-picked
 - [x] Picks folded into Gifts ("All gifts"); /picks forwards there
 - [x] Sign-up line and Gifts line written (Tiffany: "你写就行")
-- [ ] Publish the 11/17 late-night changes when Tiffany says "发布" (on the v3-design preview)
+- [x] Story pages in three columns on a computer: Recreate This at Home, the story, Try This (same card design); one page scroll; story sign-up box removed (11/18)
+- [x] The Edit: the line on the date's row on a Mist ground; "Latest" heading removed (11/18)
+- [ ] Publish the 11/17 late-night and 11/18 changes when Tiffany says "发布" (on the v3-design preview)
 - [ ] 11–14 wait for Tiffany's decisions and words

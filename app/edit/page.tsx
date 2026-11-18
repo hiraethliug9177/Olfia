@@ -21,9 +21,12 @@ export default function EditPage() {
   return (
     <div className="wrap page">
       <header className="np-mast">
-        <span className="np-mast__date">{newest ? dateline(newest.date) : ""}</span>
+        {/* 11/18 (Tiffany): the line sits on the date's row */}
+        <div className="np-mast__line">
+          {newest ? <span className="np-mast__date">{dateline(newest.date)}</span> : null}
+          <span className="np-mast__tag">Culture, fragrance,<br className="np-mast__br" /> and the art of living.</span>
+        </div>
         <h1 className="np-mast__title">The Olfia Edit</h1>
-        <span className="np-mast__tag">Culture, fragrance, and the art of living.</span>
       </header>
 
       <LibraryBlock />
