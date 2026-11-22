@@ -83,5 +83,7 @@ Done 11/10 ~6:45 pm PT: all seven items are live on olfia-nine.vercel.app (main 
 - [x] Rooms: the room choice moved below the name as a setting like Time of day (11/18)
 - [x] Home, Seven scent families: "Turn the dial." only, dial turns every 5 s with the card, bold name, full-width line, larger materials without labels (11/18)
 - [x] Demo copy has every 11/18 change (`787b68f`, at her request during class)
+- [x] Published to www.olfia.studio (11/21, `d828eed`)
+- [ ] Olfia User Guide (Claude Docs) still describes the 11/10 site: update for the presentation draft (11/24)
 - [ ] Publish the 11/17 late-night and 11/18 changes when Tiffany says "发布" (on the v3-design preview)
 - [ ] 11–14 wait for Tiffany's decisions and words
