@@ -21,7 +21,7 @@ export function StoryRelated({ families }: { families: FamilyId[] }) {
           const f = familyById(id);
           const lib = storyFor(id);
           return (
-            <Link key={id} href={`/library#${id}`} className="story-card story-fam" style={{ background: FAMILY_WASH[id] }}>
+            <Link key={id} href={`/scentpedia#${id}`} className="story-card story-fam" style={{ background: FAMILY_WASH[id] }}>
               <span className="story-card__head">
                 <span className="chip__dot" style={{ background: f.hex }} aria-hidden="true" />
                 {f.label}

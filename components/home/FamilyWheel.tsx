@@ -134,7 +134,7 @@ export function FamilyWheel() {
           <p className="muted" style={{ fontSize: 15 }}>Sits next to {prev.label} and {next.label}; neighbours layer well.</p>
           <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "12px 24px" }}>
             <Link href={`/rooms?family=${sel.id}`} className="btn btn--primary"><span className="chip__dot" style={{ background: sel.hex, boxShadow: "0 0 0 2px #fff" }} aria-hidden="true" />Try {sel.label} in a room</Link>
-            <Link href={`/library#${sel.id}`} className="hero__link">Read more</Link>
+            <Link href={`/scentpedia#${sel.id}`} className="hero__link">Read more</Link>
           </div>
         </div>
       </div>

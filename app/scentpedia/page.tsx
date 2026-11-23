@@ -4,19 +4,24 @@ import { FAMILIES, texture } from "@/lib/catalog";
 import { LIBRARY_INTRO, storyFor } from "@/lib/library";
 import { FAMILY_FILL, FAMILY_WASH } from "@/lib/colors";
 import { Story } from "@/components/library/Story";
-import { Icon } from "@/components/ui/Icon";
+import { QuizInvite } from "@/components/home/QuizInvite";
 
-export const metadata: Metadata = { title: "Scent Library" };
+export const metadata: Metadata = { title: "Scentpedia" };
 
-/** Scent Library (part of The Olfia Edit since 11/10): seven families, each with Tiffany's little story. */
+/**
+ * Scentpedia (v2, 11/23; the Scent Library until then, /library forwards here): the quiz module on top (an invitation,
+ * or your result), then the seven families, each with Tiffany's little story (her Notion: "quiz在上family在下").
+ */
 export default function LibraryPage() {
   return (
     <div className="wrap page">
-      <Link href="/edit" className="article__back"><Icon name="arrowLeft" size={18} />The Olfia Edit</Link>
-      <div className="split-head" style={{ marginTop: 20 }}>
-        <h1 className="h-page">Scent Library</h1>
+      <div className="split-head">
+        <h1 className="h-page">Scentpedia</h1>
         <p className="lead">{LIBRARY_INTRO}</p>
       </div>
+      <section id="quiz" aria-label="Scent quiz" style={{ marginBottom: 48 }}>
+        <QuizInvite />
+      </section>
       <nav aria-label="Families" className="lib-jump">
         {FAMILIES.map((f) => (
           <a key={f.id} href={`#${f.id}`} className="lib-fam">

@@ -13,7 +13,8 @@ import { track } from "@/lib/analytics";
  */
 const KIT_FORM = "https://app.kit.com/forms/10196062/subscriptions";
 
-export function SignupForm({ place }: { place: string }) {
+/** `heading={false}` leaves out the line above the email box, where a window has its own title (Olfia Plus, 11/23). */
+export function SignupForm({ place, heading = true }: { place: string; heading?: boolean }) {
   const s = strings.signup;
   const [email, setEmail] = useState("");
   const [found, setFound] = useState("");
@@ -44,7 +45,7 @@ export function SignupForm({ place }: { place: string }) {
 
   return (
     <form className="signup" onSubmit={submit}>
-      {s.heading ? <p className="signup__heading">{s.heading}</p> : null}
+      {heading && s.heading ? <p className="signup__heading">{s.heading}</p> : null}
       <div className="signup__row">
         <input
           className="input"

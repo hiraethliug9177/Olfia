@@ -18,10 +18,10 @@
   - tags, and your scents at a glance;
   - **My shelf**, where you add the products you love by link or photo.
 - **Scent Card.** Turn any room or captured moment into a card to share. There are three templates (Film, Instant, Postcard) and two sizes (9:16 and 3:4). Export is a 1080 px PNG.
-- **The Olfia Edit.** Stories about scent, culture, history and places. The **Scent Library** explains the seven scent families.
+- **The Olfia Edit.** Stories about scent, culture, history and places. **Scentpedia** explains the seven scent families and holds the scent quiz.
 - **My Account.** Your profile, preferences, quiz result and settings.
 
-A first visit opens with sample pages, so every view has something to show. They stay in that browser only and can be cleared in My Account → Settings.
+A first visit starts clean. "See a sample" in the Scent Atlas, or any address with `?sample=on`, loads sample pages; they stay in that browser only and can be cleared in My Page → Settings.
 
 ## How it is built
 
@@ -45,7 +45,7 @@ Node 22.
 
 | Folder | What is in it |
 |---|---|
-| `app/` | The pages: Home, Capture, Rooms, Scent Atlas, Scent Card, The Olfia Edit, Scent Library, quiz, My Account, About, Privacy |
+| `app/` | The pages: Home (with About Olfia), Capture, Rooms, Scent Atlas, Scent Card, The Olfia Edit, Gifts, Scentpedia, quiz, My Page, Privacy |
 | `components/` | The parts of each page; `scene/` holds the collage engine shared by Rooms, Capture and the Scent Card |
 | `lib/` | Data and logic: scent families, materials and furniture (`catalog.ts`), products, quiz, articles, room presets, sample pages |
 | `public/assets/` | Furniture and material cut-outs, textures, quiz characters, article images, footer artwork |

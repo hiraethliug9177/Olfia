@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, type FocusEvent, type KeyboardEvent, type MouseEvent } from "react";
 import { useRehydrateAtlas } from "@/lib/store";
 import { loadSample } from "@/lib/demo";
+import { needsSignIn, useOverlays } from "@/lib/mockAuth";
 import { track } from "@/lib/analytics";
 import { useToast } from "@/lib/toast";
 import { strings } from "@/lib/strings";
@@ -12,70 +13,56 @@ import { SignupForm } from "@/components/SignupForm";
 import { Icon, MenuMorph } from "@/components/ui/Icon";
 
 const isActive = (path: string, href: string) => (href === "/" ? path === "/" : path === href || path.startsWith(`${href}/`));
+const pathOf = (href: string) => href.split(/[?#]/)[0];
 
-/** narrow: shown only where the header has no room for the "Make a Scent Card" button (≤1220px since the Gifts tab, not phones). */
-type Sub = { href: string; label: string; dot: string; narrow?: boolean };
-type NavItem = { href: string; label: string; icon?: "home" | "user"; sub: Sub[] };
+type Sub = { href: string; label: string };
+/** `match`: the pages that mark this entry as the current one. `note`: an optional line at the top of its menu. */
+type NavItem = { href: string; label: string; match: string[]; note?: string; sub: Sub[] };
 
 /**
- * Main navigation (Tiffany 11/10): the house icon stands for Home again, My Page sits in the
- * middle row, and every tab opens a small menu of the sections on that page when hovered or focused.
- * 11/18 (Tiffany): menus trimmed to what is worth a click. Capture lost "Make a Scent Card" (the button on the
- * right does that), which left it one entry pointing at itself, so Capture has no menu where that button shows; where
- * the button has no room (≤1220px) the entry stays, and phones get the button at the foot of their menu. Rooms lost "Your rooms" and
- * "Room presets"; The Edit lost "Latest stories", "Editor's Picks" and "Browse by topic"; My Account is renamed
- * My Page and lost "Preferences" and "Personal info".
- * 11/18 (Tiffany): Gifts has its own tab, after Scent Atlas, with For me and For someone; it left The Edit's menu.
+ * Main navigation, v2 (Tiffany's Notion "Capstone Draft", 11/23): the Olfia wordmark is the way home (the house
+ * icon is gone), five entries, and one account icon on the right. Each entry opens its first page; its menu opens
+ * on hover or keyboard focus. The Edit has no menu. The "Make a Scent Card" button left the header: Scent cards
+ * sits in the Capture menu. The one menu line so far is hers ("Your personal archive of scent."); the others wait
+ * for her words, so they are left out rather than drafted.
+ * Old menus (11/10–11/21) are in git history.
  */
-const NAV: NavItem[] = [
-  {
-    href: "/", label: "Home", icon: "home", sub: [
-      { href: "/#quiz", label: "Scent quiz", dot: "#E7B49F" },
-      { href: "/#families", label: "Seven scent families", dot: "#A0A6C8" },
-      { href: "/#edit", label: "The Olfia Edit", dot: "#E7B49F" },
-      { href: "/#gifts", label: "Gifts", dot: "#A0A6C8" },
-      { href: "/#presets", label: "Room presets", dot: "#4C527A" },
-    ],
-  },
-  {
-    href: "/capture", label: "Capture", sub: [
-      { href: "/card", label: "Make a Scent Card", dot: "#4C527A", narrow: true },
-    ],
-  },
-  {
-    href: "/rooms", label: "Rooms", sub: [
-      { href: "/rooms#editor", label: "Room editor", dot: "#E7B49F" },
-      { href: "/rooms#products", label: "Matches this room", dot: "#A0A6C8" },
-    ],
-  },
-  {
-    href: "/atlas", label: "Scent Atlas", sub: [
-      { href: "/atlas?tab=calendar", label: "Calendar", dot: "#E7B49F" },
-      { href: "/atlas?tab=favorites", label: "Favorites", dot: "#A0A6C8" },
-      { href: "/atlas?tab=tags", label: "Tags & profile", dot: "#4C527A" },
-      { href: "/atlas?tab=shelf", label: "My shelf", dot: "#E7B49F" },
-    ],
-  },
-  {
-    href: "/gifts", label: "Gifts", sub: [
-      { href: "/gifts?for=me", label: "For me", dot: "#A0A6C8" },
-      { href: "/gifts?for=someone", label: "For someone", dot: "#E7B49F" },
-    ],
-  },
-  {
-    href: "/edit", label: "The Edit", sub: [
-      { href: "/library", label: "Scent Library", dot: "#4C527A" },
-    ],
-  },
-  {
-    href: "/account", label: "My Page", icon: "user", sub: [
-      { href: "/account#profile", label: "Your profile", dot: "#E7B49F" },
-      { href: "/account#settings", label: "Settings", dot: "#A0A6C8" },
-      { href: "/account#quiz", label: "Quiz result", dot: "#4C527A" },
-      { href: "/about", label: "About Olfia", dot: "#E7B49F" },
-    ],
-  },
+export const NAV: NavItem[] = [
+  { href: "/capture", label: "Capture", match: ["/capture", "/card"], sub: [
+    { href: "/capture", label: "Record a scent" },
+    { href: "/card", label: "Scent cards" },
+  ] },
+  { href: "/rooms", label: "Rooms", match: ["/rooms"], sub: [
+    { href: "/rooms#editor", label: "Create an atmosphere" },
+    { href: "/rooms#products", label: "Fragrance matches" },
+  ] },
+  { href: "/atlas?tab=shelf", label: "Scent Atlas", match: ["/atlas"], note: "Your personal archive of scent.", sub: [
+    { href: "/atlas?tab=shelf", label: "Fragrance shelf" },
+    { href: "/atlas?tab=calendar", label: "Scent journals" },
+  ] },
+  { href: "/gifts", label: "Discover", match: ["/gifts", "/scentpedia"], sub: [
+    { href: "/gifts", label: "Olfia · Gifts" },
+    { href: "/scentpedia", label: "Scentpedia" },
+  ] },
+  { href: "/edit", label: "The Edit", match: ["/edit"], sub: [] },
 ];
+
+/** The account icon (Lucide CircleUserRound). Saved joins its menu once it exists. */
+export const ACCOUNT: NavItem = { href: "/account", label: "My Page", match: ["/account"], sub: [
+  { href: "/account#profile", label: "Account" },
+  { href: "/account#settings", label: "Settings" },
+] };
+
+/**
+ * Q17 (Tiffany 11/23): while the sample content is loaded and nobody has signed in, the way into My Page opens the
+ * mock sign-in first, then goes on to the page asked for. Otherwise the links work as usual.
+ */
+function guardAccount(e: MouseEvent<HTMLAnchorElement>, href: string): boolean {
+  if (!href.startsWith("/account") || !needsSignIn()) return false;
+  e.preventDefault();
+  useOverlays.getState().openSignIn({ kind: "go", href });
+  return true;
+}
 
 /** Pages that are mostly white work surfaces get a quieter backdrop. */
 const SOFT = ["/capture", "/rooms", "/card", "/atlas"];
@@ -92,13 +79,53 @@ export function Backdrop() {
   );
 }
 
+/**
+ * One header entry. Its menu opens on hover or keyboard focus (CSS). Esc closes it and leaves focus on the entry;
+ * it opens again once focus or the pointer leaves the entry and comes back.
+ */
+function Entry({ n, cur, here, icon }: { n: NavItem; cur: boolean; here: (s: Sub) => boolean; icon?: boolean }) {
+  const go = (href: string) => (e: MouseEvent<HTMLAnchorElement>) => { guardAccount(e, href); };
+  const [shut, setShut] = useState(false);
+  const link = useRef<HTMLAnchorElement>(null);
+  const onKey = (e: KeyboardEvent<HTMLLIElement>) => {
+    if (e.key !== "Escape" || !n.sub.length) return;
+    setShut(true);
+    link.current?.focus();
+  };
+  const onBlur = (e: FocusEvent<HTMLLIElement>) => {
+    if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setShut(false);
+  };
+  return (
+    <li className="hd__item" data-shut={shut || undefined} onKeyDown={onKey} onBlur={onBlur} onMouseLeave={() => setShut(false)}>
+      <Link ref={link} href={n.href} onClick={go(n.href)} className={`hd__link${icon ? " hd__link--icon" : ""}`} aria-current={cur ? "page" : undefined} aria-label={icon ? n.label : undefined}>
+        {icon ? <Icon name="user" size={24} /> : n.label}
+      </Link>
+      {n.sub.length ? (
+        <div className={`hd__sub${icon ? " hd__sub--end" : ""}`}>
+          {n.note ? <p className="hd__note">{n.note}</p> : null}
+          <ul aria-label={`${n.label} pages`}>
+            {n.sub.map((s) => (
+              <li key={s.href}>
+                <Link href={s.href} onClick={go(s.href)} aria-current={here(s) ? "page" : undefined}>{s.label}</Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+    </li>
+  );
+}
+
 export function Header() {
   const path = usePathname() ?? "/";
   const [open, setOpen] = useState(false);
+  const [compact, setCompact] = useState(false);
+  const [search, setSearch] = useState("");
+  const burger = useRef<HTMLButtonElement>(null);
   useRehydrateAtlas();
   const showToast = useToast((s) => s.show);
   // ?sample=on loads the sample pages (the professor's link, lib/demo.ts); first visits otherwise start clean.
-  // The class demo copy (11/18: the `demo` branch, built with NEXT_PUBLIC_DEMO=on) opens with them already in.
+  // The 11/18 class demo copy (the `demo` branch, built with NEXT_PUBLIC_DEMO=on) opens with them already in.
   useEffect(() => {
     try {
       const url = new URL(window.location.href);
@@ -118,104 +145,105 @@ export function Header() {
       // storage blocked: nothing to load
     }
   }, [showToast]);
-  useEffect(() => setOpen(false), [path]);
-  // the Scent Library is part of The Edit since 11/10
-  const cur = (href: string) => (isActive(path, href) || (href === "/edit" && isActive(path, "/library")) ? "page" : undefined);
+  useEffect(() => { setOpen(false); setSearch(window.location.search); }, [path]);
+  // v2 (11/23): the header stays at the top and gets shorter once the page moves (72px → 56px, a hairline under it)
+  useEffect(() => {
+    const onScroll = () => setCompact(window.scrollY > 24);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+  // the phone menu covers the page: the page does not scroll under it, and Esc closes it
+  useEffect(() => {
+    if (!open) return;
+    const root = document.documentElement;
+    const prev = root.style.overflow;
+    root.style.overflow = "hidden";
+    const onKey = (e: globalThis.KeyboardEvent) => {
+      if (e.key === "Escape") { setOpen(false); burger.current?.focus(); }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => { root.style.overflow = prev; window.removeEventListener("keydown", onKey); };
+  }, [open]);
+
+  const cur = (n: NavItem) => n.match.some((m) => isActive(path, m));
+  const here = (s: Sub) => {
+    if (path !== pathOf(s.href)) return false;
+    const q = s.href.includes("?") ? s.href.slice(s.href.indexOf("?")).split("#")[0] : "";
+    return q ? search.includes(q.slice(1)) : !s.href.includes("#");
+  };
 
   return (
-    <header className="hd">
+    <header className={`hd${compact ? " hd--compact" : ""}${open ? " hd--open" : ""}`}>
       <div className="wrap hd__row">
         <Link href="/" className="hd__logo" aria-label="Olfia, home">Olfia</Link>
 
         <nav aria-label="Main" className="hd__full">
           <ul className="glass-pill hd__list">
-            {NAV.map((n) => (
-              <li key={n.href} className="hd__item">
-                <Link
-                  href={n.href}
-                  className={`hd__link${n.icon === "home" ? " hd__link--icon" : ""}`}
-                  aria-current={cur(n.href)}
-                  aria-label={n.icon === "home" ? "Home" : undefined}
-                >
-                  {n.icon === "home" ? <Icon name="home" size={24} /> : null}
-                  {n.icon === "user" ? <Icon name="user" size={24} /> : null}
-                  {n.icon === "home" ? null : n.label}
-                </Link>
-                {n.sub.length ? (
-                  <ul className={`hd__sub${n.sub.every((s) => s.narrow) ? " hd__sub--narrow" : ""}`} aria-label={`${n.label} sections`}>
-                    {n.sub.map((s) => (
-                      <li key={s.href + s.label} className={s.narrow ? "hd__sub-narrow" : undefined}>
-                        <Link href={s.href}><span className="hd__dot" style={{ background: s.dot }} aria-hidden="true" />{s.label}</Link>
-                      </li>
-                    ))}
-                  </ul>
-                ) : null}
-              </li>
-            ))}
+            {NAV.map((n) => <Entry key={n.href} n={n} cur={cur(n)} here={here} />)}
           </ul>
         </nav>
 
-        <div className="hd__end hd__full">
-          <Link href="/card" className="btn btn--ink btn--sm hd__cta" aria-current={cur("/card")}>Make a Scent Card</Link>
+        <div className="hd__end">
+          <ul className="hd__list hd__list--end hd__full">
+            <Entry n={ACCOUNT} cur={cur(ACCOUNT)} here={here} icon />
+          </ul>
+          <button ref={burger} type="button" className="hd__burger hd__mob" aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} aria-controls="hd-menu" onClick={() => setOpen((o) => !o)}>
+            <MenuMorph open={open} />
+          </button>
         </div>
-
-        <button type="button" className="hd__burger hd__mob" aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} onClick={() => setOpen((o) => !o)}>
-          <MenuMorph open={open} />
-        </button>
       </div>
       {open ? (
-        <nav aria-label="Menu" className="hd__menu hd__mob">
-          {NAV.map((n) => (
+        <nav id="hd-menu" aria-label="Menu" className="hd__menu hd__mob">
+          {[...NAV, ACCOUNT].map((n) => (
             <div key={n.href} className="hd__menu-group">
-              <Link href={n.href} aria-current={cur(n.href)} className="hd__menu-main">{n.label}</Link>
-              {n.sub.some((s) => !s.narrow) ? (
+              <Link href={n.href} aria-current={cur(n) ? "page" : undefined} className="hd__menu-main" onClick={(e) => { guardAccount(e, n.href); setOpen(false); }}>{n.label}</Link>
+              {n.sub.length ? (
                 <div className="hd__menu-sub">
-                  {n.sub.filter((s) => !s.narrow).map((s) => (
-                    <Link key={s.href + s.label} href={s.href}><span className="hd__dot" style={{ background: s.dot }} aria-hidden="true" />{s.label}</Link>
+                  {n.sub.map((s) => (
+                    <Link key={s.href} href={s.href} aria-current={here(s) ? "page" : undefined} onClick={(e) => { guardAccount(e, s.href); setOpen(false); }}>{s.label}</Link>
                   ))}
                 </div>
               ) : null}
             </div>
           ))}
-          {/* the right-hand button of wide screens, for phones and tablets */}
-          <Link href="/card" className="btn btn--ink btn--sm hd__menu-cta" aria-current={cur("/card")}>Make a Scent Card</Link>
         </nav>
       ) : null}
     </header>
   );
 }
 
+/** The last footer column: About Olfia and its three parts, all on Home (v2, 11/23). */
+const ABOUT: NavItem = {
+  href: "/#about", label: "About Olfia", match: [],
+  sub: [{ href: "/#concept", label: "The Concept" }, { href: "/#how-it-works", label: "How it Works" }, { href: "/#creator", label: "The Creator" }],
+};
+
+/**
+ * Footer, v2 (11/23): the wordmark block (invitation, contact) and then the same groups as the header, one column
+ * each, with About Olfia last. The sign-up row and the halftone art stay; Privacy stays beside © in the bottom row
+ * (Tiffany 11/17).
+ */
 export function Footer() {
   return (
     <footer className="ft">
       <div className="wrap"><div className="ft__panel">
       <div className="ft__grid">
-        <div className="ft__col" style={{ flex: "1.6 1 240px", gap: 6 }}>
-          <Link href="/" style={{ fontFamily: "var(--font-display)", fontStyle: "italic", fontSize: 28, lineHeight: 1 }}>Olfia</Link>
+        <div className="ft__col ft__brand">
+          <Link href="/" className="ft__mark">Olfia</Link>
           <span className="muted" style={{ maxWidth: "24em" }}>{strings.brand.invitation}</span>
-        </div>
-        <nav aria-label="Make" className="ft__col">
-          <span className="ft__h">Make</span>
-          <Link href="/capture">Capture</Link>
-          <Link href="/rooms">Rooms</Link>
-          <Link href="/atlas">Scent Atlas</Link>
-          <Link href="/card">Scent Card</Link>
-        </nav>
-        <nav aria-label="Read" className="ft__col">
-          <span className="ft__h">Read</span>
-          <Link href="/quiz">Scent quiz</Link>
-          <Link href="/edit">The Olfia Edit</Link>
-          <Link href="/library">Scent Library</Link>
-          <Link href="/about">About Olfia</Link>
-        </nav>
-        <div className="ft__col" style={{ flex: "1 1 200px" }}>
-          <span className="ft__h">Contact</span>
-          <a href="mailto:tliu3694@usc.edu">tliu3694@usc.edu</a>
-          <div style={{ display: "flex", gap: 10 }}>
+          <a href="mailto:tliu3694@usc.edu" className="ft__contact">tliu3694@usc.edu</a>
+          <div className="ft__icons">
             <a href="#" className="ft__icon" aria-label="Instagram (coming soon)"><Icon name="instagram" /></a>
             <a href="#" className="ft__icon" aria-label="小红书 (coming soon)"><Icon name="bookOpen" /></a>
           </div>
         </div>
+        {[...NAV, ABOUT].map((n) => (
+          <nav key={n.href} aria-label={n.label} className="ft__col">
+            <Link href={n.href} className="ft__h">{n.label}</Link>
+            {n.sub.map((s) => <Link key={s.href} href={s.href}>{s.label}</Link>)}
+          </nav>
+        ))}
       </div>
       <div className="ft__signup"><SignupForm place="footer" /></div>
       <div className="ft__base">

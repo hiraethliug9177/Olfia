@@ -11,6 +11,8 @@ import type { Entry, FamilyId, SourceKind } from "@/lib/types";
 import { ScentSummary } from "@/components/account/ScentSummary";
 import { Character } from "@/components/quiz/Character";
 import { blendsWith, loadQuiz, type QuizResult } from "@/lib/quiz";
+import { Plans } from "@/components/plans/Plans";
+import { markSample, setSignedIn, useAuthState } from "@/lib/mockAuth";
 
 /**
  * The person's own quiz result, or an invitation to take the quiz. Tiffany 11/10: the character only
@@ -73,6 +75,7 @@ export function AccountView() {
   const add = useAtlas((s) => s.add);
   const clear = useAtlas((s) => s.clear);
   const show = useToast((s) => s.show);
+  const auth = useAuthState();
   const [prefs, setPrefs] = useState<Prefs>({ families: [], sources: [] });
 
   useEffect(() => {
@@ -114,6 +117,12 @@ export function AccountView() {
         <div style={{ flex: "1 1 240px", display: "flex", flexDirection: "column", gap: 4 }}>
           <h1 className="h-page" style={{ fontSize: "clamp(36px, 4.4vw, 56px)" }}>My Page</h1>
           <span className="muted">Accounts come later. For now, everything lives in this browser.</span>
+          {/* the mock sign-in (v2, 11/23): signing out lets the sample walk-through start again */}
+          {auth.signedIn ? (
+            <span className="muted" style={{ fontSize: 15 }}>
+              Signed in for this preview. <button type="button" className="auth__link" onClick={() => { setSignedIn(false); show("Signed out"); }}>Sign out</button>
+            </span>
+          ) : null}
         </div>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
           <span className="callout">{mounted ? days : "–"} days recorded</span>
@@ -170,13 +179,15 @@ export function AccountView() {
         </div>
       </section>
 
+      <Plans />
+
       <section id="settings" className="card anchor" style={{ display: "flex", flexDirection: "column", gap: 14, background: "var(--mist)" }}>
         <h2 className="h-section" style={{ fontSize: 34 }}>Settings</h2>
         <p className="muted" style={{ margin: 0 }}>Entries are saved in this browser only.</p>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
-          <button type="button" className="btn btn--primary" onClick={() => { sampleEntries().forEach((e) => add(e)); show("Sample pages added", "/atlas", "Open Scent Atlas"); }}>Load sample pages</button>
+          <button type="button" className="btn btn--primary" onClick={() => { sampleEntries().forEach((e) => add(e)); markSample(true); show("Sample pages added", "/atlas", "Open Scent Atlas"); }}>Load sample pages</button>
           <button type="button" className="btn btn--ghost" onClick={exportData} disabled={!mounted || entries.length === 0}>Export my data</button>
-          <button type="button" className="btn btn--ghost" disabled={!mounted || entries.length === 0} onClick={() => { if (window.confirm("Clear every entry saved in this browser?")) { clear(); show("This browser is cleared"); } }}>Clear this browser</button>
+          <button type="button" className="btn btn--ghost" disabled={!mounted || entries.length === 0} onClick={() => { if (window.confirm("Clear every entry saved in this browser?")) { clear(); markSample(false); setSignedIn(false); show("This browser is cleared"); } }}>Clear this browser</button>
         </div>
       </section>
 

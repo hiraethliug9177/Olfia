@@ -1,9 +1,9 @@
 "use client";
 
 import {
-  ArrowLeft, ArrowRight, BookOpen, Bookmark, BookmarkCheck, CalendarDays, Check, ChevronDown, ChevronLeft, ChevronRight, CircleUserRound, Clock, Copy, Download,
-  Drama, ExternalLink, Flame, FlaskConical, FlipHorizontal2, Gift, House, Image, ImagePlus, Instagram, Layers, Link2, Mail, MapPin,
-  Menu, Minus, Pause, PencilRuler, Pin, Play, Plus, Redo2, RotateCcw, RotateCw, Scroll, SendToBack, Share2, Trash2, Undo2, X,
+  ArrowLeft, ArrowRight, BookOpen, Bookmark, BookmarkCheck, CalendarDays, Check, ChevronDown, ChevronLeft, ChevronRight, CircleUserRound, Clock, Compass, Copy, Download,
+  DoorOpen, Drama, ExternalLink, Flame, FlaskConical, FlipHorizontal2, Gift, House, Image, ImagePlus, Instagram, Layers, Link2, Mail, Map as MapIcon, MapPin,
+  Menu, Minus, Newspaper, Pause, PenLine, PencilRuler, Pin, Play, Plus, Redo2, RotateCcw, RotateCw, Scroll, SendToBack, Share2, Trash2, Undo2, X,
   type LucideIcon,
 } from "lucide-react";
 
@@ -60,6 +60,13 @@ const ICONS = {
   bookmark: Bookmark,
   bookmarkCheck: BookmarkCheck,
   image: Image,
+  // v2 (11/23): the three lines under the Home title (Capture, Rooms, Atlas)
+  penLine: PenLine,
+  doorOpen: DoorOpen,
+  map: MapIcon,
+  // v2 (11/23): About Olfia on Home (the loop's Discover step; The Olfia Edit)
+  compass: Compass,
+  newspaper: Newspaper,
 } satisfies Record<string, LucideIcon>;
 
 export type IconName = keyof typeof ICONS;

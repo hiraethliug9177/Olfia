@@ -2,7 +2,20 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
-import { strings } from "@/lib/strings";
+import { Icon, type IconName } from "@/components/ui/Icon";
+
+/**
+ * v2 (11/23, Tiffany's Notion "Capstone Draft", 01–02): the text on the left changes; the board on the right stays
+ * exactly as it is (Tiffany 11/23: "首页的main visual … 维持原样"). "Scent is an afterimage." moves to About Olfia.
+ * The line is her positioning sentence cut to one line (decision 2); the three lines are hers, with "in the moment"
+ * and "full of memories" (decision 3); both buttons share one style, in sentence case.
+ */
+const HERO_LINE = "A personal home fragrance platform that connects scent, space, and memory.";
+const DOES: Array<{ icon: IconName; name: string; line: string }> = [
+  { icon: "penLine", name: "Capture", line: "Keep a scent you noticed in the moment." },
+  { icon: "doorOpen", name: "Rooms", line: "Design your space with the ideal scent in mind." },
+  { icon: "map", name: "Atlas", line: "Your personal scent archive, full of memories." },
+];
 
 /**
  * Home hero (2026-11-09): the cork scent design board, confirmed by Tiffany.
@@ -118,11 +131,16 @@ export function Hero() {
   return (
     <section className="wrap hero">
       <div className="hero__text">
-        <h1 className="hero__h1 anim-rise">Scent is an afterimage.</h1>
-        <p className="lead anim-rise" style={{ animationDelay: "0.12s" }}>{strings.brand.awareness}</p>
+        <h1 className="hero__h1 anim-rise">Life, through scent.</h1>
+        <p className="lead anim-rise" style={{ animationDelay: "0.12s" }}>{HERO_LINE}</p>
+        <ul className="hero__does anim-rise" style={{ animationDelay: "0.18s" }}>
+          {DOES.map((d) => (
+            <li key={d.name}><Icon name={d.icon} /><span><strong>{d.name}</strong> {d.line}</span></li>
+          ))}
+        </ul>
         <div className="anim-rise hero__ctas" style={{ animationDelay: "0.24s" }}>
-          <Link href={`/rooms?family=${families}`} className="btn btn--primary">Open in Rooms</Link>
-          <Link href="/capture" className="btn btn--apricot">Capture a scent</Link>
+          <Link href="/capture" className="btn btn--primary">Start the capture</Link>
+          <Link href={`/rooms?family=${families}`} className="btn btn--primary">Design your space</Link>
         </div>
       </div>
 

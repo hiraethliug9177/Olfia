@@ -3,6 +3,7 @@ import { loadShelf, saveShelf, type ShelfItem } from "@/lib/shelf";
 import { productById } from "@/lib/products";
 import { ARCHETYPES, loadQuiz, saveQuiz } from "@/lib/quiz";
 import { newId, useAtlas } from "@/lib/store";
+import { markSample } from "@/lib/mockAuth";
 
 /**
  * Sample pages on request (Tiffany 11/15: first visits start clean; the "See a sample" button in the
@@ -27,6 +28,8 @@ function shelfItem(productId: string, routine: ShelfItem["routine"], note: strin
  * `onDone(added)` reports whether sample pages went into the Atlas (false when it already held pages).
  */
 export function loadSample(onDone?: (added: boolean) => void): void {
+  // v2 (11/23): asking for the samples puts this browser in sample mode, where the mock sign-in shows (answer 17)
+  markSample(true);
   try {
     if (!window.localStorage.getItem(PREFS_KEY)) {
       window.localStorage.setItem(PREFS_KEY, JSON.stringify({ families: ["woody", "citrus", "green"], sources: ["candle", "diffuser"] }));

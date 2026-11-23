@@ -3,6 +3,8 @@ import "./globals.css";
 import { Analytics } from "@/components/Analytics";
 import { Backdrop, Footer, Header, Toaster } from "@/components/AppChrome";
 import { CutDefs } from "@/components/scene/Cutout";
+import { QuizWindow } from "@/components/QuizWindow";
+import { Overlays } from "@/components/Overlays";
 import { strings } from "@/lib/strings";
 import { SHARE_IMAGE } from "@/lib/share";
 
@@ -38,6 +40,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <Header />
         <main id="main" style={{ flex: 1 }}>{children}</main>
         <Footer />
+        <QuizWindow />
+        <Overlays />
         <Toaster />
         {gaId ? <Analytics gaId={gaId} /> : null}
       </body>

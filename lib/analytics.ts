@@ -18,6 +18,13 @@ type EventMap = {
   quiz_start: Record<string, never>;
   quiz_complete: { code: string; family: string };
   quiz_share: { method: "download" | "share" };
+  /** The quiz window at the bottom right (v2, 11/23): its button (take the quiz or see the result), or × to close it. */
+  quiz_window: { action: "start" | "result" | "close" };
+  /**
+   * Join Olfia Plus is pressed (v2, 11/23; the Olfia Plus fake-door test): the plan, the billing shown ("none"
+   * while prices are not set), and where (My Page plans, or the third-room window). Nothing personal.
+   */
+  plan_select: { plan: "plus"; billing: "monthly" | "yearly" | "none"; place: string };
   shelf_link_read: { from: "page" | "address"; matched: 0 | 1 };
   shelf_item_added: { mode: "photo" | "link" };
   /** A recommended product link opens: which product, its family, and where on the site. */

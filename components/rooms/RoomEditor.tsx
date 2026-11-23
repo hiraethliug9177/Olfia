@@ -30,6 +30,8 @@ import { ScenePage } from "@/components/scene/ScenePage";
 import { ItemArt } from "@/components/scene/Cutout";
 import { Icon } from "@/components/ui/Icon";
 import { ProductCards } from "@/components/products/ProductCards";
+import { ThirdRoom } from "@/components/plans/ThirdRoom";
+import { FREE_ROOMS } from "@/lib/plans";
 
 const DEFAULT_FAMS: FamilyId[] = ["woody", "spicy"];
 const TIMES: Array<{ id: TimeOfDay; label: string }> = [
@@ -52,6 +54,9 @@ export function RoomEditor() {
   const entries = useAtlas((s) => s.entries);
   const hydrated = useAtlas((s) => s.hydrated);
   const replace = useAtlas((s) => s.replace);
+  const remove = useAtlas((s) => s.remove);
+  // v2 (11/23): a new room beyond the free plan's two opens the plans window instead of saving (goCard kept for after)
+  const [limit, setLimit] = useState<{ goCard: boolean } | null>(null);
   const show = useToast((s) => s.show);
 
   const [entryId, setEntryId] = useState<string | null>(null);
@@ -225,7 +230,12 @@ export function RoomEditor() {
     }
   };
 
+  const savedRooms = entries.filter((e): e is RoomsEntry => e.type === "rooms");
   const save = (goCard: boolean) => {
+    if (!entryId && savedRooms.length >= FREE_ROOMS) { setLimit({ goCard }); return; }
+    store(goCard);
+  };
+  const store = (goCard: boolean) => {
     const now = new Date().toISOString();
     const id = entryId ?? newId();
     const entry: RoomsEntry = {
@@ -450,6 +460,13 @@ export function RoomEditor() {
       <section id="products" className="card anchor" style={{ marginTop: 8 }}>
         <ProductCards families={families} title="Matches this room" />
       </section>
+
+      <ThirdRoom
+        open={limit !== null}
+        rooms={savedRooms}
+        onClose={() => setLimit(null)}
+        onReplace={(id) => { const goCard = limit?.goCard ?? false; setLimit(null); remove(id); store(goCard); }}
+      />
     </div>
   );
 }

@@ -52,12 +52,16 @@ export function Quiz() {
   const [busy, setBusy] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
-  // Keep the layer order (who → reach) but shuffle inside each layer, once per visit.
-  const order = useMemo(() => {
+  // Keep the layer order (who → reach) but shuffle inside each layer, once per visit. The shuffle runs in the
+  // browser after the page has loaded: done during the first render, the server and the browser drew different
+  // first questions and React threw the server's page away (hydration error #418, found 11/23).
+  const layered = useMemo(() => [...QUESTIONS.filter((q) => q.layer === "who"), ...QUESTIONS.filter((q) => q.layer === "reach")], []);
+  const [order, setOrder] = useState(layered);
+  useEffect(() => {
     const seed = Math.random();
     const shuffle = <T,>(a: T[]) => a.map((v, k) => ({ v, k: Math.sin(seed * 1000 + k) })).sort((x, y) => x.k - y.k).map((x) => x.v);
-    return [...shuffle(QUESTIONS.filter((q) => q.layer === "who")), ...shuffle(QUESTIONS.filter((q) => q.layer === "reach"))];
-  }, []);
+    setOrder([...shuffle(layered.filter((q) => q.layer === "who")), ...shuffle(layered.filter((q) => q.layer === "reach"))]);
+  }, [layered]);
 
   useEffect(() => {
     if (!mounted) return;

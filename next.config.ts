@@ -9,6 +9,8 @@ const nextConfig: NextConfig = {
     return [
       // Picks was folded into Gifts on 11/17; old links land on the full list, their filters kept.
       { source: "/picks", destination: "/gifts", permanent: true },
+      // v2 (11/23): the Scent Library is now Scentpedia, under Discover
+      { source: "/library", destination: "/scentpedia", permanent: true },
       {
         source: "/:path*",
         has: [{ type: "host", value: "olfia-nine.vercel.app" }],
