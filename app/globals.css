@@ -395,7 +395,8 @@ html { scroll-padding-top: 80px; }
 .loop__track { fill: none; stroke: var(--peri); stroke-width: 1.5; }
 .loop__spoke { stroke: var(--peri); stroke-width: 1.5; stroke-dasharray: 2 7; stroke-linecap: round; transition: stroke 0.4s; }
 .loop__spoke[data-on] { stroke: var(--deep); }
-.loop__arrow { fill: none; stroke: var(--peri); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+/* the arrows say which way the loop runs, so they are Slate (Periwinkle is for washes and lines only) */
+.loop__arrow { fill: none; stroke: var(--slate); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
 .loop__node { position: absolute; translate: -50% -50%; display: flex; justify-content: center; }
 .loop__node--discover { left: 50%; top: 12.5%; }
 .loop__node--rooms { left: 87.5%; top: 50%; }

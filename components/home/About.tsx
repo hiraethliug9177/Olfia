@@ -199,7 +199,7 @@ export function About() {
                 <h4 className="about__h4">Where the seven families come from</h4>
                 <p>Olfia’s seven families start from Michael Edwards’ Fragrance Wheel. Its four main families, Fresh, Floral, Amber and Woody, are the frame; Citrus &amp; Fruit and Gourmand are split out the way home-fragrance shelves sort them.</p>
                 <p className="about__cite">
-                  <a href="https://fragrancesoftheworld.com/" target="_blank" rel="noopener noreferrer">Fragrances of the World<Icon name="external" size={16} /></a>
+                  <a href="https://fragrancesoftheworld.com/" target="_blank" rel="noopener noreferrer">Fragrances of the World<Icon name="external" size={18} /></a>
                 </p>
               </div>
               <div className="about__note">

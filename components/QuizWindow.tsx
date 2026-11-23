@@ -120,8 +120,8 @@ export function QuizWindow() {
             </Link>
           </div>
           <div className="qw__tools">
-            <button type="button" aria-label="Minimize" onClick={() => pick("mini")}><Icon name="minus" size={18} /></button>
-            <button type="button" aria-label="Close" onClick={close}><Icon name="x" size={18} /></button>
+            <button type="button" aria-label="Minimize" onClick={() => pick("mini")}><Icon name="minus" size={20} /></button>
+            <button type="button" aria-label="Close" onClick={close}><Icon name="x" size={20} /></button>
           </div>
         </div>
       )}
