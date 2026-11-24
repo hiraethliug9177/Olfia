@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { Fragment, useEffect, useRef, useState, type MouseEvent, type ReactNode } from "react";
+import { Fragment, useEffect, useRef, useState, type CSSProperties, type MouseEvent, type ReactNode } from "react";
 import { Icon, type IconName } from "@/components/ui/Icon";
-import { CardRail } from "@/components/ui/CardRail";
+import { CardDeck } from "@/components/ui/CardDeck";
 import { Stamp } from "@/components/scene/Stamp";
 import { strings } from "@/lib/strings";
 import { CONCEPT, CREATOR_LETTER, HOW_IT_WORKS } from "@/lib/copy/about";
@@ -20,13 +20,24 @@ import { CONCEPT, CREATOR_LETTER, HOW_IT_WORKS } from "@/lib/copy/about";
  * - The two notes below it share one height; the two links are buttons. Research notes are gone everywhere.
  * - The Creator: tape and stickers on the photo; the letter's paragraphs are cards like The Concept's, each opening
  *   with a large first letter, with a few words marked as in a journal (highlighter, bold, a wavy underline).
+ * Later the same day (her screenshots and "Tactile Card Deck Interaction System", modern skeuomorphic style):
+ * - every part is a deck of cards leafed through with two buttons (components/ui/CardDeck): The Concept on landscape
+ *   index cards, How it Works in folders with tabs, The Science on near-square receipts, The Creator's letter cards
+ *   unchanged;
+ * - the two notes that sat under How it Works are now their own part, The Science (/#science), before The Creator;
+ * - her photo is in the Creator's frame (public/assets/about/creator.webp, cut to 4:5, photo data removed).
+ * The words are unchanged.
  */
 
 const PARTS = [
   { id: "concept", label: "The Concept" },
   { id: "how-it-works", label: "How it Works" },
+  { id: "science", label: "The Science" },
   { id: "creator", label: "The Creator" },
 ] as const;
+
+/** Where each folder's tab sits along its top edge, as in a drawer of real folders (thirds, in turn). */
+const TAB_AT = ["3%", "35%", "67%"] as const;
 
 /** How it Works: each entry's picture (the site's collage materials), icon and link; the words are Tiffany's (§1.6). */
 const ENTRY_LOOK: Record<string, { icon: IconName; href: string; img: string }> = {
@@ -128,99 +139,140 @@ export function About() {
 
         <div className="about__body">
           <section id="concept" className="about__part" aria-labelledby="concept-h">
-            <CardRail label="The Concept" className="rail--concept" head={<h3 id="concept-h" className="about__h" tabIndex={-1}>The Concept</h3>}>
-              {CONCEPT.map((c) => (
-                <article key={c.theme} className="about__idea" aria-label={c.theme}>
-                  <h4 className="about__big">{c.title}</h4>
-                  {c.paragraphs.map((t) => <p key={t.slice(0, 32)}>{t}</p>)}
-                </article>
-              ))}
-            </CardRail>
+            <CardDeck
+              label="The Concept"
+              look="vocabulary-card"
+              head={<h3 id="concept-h" className="about__h" tabIndex={-1}>The Concept</h3>}
+              cards={CONCEPT.map((c) => ({
+                key: c.theme,
+                label: c.theme,
+                content: (
+                  <article className="vocab" aria-label={c.theme}>
+                    <h4 className="about__big vocab__title">{c.title}</h4>
+                    <div className="vocab__lines">
+                      {c.paragraphs.map((t) => <p key={t.slice(0, 32)}>{t}</p>)}
+                    </div>
+                  </article>
+                ),
+              }))}
+            />
           </section>
 
           <section id="how-it-works" className="about__part about__part--white" aria-labelledby="how-h">
-            <CardRail
+            <CardDeck
               label="How it Works"
-              className="rail--ways"
+              look="file-folder"
               head={<h3 id="how-h" className="about__h" tabIndex={-1}>How it Works</h3>}
               intro={<><h4 className="about__h4">{HOW_IT_WORKS.title}</h4><p className="lead" style={{ margin: 0 }}>{HOW_IT_WORKS.lead}</p></>}
-            >
-              {ways.map((pair) => (
-                <article key={pair.map((e) => e.feature).join("+")} className={`ways-card${pair.length === 1 ? " ways-card--solo" : ""}`}>
-                  {pair.map((e) => {
-                    const look = ENTRY_LOOK[e.feature];
-                    return (
-                      <div key={e.feature} className="way">
-                        <figure className="way__pic" aria-hidden="true"><img src={look.img} alt="" loading="lazy" /></figure>
-                        <div className="way__text">
-                          <span className="way__feature"><Icon name={look.icon} size={20} />{e.feature}</span>
-                          <h4 className="way__title">{e.title}</h4>
-                          <p>{e.body}</p>
-                          <Link href={look.href} className="hero__link">{e.cta}</Link>
-                        </div>
+              cards={ways.map((pair, i) => ({
+                key: pair.map((e) => e.feature).join("+"),
+                label: pair.map((e) => e.feature).join(" and "),
+                content: (
+                  <div className="folder" style={{ "--tab-at": TAB_AT[i % TAB_AT.length] } as CSSProperties}>
+                    <span className="folder__tab" aria-hidden="true">
+                      {pair.map((e) => <Icon key={e.feature} name={ENTRY_LOOK[e.feature].icon} size={20} />)}
+                    </span>
+                    <article className={`folder__body ways-card${pair.length === 1 ? " ways-card--solo" : ""}`}>
+                      {pair.map((e) => {
+                        const look = ENTRY_LOOK[e.feature];
+                        return (
+                          <div key={e.feature} className="way">
+                            <figure className="way__pic" aria-hidden="true"><img src={look.img} alt="" loading="lazy" /></figure>
+                            <div className="way__text">
+                              <span className="way__feature"><Icon name={look.icon} size={20} />{e.feature}</span>
+                              <h4 className="way__title">{e.title}</h4>
+                              <p>{e.body}</p>
+                              <Link href={look.href} className="hero__link">{e.cta}</Link>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </article>
+                  </div>
+                ),
+              }))}
+            />
+          </section>
+
+          {/* her screenshot (11/24): "还是在这个区域单开一个 The Science Section 来承载这些内容吧" — the two notes, unchanged */}
+          <section id="science" className="about__part" aria-labelledby="science-h">
+            <CardDeck
+              label="The Science"
+              look="square-receipt"
+              head={<h3 id="science-h" className="about__h" tabIndex={-1}>The Science</h3>}
+              cards={[
+                {
+                  key: "families",
+                  label: HOW_IT_WORKS.families.title,
+                  content: (
+                    <article className="receipt">
+                      <h4 className="about__h4 receipt__h">{HOW_IT_WORKS.families.title}</h4>
+                      <p className="receipt__p">{HOW_IT_WORKS.families.body}</p>
+                      <div className="about__links receipt__foot">
+                        <Link href="/scentpedia" className="btn btn--primary">Explore Scentpedia</Link>
+                        <a href="https://fragrancesoftheworld.com/" target="_blank" rel="noopener noreferrer" className="btn btn--ghost">
+                          Fragrances of the World<Icon name="external" size={18} />
+                        </a>
                       </div>
-                    );
-                  })}
-                </article>
-              ))}
-            </CardRail>
-            <div className="about__more">
-              <div className="about__note">
-                <h4 className="about__h4">{HOW_IT_WORKS.families.title}</h4>
-                <p>{HOW_IT_WORKS.families.body}</p>
-                <div className="about__links">
-                  <Link href="/scentpedia" className="btn btn--primary">Explore Scentpedia</Link>
-                  <a href="https://fragrancesoftheworld.com/" target="_blank" rel="noopener noreferrer" className="btn btn--ghost">
-                    Fragrances of the World<Icon name="external" size={18} />
-                  </a>
-                </div>
-              </div>
-              <div className="about__note">
-                <h4 className="about__h4">{HOW_IT_WORKS.ideasTitle}</h4>
-                <div className="about__tiles">
-                  {HOW_IT_WORKS.ideas.map((t) => (
-                    <Link key={t.name} href={t.name === "The Olfia Edit" ? "/edit" : "/gifts"} className="about__tile">
-                      <Icon name={t.name === "The Olfia Edit" ? "newspaper" : "gift"} size={24} />
-                      <span className="about__tile-name">{t.name}</span>
-                      <span className="about__tile-line">{t.line}</span>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            </div>
+                    </article>
+                  ),
+                },
+                {
+                  key: "ideas",
+                  label: HOW_IT_WORKS.ideasTitle,
+                  content: (
+                    <article className="receipt">
+                      <h4 className="about__h4 receipt__h">{HOW_IT_WORKS.ideasTitle}</h4>
+                      <div className="receipt__items">
+                        {HOW_IT_WORKS.ideas.map((t) => (
+                          <Link key={t.name} href={t.name === "The Olfia Edit" ? "/edit" : "/gifts"} className="receipt__item">
+                            <Icon name={t.name === "The Olfia Edit" ? "newspaper" : "gift"} size={24} />
+                            <span className="receipt__item-name">{t.name}</span>
+                            <span className="receipt__item-line">{t.line}</span>
+                          </Link>
+                        ))}
+                      </div>
+                    </article>
+                  ),
+                },
+              ]}
+            />
           </section>
 
           <section id="creator" className="about__part" aria-labelledby="creator-h">
-            <CardRail
+            <CardDeck
               label="A letter from the creator"
-              className="rail--letter"
+              look="existing-creator-card"
               head={<h3 id="creator-h" className="about__h" tabIndex={-1}>The Creator</h3>}
               aside={
-                // TODO(Tiffany): her photo (public/assets/about/creator.webp, 4:5) replaces the blank frame
-                <figure className="about__photo" aria-hidden="true">
-                  <span className="tape tape--a" />
-                  <span className="tape tape--b" />
-                  <span className="about__photo-blank"><Icon name="user" size={40} /></span>
-                  <span className="sticker sticker--rose"><img src="/assets/materials/floral-rose.webp" alt="" /></span>
-                  <span className="sticker sticker--lavender"><img src="/assets/materials/green-lavender.webp" alt="" /></span>
-                  <span className="sticker sticker--orange"><img src="/assets/materials/citrus-orange-slice.webp" alt="" /></span>
-                  <span className="sticker sticker--stamp"><Stamp family="woody" size={70} rot={-10} /></span>
+                <figure className="about__photo">
+                  <span className="tape tape--a" aria-hidden="true" />
+                  <span className="tape tape--b" aria-hidden="true" />
+                  {/* her photo (11/24), cut to the frame's 4:5 */}
+                  <img className="about__photo-img" src="/assets/about/creator.webp" width={800} height={1000} alt="Tiffany Liu" />
+                  <span className="sticker sticker--rose" aria-hidden="true"><img src="/assets/materials/floral-rose.webp" alt="" /></span>
+                  <span className="sticker sticker--lavender" aria-hidden="true"><img src="/assets/materials/green-lavender.webp" alt="" /></span>
+                  <span className="sticker sticker--orange" aria-hidden="true"><img src="/assets/materials/citrus-orange-slice.webp" alt="" /></span>
+                  <span className="sticker sticker--stamp" aria-hidden="true"><Stamp family="woody" size={70} rot={-10} /></span>
                 </figure>
               }
-            >
-              {CREATOR_LETTER.map((t, i) => (
-                <article key={t.slice(0, 32)} className="letter-card">
-                  {/* the first letter is its own span so "I’m" keeps its apostrophe at text size */}
-                  <p><span className="dropcap" aria-hidden="true">{t[0]}</span><span className="sr-only">{t[0]}</span>{marked(t.slice(1), (LETTER_MARKS[i] ?? []).filter((m) => !t.startsWith(m.text)))}</p>
-                  {i === CREATOR_LETTER.length - 1 ? (
-                    <div className="letter__sign">
-                      <span className="hand" style={{ fontSize: 34 }}>Tiffany Liu</span>
-                      <a href="mailto:tliu3694@usc.edu" className="hero__link" style={{ fontSize: 16 }}>Say hello</a>
-                    </div>
-                  ) : null}
-                </article>
-              ))}
-            </CardRail>
+              cards={CREATOR_LETTER.map((t, i) => ({
+                key: t.slice(0, 32),
+                label: `${i + 1} / ${CREATOR_LETTER.length}`,
+                content: (
+                  <article className="letter-card">
+                    {/* the first letter is its own span so "I’m" keeps its apostrophe at text size */}
+                    <p><span className="dropcap" aria-hidden="true">{t[0]}</span><span className="sr-only">{t[0]}</span>{marked(t.slice(1), (LETTER_MARKS[i] ?? []).filter((m) => !t.startsWith(m.text)))}</p>
+                    {i === CREATOR_LETTER.length - 1 ? (
+                      <div className="letter__sign">
+                        <span className="hand" style={{ fontSize: 34 }}>Tiffany Liu</span>
+                        <a href="mailto:tliu3694@usc.edu" className="hero__link" style={{ fontSize: 16 }}>Say hello</a>
+                      </div>
+                    ) : null}
+                  </article>
+                ),
+              }))}
+            />
           </section>
         </div>
       </div>

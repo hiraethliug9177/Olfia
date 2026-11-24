@@ -217,7 +217,7 @@ export function Header() {
 /** The last footer column: About Olfia and its three parts, all on Home (v2, 11/23). */
 const ABOUT: NavItem = {
   href: "/#about", label: "About Olfia", match: [],
-  sub: [{ href: "/#concept", label: "The Concept" }, { href: "/#how-it-works", label: "How it Works" }, { href: "/#creator", label: "The Creator" }],
+  sub: [{ href: "/#concept", label: "The Concept" }, { href: "/#how-it-works", label: "How it Works" }, { href: "/#science", label: "The Science" }, { href: "/#creator", label: "The Creator" }],
 };
 
 /**

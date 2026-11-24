@@ -18,6 +18,8 @@ export const revalidate = 86400;
  * right, and About Olfia lives here in full. Copy v1 (Tiffany 11/24, docs/copy/olfia-site-copy-v1.md §1): the order
  * stays as it is; 03 "The same room, a different feeling" is outside this round.
  * Design round (Tiffany 11/24): the Gifts section and the closing invite are gone from Home (Gifts stays under Discover).
+ * Later on 11/24 (her screenshots): About Olfia comes right after the family dial; the room presets ("太占地儿了") and
+ * then The Olfia Edit ("跟着 Explore Rooms 一起到 About 后面去") follow it.
  */
 // 11/18 (Tiffany): Home shows three of the six presets, in this order; Rooms keeps all six
 const HOME_PRESET_IDS = ["living-night", "bedroom-morning", "study-afternoon"];
@@ -41,22 +43,7 @@ export default function HomePage() {
         <FamilyWheel />
       </section>
 
-      <section id="edit" className="wrap section">
-        <div className="panel panel--white">
-          {/* 11/17 (Tiffany): the line sits beside the title on its baseline; the button goes to the right edge */}
-          <div className="row-head row-head--stack">
-            {/* copy v1 (11/24, §1.3): the section is called The Olfia Edit again; one line about what the stories cover */}
-            <h2 className="h-section">The Olfia Edit</h2>
-            <span className="row-head__break" aria-hidden="true" />
-            <p className="lead">Culture, fragrance, and the art of living.</p>
-            <Link href="/edit" className="btn btn--primary btn--sm row-head__cta">Explore the Edit</Link>
-            <p className="row-head__body">Stories about familiar ingredients, the places we inhabit, and the traditions and habits that shape our sensory lives.</p>
-          </div>
-          <div className="edit-grid">
-            {latest.map((a) => <ArticleCard key={a.slug} a={a} />)}
-          </div>
-        </div>
-      </section>
+      <About />
 
       <section id="presets" className="wrap section">
         <div className="panel panel--apricot">
@@ -80,7 +67,22 @@ export default function HomePage() {
         </div>
       </section>
 
-      <About />
+      <section id="edit" className="wrap section">
+        <div className="panel panel--white">
+          {/* 11/17 (Tiffany): the line sits beside the title on its baseline; the button goes to the right edge */}
+          <div className="row-head row-head--stack">
+            {/* copy v1 (11/24, §1.3): the section is called The Olfia Edit again; one line about what the stories cover */}
+            <h2 className="h-section">The Olfia Edit</h2>
+            <span className="row-head__break" aria-hidden="true" />
+            <p className="lead">Culture, fragrance, and the art of living.</p>
+            <Link href="/edit" className="btn btn--primary btn--sm row-head__cta">Explore the Edit</Link>
+            <p className="row-head__body">Stories about familiar ingredients, the places we inhabit, and the traditions and habits that shape our sensory lives.</p>
+          </div>
+          <div className="edit-grid">
+            {latest.map((a) => <ArticleCard key={a.slug} a={a} />)}
+          </div>
+        </div>
+      </section>
 
     </div>
   );

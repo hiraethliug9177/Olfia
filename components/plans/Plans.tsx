@@ -58,7 +58,7 @@ function Cell({ v }: { v: boolean | string }) {
 
 /**
  * My Page → Plans (/account#plans): the 11/21 design Tiffany kept, now inside My Page (her Notion 11/23).
- * Design round (Tiffany 11/24): the comparison table opens in a window from "Compare plans"; the questions sit under
+ * Design round (Tiffany 11/24): the comparison table opens in a window from a "Compare" button beside the title; the questions sit under
  * an FAQ heading; the second Join button at the end is gone (the Plus card has it).
  */
 export function Plans() {
@@ -68,13 +68,16 @@ export function Plans() {
   return (
     <section id="plans" className="card anchor plans" aria-labelledby="plans-h">
       <div className="plans__head">
-        <h2 id="plans-h" className="h-section" style={{ fontSize: 34 }}>Plans</h2>
+        {/* her note (11/24): the comparison button sits beside the title and reads only "Compare" */}
+        <div className="plans__title">
+          <h2 id="plans-h" className="h-section" style={{ fontSize: 34 }}>Plans</h2>
+          <button type="button" className="btn btn--ghost btn--sm plans__compare" onClick={() => setCompare(true)}>Compare</button>
+        </div>
         {hasPrices ? <BillingSwitch value={billing} onChange={setBilling} /> : null}
       </div>
       <p className="lead plans__lead">Explore Olfia for free today. Olfia Plus is planned for people who want to keep more room designs and personalize their visual collection.</p>
       <p className="muted plans__hint">Olfia Plus is not available yet. The features below describe the planned offering.</p>
       <PlanCards billing={billing} onJoin={join} />
-      <button type="button" className="btn btn--ghost plans__compare" onClick={() => setCompare(true)}>Compare plans</button>
       <Dialog open={compare} onClose={() => setCompare(false)} label="Compare plans" className="dlg--wide dlg--compare">
         <div className="dlg__body">
           <button type="button" className="dlg__x" aria-label="Close" onClick={() => setCompare(false)}><Icon name="x" /></button>

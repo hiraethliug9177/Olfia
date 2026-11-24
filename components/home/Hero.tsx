@@ -131,7 +131,8 @@ export function Hero() {
   return (
     <section className="wrap hero">
       <div className="hero__text">
-        <h1 className="hero__h1 anim-rise">Life, through scent.</h1>
+        {/* her note (11/24): larger, sized to fill the column, "Life," and "through scent." on two lines */}
+        <h1 className="hero__h1 anim-rise">Life,<br />through scent.</h1>
         <p className="lead anim-rise" style={{ animationDelay: "0.12s" }}>{HERO_LINE}</p>
         <ul className="hero__does anim-rise" style={{ animationDelay: "0.18s" }}>
           {DOES.map((d) => (
