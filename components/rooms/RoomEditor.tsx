@@ -169,7 +169,7 @@ interface Ask {
   run: () => void;
 }
 
-/* Claude's wording for the unsaved-changes window (11/24), hers to change */
+/* Claude's wording for the unsaved-changes window (11/24), approved by her the same day ("我许可") */
 const LEAVE = {
   title: "Leave without saving?",
   text: "The changes you made to this room haven’t been saved yet.",
@@ -1136,7 +1136,7 @@ export function RoomEditor() {
               {sceneName(sceneId)}
               {nickname.trim() ? <span className="hand">{nickname.trim()}</span> : null}
             </span>
-            {/* Claude's wording (11/24), hers to change: where the room stands */}
+            {/* Claude's wording (11/24, approved by her): where the room stands */}
             <span className="ws__status-line" role="status">{!entryId ? "Not saved yet" : dirty ? "Unsaved changes" : "Saved to your Scent Atlas"}</span>
           </div>
           <a href="#products" className="ws__jump">Fragrance Matches<Icon name="arrowDown" size={16} /></a>
