@@ -59,11 +59,11 @@ function SignIn() {
               {signingIn ? (
                 <div className="auth__row">
                   <label className="auth__check"><input type="checkbox" /> Remember me</label>
-                  <button type="button" className="auth__link" onClick={() => setNote("Resetting a password comes with real accounts.")}>Forgot password?</button>
+                  <button type="button" className="auth__link" onClick={() => setNote("Password reset will be available when accounts launch.")}>Forgot password?</button>
                 </div>
               ) : null}
               <button type="submit" className="btn btn--primary btn--block">{signingIn ? "Sign in" : "Create account"}</button>
-              <p className="auth__note" role="status">{note ?? "This is a preview: what you type here is not kept or sent."}</p>
+              <p className="auth__note" role="status">{note ?? "This is a sign-in preview. Your email and password are not saved or sent."}</p>
             </form>
             <div className="auth__or" aria-hidden="true"><span>or</span></div>
             <button type="button" className="btn btn--ghost btn--block" onClick={finish}>Continue with Google</button>
@@ -94,7 +94,7 @@ function PlusNotOpen() {
       <div className="dlg__body">
         <button type="button" className="dlg__x" aria-label="Close" onClick={close}><Icon name="x" /></button>
         <h2 className="dlg__title">Olfia Plus isn’t open yet.</h2>
-        <p className="dlg__text">Leave your email and you’ll hear first.</p>
+        <p className="dlg__text">Leave your email to receive updates about the launch.</p>
         <SignupForm place="plans" heading={false} />
       </div>
     </Dialog>

@@ -24,7 +24,7 @@ export function ShareRow({ url, title, image, slug }: { url: string; title: stri
       show("Link copied");
       track("story_share", { method: "copy", slug });
     } catch {
-      show("The link couldn’t be copied");
+      show("Couldn’t copy the link. Try again.");
     }
   };
 

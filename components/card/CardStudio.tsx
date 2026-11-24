@@ -276,10 +276,10 @@ export function CardStudio() {
         a.remove();
         setTimeout(() => URL.revokeObjectURL(url), 4000);
         track("scent_card_export", { mode, method: "download", ratio });
-        show(prefer === "share" ? "Image saved — post it from your app" : "Scent Card saved");
+        show(prefer === "share" ? "Image saved. Open your social app to share it." : "Scent Card saved");
       }
     } catch {
-      show("Couldn’t make the image. Try again?");
+      show("Couldn’t create the image. Please try again.");
     } finally {
       setBusy(false);
     }
@@ -435,8 +435,8 @@ export function CardStudio() {
               <button key={t.id} type="button" role="radio" aria-checked={template === t.id} className="seg__opt" style={{ padding: 0 }} onClick={() => setTemplate(t.id)}>{t.label}</button>
             ))}
           </div>
-          <span className="legend" style={{ marginBottom: 0, marginTop: 6 }}>Size</span>
-          <div role="radiogroup" aria-label="Size" className="seg">
+          <span className="legend" style={{ marginBottom: 0, marginTop: 6 }}>Aspect ratio</span>
+          <div role="radiogroup" aria-label="Aspect ratio" className="seg">
             <span className="seg__thumb" aria-hidden="true" style={{ left: ratio === "9:16" ? 5 : "50%", width: "calc(50% - 5px)" }} />
             <button type="button" role="radio" aria-checked={ratio === "9:16"} className="seg__opt" onClick={() => setRatio("9:16")}>9:16</button>
             <button type="button" role="radio" aria-checked={ratio === "3:4"} className="seg__opt" onClick={() => setRatio("3:4")}>3:4</button>
@@ -487,14 +487,14 @@ export function CardStudio() {
               <button type="button" className="tool" aria-label="Smaller" onClick={() => patch((s) => ({ ...s, size: Math.max(0.06, s.size / 1.15) }))}><Icon name="minus" /></button>
               <button type="button" className="tool" aria-label="Delete sticker" onClick={() => { setStickers((cur) => cur.filter((x) => x.uid !== selected)); setSelected(null); }}><Icon name="trash" /></button>
             </>
-          ) : <span className="muted" style={{ fontSize: 15, alignSelf: "center" }}>Drag stickers to place them. Tap one to resize or rotate.</span>}
+          ) : <span className="muted" style={{ fontSize: 15, alignSelf: "center" }}>Drag a sticker to place it. Select it to resize or rotate.</span>}
         </div>
       </div>
 
       <div className="editor__panel">
         <div className="fieldset" style={{ padding: 20 }}>
           <label className="field">Notes<input className="input" value={notes} maxLength={48} onChange={(e) => setNotes(e.target.value)} /></label>
-          <label className="field">One line<input className="input" value={line} maxLength={60} placeholder="What was going on?" onChange={(e) => setLine(e.target.value)} /></label>
+          <label className="field">One line<input className="input" value={line} maxLength={60} placeholder="What do you remember about this moment?" onChange={(e) => setLine(e.target.value)} /></label>
           <label className="field">Room<input className="input" value={place} maxLength={32} onChange={(e) => setPlace(e.target.value)} /></label>
           <Toggle label="Show name" on={showName} onChange={setShowName} />
           {showName ? <label className="field">Name<input className="input" value={name} maxLength={24} onChange={(e) => setName(e.target.value)} /></label> : null}
@@ -503,7 +503,7 @@ export function CardStudio() {
           {showCity ? <label className="field">City<input className="input" value={city} maxLength={24} onChange={(e) => setCity(e.target.value)} /></label> : null}
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          <button type="button" className="btn btn--primary" disabled={busy} onClick={() => exportCard("download")}>{busy ? "Making image…" : `Save image · ${ratio}`}</button>
+          <button type="button" className="btn btn--primary" disabled={busy} onClick={() => exportCard("download")}>{busy ? "Creating image…" : `Save image · ${ratio}`}</button>
           <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
             <button type="button" className="tool" aria-label="Share to Instagram" title="Instagram" disabled={busy} onClick={() => exportCard("share")} style={{ borderRadius: "50%", width: 48, height: 48 }}>
               <Icon name="instagram" />
@@ -518,10 +518,10 @@ export function CardStudio() {
               </button>
             ))}
           </div>
-          <span className="muted" style={{ fontSize: 14, textAlign: "center" }}>1080 px wide PNG</span>
+          <span className="muted" style={{ fontSize: 14, textAlign: "center" }}>PNG · 1080 px wide</span>
           {!source && mounted ? (
             <span style={{ fontSize: 15, textAlign: "center" }}>
-              Start from a page: <Link href="/atlas">Scent Atlas</Link>
+              Start with a saved entry: <Link href="/atlas">Scent Atlas</Link>
             </span>
           ) : null}
         </div>

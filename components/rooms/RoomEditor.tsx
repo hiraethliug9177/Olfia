@@ -249,7 +249,7 @@ export function RoomEditor() {
     if (goCard) {
       router.push(`/card?from=${id}`);
     } else {
-      show("Saved to your Scent Atlas", "/atlas", "Open the Atlas");
+      show("Saved to your Scent Atlas", "/atlas", "Open Scent Atlas");
       if (!editId) router.replace(`/rooms?id=${id}`, { scroll: false });
     }
   };
@@ -314,7 +314,7 @@ export function RoomEditor() {
               </div>
             );
           })()}
-          <span className="muted" style={{ fontSize: 15 }}>Tap to add, then drag it into place.</span>
+          <span className="muted" style={{ fontSize: 15 }}>Select an object to add it, then drag it into place.</span>
           </div>
         </div>
 
@@ -352,8 +352,8 @@ export function RoomEditor() {
               <span className="mono" style={{ fontSize: 13, padding: "0 10px" }}>{selItem ? (itemById(selItem.kind)?.label ?? findMaterial(selItem.kind)?.label ?? "") : "select an item"}</span>
               <button type="button" className="tool" aria-label="Rotate" disabled={!selItem} onClick={() => patchSel((it) => ({ ...it, rot: (it.rot + 15) % 360 }))}><Icon name="rotateCw" /></button>
               <button type="button" className="tool" aria-label="Flip" disabled={!selItem} onClick={() => patchSel((it) => ({ ...it, flip: it.flip === 1 ? -1 : 1 }))}><Icon name="flip" /></button>
-              <button type="button" className="tool" aria-label="Bigger" disabled={!selItem} onClick={() => patchSel((it) => ({ ...it, scale: Math.min(2, +(it.scale + 0.1).toFixed(2)) }))}><Icon name="plus" /></button>
-              <button type="button" className="tool" aria-label="Smaller" disabled={!selItem} onClick={() => patchSel((it) => ({ ...it, scale: Math.max(0.4, +(it.scale - 0.1).toFixed(2)) }))}><Icon name="minus" /></button>
+              <button type="button" className="tool" aria-label="Increase size" disabled={!selItem} onClick={() => patchSel((it) => ({ ...it, scale: Math.min(2, +(it.scale + 0.1).toFixed(2)) }))}><Icon name="plus" /></button>
+              <button type="button" className="tool" aria-label="Decrease size" disabled={!selItem} onClick={() => patchSel((it) => ({ ...it, scale: Math.max(0.4, +(it.scale - 0.1).toFixed(2)) }))}><Icon name="minus" /></button>
               <button type="button" className="tool" aria-label="Bring to front" disabled={!selItem} onClick={() => patchSel((it) => ({ ...it, z: topZ() + 1 }))}><Icon name="front" /></button>
               <button type="button" className="tool" aria-label="Send to back" disabled={!selItem} onClick={() => patchSel((it) => ({ ...it, z: lowZ() - 1 }))}><Icon name="back" /></button>
               <button type="button" className="tool" aria-label="Delete" disabled={!selItem} onClick={() => patchSel(() => null)}><Icon name="trash" /></button>
@@ -363,7 +363,7 @@ export function RoomEditor() {
 
         <div className="card editor__panel" style={{ padding: 22 }}>
           <label className="field">
-            Your name for it
+            Name your room
             <input className="input hand" style={{ fontSize: 22 }} type="text" value={nickname} maxLength={40} onChange={(e) => setNickname(e.target.value)} placeholder="rain, chapter three" />
           </label>
 
@@ -382,6 +382,7 @@ export function RoomEditor() {
             Scent strength
             <input className="range" type="range" min={20} max={100} value={strength} onChange={(e) => setStrength(Number(e.target.value))} />
             <span className="muted" style={{ display: "flex", justifyContent: "space-between", fontSize: 14, fontWeight: 400 }}><span>barely there</span><span>fills the room</span></span>
+            <span className="field__hint" style={{ fontWeight: 400 }}>Scent strength represents your imagined atmosphere, rather than a measured concentration.</span>
           </label>
 
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -400,7 +401,7 @@ export function RoomEditor() {
           </button>
 
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            <span style={{ fontSize: 17, fontWeight: 600 }}>Scent families <span className="field__hint">up to 3</span></span>
+            <span style={{ fontSize: 17, fontWeight: 600 }}>Scent families <span className="field__hint">Choose up to three</span></span>
             <div className="chips" style={{ gap: 6 }}>
               {FAMILIES.map((f) => (
                 <button key={f.id} type="button" className="chip" aria-pressed={families.includes(f.id)} style={{ minHeight: 40, padding: "0 12px 0 8px", fontSize: 14 }} onClick={() => toggleFamily(f.id)}>
@@ -410,16 +411,18 @@ export function RoomEditor() {
               ))}
             </div>
             {(() => {
-              const near = FAMILIES.filter((f) => !families.includes(f.id) && families.some((id) => areNeighbours(id, f.id))).slice(0, 2);
+              // copy v1 (11/24, §4.1): one suggestion, "Explore {family} as an additional scent."; the family is the button
+              const near = FAMILIES.filter((f) => !families.includes(f.id) && families.some((id) => areNeighbours(id, f.id))).slice(0, 1);
               return near.length && families.length < 3 ? (
                 <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 8, fontSize: 15 }}>
-                  <span className="muted">Try adding</span>
+                  <span className="muted">Explore</span>
                   {near.map((f) => (
                     <button key={f.id} type="button" className="chip" style={{ minHeight: 36, padding: "0 12px 0 8px", fontSize: 14, borderStyle: "dashed" }} onClick={() => toggleFamily(f.id)}>
                       <span className="chip__dot" style={{ background: f.hex, width: 13, height: 13 }} />
                       {f.label}
                     </button>
                   ))}
+                  <span className="muted">as an additional scent.</span>
                 </div>
               ) : null;
             })()}
@@ -453,12 +456,12 @@ export function RoomEditor() {
           </Link>
         ))}
         </div>
-        ) : <span className="muted" style={{ fontSize: 15 }}>Rooms you save land here.</span>}
+        ) : <span className="muted" style={{ fontSize: 15 }}>Save a room to keep your design here and return to it whenever you like.</span>}
       </section>
 
 
       <section id="products" className="card anchor" style={{ marginTop: 8 }}>
-        <ProductCards families={families} title="Matches this room" />
+        <ProductCards families={families} title="Fragrance Matches" lead="Explore products with fragrance families in common with your room. Use the match as a starting point, then consider how the product smells to you." />
       </section>
 
       <ThirdRoom

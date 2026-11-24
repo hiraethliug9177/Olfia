@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState, type CSSProperties } from "react";
-import { FAMILIES, familyById, itemById, methodLabel, roomLabel, sceneName, sourceLabel } from "@/lib/catalog";
+import { familyById, itemById, methodLabel, roomLabel, sceneName, sourceLabel } from "@/lib/catalog";
 import { useAtlas, useMounted } from "@/lib/store";
 import { useToast } from "@/lib/toast";
 import { track } from "@/lib/analytics";
@@ -12,22 +12,28 @@ import { FitWidth } from "@/components/ui/FitWidth";
 import { Icon } from "@/components/ui/Icon";
 import { Star as StarIcon } from "lucide-react";
 import { loadSample } from "@/lib/demo";
-import type { CaptureEntry, Entry, FamilyId, RoomsEntry } from "@/lib/types";
+import type { CaptureEntry, Entry, RoomsEntry } from "@/lib/types";
 import { ScenePage } from "@/components/scene/ScenePage";
-import { ScentSummary } from "@/components/account/ScentSummary";
-import { Stamp } from "@/components/scene/Stamp";
 import { useSearchParams } from "next/navigation";
 import { Shelf } from "@/components/atlas/Shelf";
 import { MonthRecord } from "@/components/atlas/MonthRecord";
+import { Scentprint } from "@/components/atlas/Scentprint";
+import { takeTag } from "@/lib/atlasTag";
 
-/** Atlas views and their colours (Tiffany 11/10: each panel in one of the site's own colours). */
-const TABS = ["calendar", "favorites", "tags", "shelf"] as const;
+/**
+ * Atlas views and their colours (Tiffany 11/10: each panel in one of the site's own colours).
+ * Names from copy v1 (11/24): Scent Journal (was Calendar), Favorites, My Scentprint (was Tags & profile, now with
+ * My Preferences from My Page), Fragrance Shelf (was My shelf). Old links (?tab=calendar, ?tab=tags, ?tag=) still open.
+ */
+const TABS = ["journal", "favorites", "scentprint", "shelf"] as const;
 type TabId = 0 | 1 | 2 | 3;
-const TAB_LABELS = ["Calendar", "Favorites", "Tags & profile", "My shelf"];
+const LEGACY_TABS: Record<string, TabId> = { calendar: 0, tags: 2 };
+const TAB_LABELS = ["Scent Journal", "Favorites", "My Scentprint", "Fragrance Shelf"];
 function tabFromParams(p: URLSearchParams | null): TabId {
-  const t = p?.get("tab");
-  const i = TABS.indexOf((t ?? "") as (typeof TABS)[number]);
+  const t = p?.get("tab") ?? "";
+  const i = TABS.indexOf(t as (typeof TABS)[number]);
   if (i >= 0) return i as TabId;
+  if (t in LEGACY_TABS) return LEGACY_TABS[t];
   return p?.get("tag") ? 2 : 0;
 }
 
@@ -62,10 +68,13 @@ export function AtlasView() {
   const [ym, setYm] = useState<{ y: number; m: number } | null>(null);
   const [day, setDay] = useState<number>(1);
 
-  // the header menu links to /atlas?tab=…; follow it when the address changes
+  // the header menu links to /atlas?tab=…; follow it when the address changes. A tag chosen elsewhere
+  // (My Page, the monthly record) arrives through sessionStorage, never in the address (lib/atlasTag.ts).
   useEffect(() => {
     setTab(tabFromParams(params));
-    if (params.get("tag")) setTag(params.get("tag"));
+    const handed = takeTag();
+    if (handed) setTag(handed);
+    else if (params.get("tag")) setTag(params.get("tag"));
   }, [params]);
 
   useEffect(() => {
@@ -105,7 +114,7 @@ export function AtlasView() {
   const monthName = monthLabel(ym.y, ym.m).split(" ")[0];
 
   const del = (e: Entry) => {
-    if (typeof window !== "undefined" && !window.confirm("Delete this page from your Scent Atlas?")) return;
+    if (typeof window !== "undefined" && !window.confirm("Delete this entry from your Scent Atlas?")) return;
     remove(e.id);
     track("entry_deleted", { mode: e.type });
   };
@@ -119,6 +128,7 @@ export function AtlasView() {
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           <h1 className="h-page">Scent Atlas</h1>
           <p className="lead" style={{ fontSize: 18 }}>Your rooms, ideas, and scent notes, all in one place.</p>
+          <p style={{ margin: 0, maxWidth: 640 }}>As your collection grows, revisit familiar scents, rediscover details from past days, and notice how your records change with the seasons.</p>
         </div>
         {tab === 0 ? (
           <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 18, fontWeight: 600 }}>
@@ -139,17 +149,20 @@ export function AtlasView() {
         ))}
       </div>
 
-      <div className={`atlas-panel atlas-panel--${tab}${tab === 2 && entries.length > 0 ? " panel--deep" : ""}`}>
+      {/* My Scentprint keeps the light panel: its map, chips and highlights are drawn for a pale ground */}
+      <div className={`atlas-panel atlas-panel--${tab}`}>
         {tab === 3 ? (
           <div style={{ padding: "32px 28px" }}><Shelf /></div>
-        ) : entries.length === 0 ? (
+        ) : tab === 2 ? (
+          <div style={{ padding: "32px 28px" }}><Scentprint entries={entries} tag={tag} setTag={setTag} /></div>
+        ) : tab === 0 && entries.length === 0 ? (
           <div style={{ padding: "56px 32px", display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 16 }}>
-            <span className="hand" style={{ fontSize: 30, color: "var(--deep)" }}>nothing pinned yet</span>
-            <p className="lead">Save a room or capture a scent, and it lands here as a page of the month.</p>
+            <span className="hand" style={{ fontSize: 30, color: "var(--deep)" }}>Your journal is waiting for its first entry.</span>
+            <p className="lead">Capture a scent or save a room to start collecting pages in your monthly journal.</p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
               <Link href="/capture" className="btn btn--primary">Capture a scent</Link>
-              <Link href="/rooms" className="btn btn--ghost">Make a room</Link>
-              <button type="button" className="btn btn--ghost" onClick={() => { loadSample(); track("sample_loaded", { place: "atlas" }); show("Sample pages added"); }}>See a sample</button>
+              <Link href="/rooms" className="btn btn--ghost">Design a room</Link>
+              <button type="button" className="btn btn--ghost" onClick={() => { loadSample(); track("sample_loaded", { place: "atlas" }); show("Sample pages added to your Scent Atlas"); }}>See a sample</button>
             </div>
           </div>
         ) : tab === 0 ? (
@@ -195,7 +208,7 @@ export function AtlasView() {
                 <span className="label-mono">{monthName} {day}</span>
                 {dayEntries.length === 0 ? (
                   <>
-                    <span className="hand muted" style={{ fontSize: 24 }}>nothing pinned this day</span>
+                    <span className="hand muted" style={{ fontSize: 24 }}>No entries for this day.</span>
                     <Link href="/capture" className="hero__link">Capture a scent</Link>
                   </>
                 ) : (
@@ -225,46 +238,6 @@ export function AtlasView() {
               <MonthRecord entries={monthEntries} year={ym.y} month={ym.m} />
             </div>
           </>
-        ) : tab === 2 ? (
-          <div style={{ display: "flex", flexDirection: "column", gap: 24, padding: "32px 28px" }}>
-            {(() => {
-              const caps = entries.filter((e): e is CaptureEntry => e.type === "capture");
-              const counts = new Map<string, number>();
-              caps.forEach((c) => (c.tags ?? []).forEach((t) => counts.set(t, (counts.get(t) ?? 0) + 1)));
-              const allTags = [...counts.entries()].sort((a, b) => b[1] - a[1]);
-              const list = tag ? caps.filter((c) => (c.tags ?? []).includes(tag)) : [];
-              return (
-                <>
-                  {allTags.length ? (
-                    <div className="chips">
-                      {allTags.map(([t, n]) => (
-                        <button key={t} type="button" className={`tag${tag === t ? " tag--on" : ""}`} onClick={() => setTag(tag === t ? null : t)} style={{ border: 0, cursor: "pointer" }}>#{t} <span style={{ marginLeft: 6, opacity: 0.7 }}>{n}</span></button>
-                      ))}
-                    </div>
-                  ) : <span className="muted">Tags appear once you capture a scent.</span>}
-                  {tag ? (
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 16 }}>
-                      {list.map((e) => (
-                        <div key={e.id} className="light" style={{ display: "flex", flexDirection: "column", gap: 8, padding: 16, borderRadius: 18, background: "var(--ivory)" }}>
-                          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                            {e.families[0] ? <Stamp family={e.families[0]} size={48} /> : null}
-                            <span style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                              <span style={{ fontSize: 17, fontWeight: 600 }}>{entryTitle(e)}</span>
-                              <span className="mono muted" style={{ fontSize: 13 }}>{roomLabel(e.room)} · {hourOnly(new Date(e.createdAt))}</span>
-                            </span>
-                          </div>
-                          {e.momentName || e.situation ? <span className="hand" style={{ fontSize: 21 }}>{e.momentName || e.situation}</span> : null}
-                          <div className="chips">{(e.tags ?? []).map((t) => <span key={t} className="tag" style={{ minHeight: 26, fontSize: 12 }}>#{t}</span>)}</div>
-                          <Link href={`/card?from=${e.id}`} className="btn btn--ghost btn--sm" style={{ height: 36, alignSelf: "flex-start" }}>Scent Card</Link>
-                        </div>
-                      ))}
-                    </div>
-                  ) : null}
-                  <ScentSummary compact />
-                </>
-              );
-            })()}
-          </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 24, padding: "32px 28px" }}>
             <div role="tablist" aria-label="Favorites" className="seg" style={{ width: 340, maxWidth: "100%" }}>
@@ -281,7 +254,7 @@ export function AtlasView() {
                     </Link>
                   ))}
                 </div>
-              ) : <span className="muted">Star a room in the calendar to keep it here.</span>
+              ) : <span className="muted">Star a room in your Scent Journal to find it here again.</span>
             ) : products.length ? (
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 18 }}>
                 {products.map((p) => {
@@ -289,7 +262,7 @@ export function AtlasView() {
                   return (
                     <div key={p.id} className="mono" style={{ display: "flex", flexDirection: "column", gap: 8, padding: 22, borderRadius: 18, background: "var(--ivory)", border: "1px solid rgba(41,42,49,0.08)" }}>
                       <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
-                        <span style={{ fontSize: 17, fontWeight: 600 }}><span className="hl" style={{ "--hl": f ? `${f.hex}66` : undefined } as CSSProperties}>{p.what.mode === "product" ? (p.what.productName || p.what.scentName || "Unnamed") : ""}</span></span>
+                        <span style={{ fontSize: 17, fontWeight: 600 }}><span className="hl" style={{ "--hl": f ? `${f.hex}66` : undefined } as CSSProperties}>{p.what.mode === "product" ? (p.what.productName || p.what.scentName || "Unnamed fragrance") : ""}</span></span>
                         <button type="button" className="tool" aria-label={p.starred ? "Unstar" : "Star"} aria-pressed={p.starred} onClick={() => toggleStar(p.id)} style={{ boxShadow: "none", background: "transparent", width: 36, height: 36 }}><Star on={p.starred} /></button>
                       </div>
                       <span className="muted" style={{ fontSize: 14 }}>{sourceLabel(p.source)} · {f ? f.label : "—"}</span>
@@ -298,7 +271,7 @@ export function AtlasView() {
                   );
                 })}
               </div>
-            ) : <span className="muted">Products you capture land here.</span>}
+            ) : <span className="muted">Fragrances recorded in Capture will appear here.</span>}
           </div>
         )}
       </div>

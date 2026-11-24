@@ -13,7 +13,7 @@ import type { RoomsEntry } from "@/lib/types";
 /**
  * Saving a third room on the free plan (v2, 11/23; Tiffany's Notion: the plans open "when a third Room is added").
  * Three ways out: Join Olfia Plus (the fake-door window), Replace a saved room (pick one; it is deleted and the new
- * room takes its place), or Not now (back to the room, nothing lost). The title is Claude's draft.
+ * room takes its place), or Not now (back to the room, nothing lost). Copy: Tiffany's v1, 11/24 (§0.5).
  */
 export function ThirdRoom({ open, rooms, onClose, onReplace }: {
   open: boolean;
@@ -28,12 +28,12 @@ export function ThirdRoom({ open, rooms, onClose, onReplace }: {
   const sorted = [...rooms].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
 
   return (
-    <Dialog open={open} onClose={onClose} label="Your free plan keeps two rooms" className="dlg--wide">
+    <Dialog open={open} onClose={onClose} label="You can save up to two rooms on the free plan" className="dlg--wide">
       <div className="dlg__body">
         <button type="button" className="dlg__x" aria-label="Close" onClick={onClose}><Icon name="x" /></button>
         {step === "plans" ? (
           <>
-            <h2 className="dlg__title">Your free plan keeps two rooms.</h2>
+            <h2 className="dlg__title">You can save up to two rooms on the free plan.</h2>
             <PlanCards billing="monthly" onJoin={join} compact />
             <div className="dlg__actions">
               <button type="button" className="btn btn--ghost" onClick={() => setStep("replace")}>Replace a saved room</button>
@@ -52,7 +52,7 @@ export function ThirdRoom({ open, rooms, onClose, onReplace }: {
                 </label>
               ))}
             </div>
-            <p className="dlg__text">The room you pick is deleted from this browser, and this one is saved in its place.</p>
+            <p className="dlg__text">The selected room will be removed from this browser and replaced with your new room.</p>
             <div className="dlg__actions">
               <button type="button" className="btn btn--primary" disabled={!pick} onClick={() => { if (pick) onReplace(pick); }}>Replace this room</button>
               <button type="button" className="dlg__link" onClick={() => setStep("plans")}>Back</button>

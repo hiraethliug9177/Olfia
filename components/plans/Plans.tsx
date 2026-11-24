@@ -38,7 +38,7 @@ export function PlanCards({ billing, onJoin, compact = false }: { billing: Billi
           {c.points.map((p) => <li key={p}><Icon name="check" size={18} />{p}</li>)}
         </ul>
         {id === "plus" ? (
-          <button type="button" className="btn btn--primary btn--block plan__cta" onClick={onJoin}>Join Olfia Plus</button>
+          <button type="button" className="btn btn--primary btn--block plan__cta" onClick={onJoin}>Join the waitlist</button>
         ) : (
           <p className="plan__current"><Icon name="check" size={18} />Your plan</p>
         )}
@@ -65,6 +65,8 @@ export function Plans() {
         <h2 id="plans-h" className="h-section" style={{ fontSize: 34 }}>Plans</h2>
         {hasPrices ? <BillingSwitch value={billing} onChange={setBilling} /> : null}
       </div>
+      <p className="lead plans__lead">Explore Olfia for free today. Olfia Plus is planned for people who want to keep more room designs and personalize their visual collection.</p>
+      <p className="muted plans__hint">Olfia Plus is not available yet. The features below describe the planned offering.</p>
       <PlanCards billing={billing} onJoin={join} />
       {/* on a phone the table scrolls sideways and its first column stays put */}
       <div className="plans__scroll" role="region" aria-label="Compare the plans" tabIndex={0}>
@@ -73,7 +75,7 @@ export function Plans() {
             <tr>
               <th scope="col"><span className="sr-only">What you get</span></th>
               <th scope="col">Free</th>
-              <th scope="col">Olfia Plus</th>
+              <th scope="col">Olfia Plus · Planned</th>
             </tr>
           </thead>
           <tbody>
@@ -96,7 +98,7 @@ export function Plans() {
         ))}
       </div>
       <div className="plans__end">
-        <button type="button" className="btn btn--primary" onClick={join}>Join Olfia Plus</button>
+        <button type="button" className="btn btn--primary" onClick={join}>Join the waitlist</button>
       </div>
     </section>
   );

@@ -54,7 +54,7 @@ export function Analytics({ gaId }: { gaId: string }) {
       if (flag === "on" || flag === "off") {
         url.searchParams.delete("me");
         window.history.replaceState(null, "", url.pathname + url.search + url.hash);
-        show(mine ? "This browser is marked as you. Its visits are not counted." : "This browser counts as a visitor again.");
+        show(mine ? "Visits from this browser are excluded from analytics." : "Visits from this browser are included in analytics again.");
       }
     } catch {
       // storage blocked: count as a visitor

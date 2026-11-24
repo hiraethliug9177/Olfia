@@ -26,8 +26,8 @@ const makeId = (): string =>
 
 /**
  * One gift pick (Tiffany 11/18): its room, then what it is, its size and price, its notes, when it suits and its
- * families. For someone: make a gift card, keep it in the Scent Atlas, or open the brand's page. For me: put it on
- * My shelf, make a Scent Card from its room, or open the brand's page.
+ * families. For someone else: make a gift card, keep it in the Scent Atlas, or open the brand's page. For myself: put it
+ * on the Fragrance Shelf, make a Scent Card from its room, or open the brand's page.
  */
 export function GiftPick({ scene, mode, to = "" }: { scene: GiftScene; mode: "me" | "someone"; to?: string }) {
   const { p } = scene;
@@ -42,9 +42,9 @@ export function GiftPick({ scene, mode, to = "" }: { scene: GiftScene; mode: "me
   }, [mode, p.id]);
 
   const name = to.trim();
-  const price = p.price ? [p.price, p.size].filter(Boolean).join(" · ") : p.url ? null : "In stores only";
+  const price = p.price ? [p.price, p.size].filter(Boolean).join(" · ") : p.url ? null : "Available in stores only";
   const brandLink = p.url ? (
-    <ProductLink href={p.url} product={{ id: p.id, brand: p.brand, family: p.families[0], tier: p.tier }} className="gift-pick__icon" ariaLabel={`Open on ${p.brand}'s site`}>
+    <ProductLink href={p.url} product={{ id: p.id, brand: p.brand, family: p.families[0], tier: p.tier }} className="gift-pick__icon" ariaLabel={`View on ${p.brand}’s website`}>
       <Icon name="external" size={18} />
     </ProductLink>
   ) : null;
@@ -63,12 +63,12 @@ export function GiftPick({ scene, mode, to = "" }: { scene: GiftScene; mode: "me
       routine: routineFor(p), note: "", url: p.url, productId: p.id,
     };
     if (!saveShelf([item, ...loadShelf()])) {
-      show("Couldn’t save it in this browser.");
+      show("Couldn’t save this entry in your browser. Try freeing up storage and saving again.");
       return;
     }
     setOnShelf(true);
     track("gift_save", { to: "shelf", product: p.id });
-    show("Added to My shelf", "/atlas?tab=shelf", "Open");
+    show("Added to your Fragrance Shelf", "/atlas?tab=shelf", "Open");
   };
 
   const makeScentCard = () => {
@@ -109,7 +109,7 @@ export function GiftPick({ scene, mode, to = "" }: { scene: GiftScene; mode: "me
           ) : (
             <>
               <button type="button" className="btn btn--primary btn--sm gift-pick__main" onClick={saveToShelf} disabled={onShelf}>
-                <Icon name={onShelf ? "bookmarkCheck" : "bookmark"} size={18} />{onShelf ? "On My shelf" : "Save to My shelf"}
+                <Icon name={onShelf ? "bookmarkCheck" : "bookmark"} size={18} />{onShelf ? "On your Fragrance Shelf" : "Save to Fragrance Shelf"}
               </button>
               <button type="button" className="gift-pick__icon" onClick={makeScentCard} aria-label="Make a Scent Card">
                 <Icon name="image" size={18} />

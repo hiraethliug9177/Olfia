@@ -9,6 +9,7 @@ import { matchProducts } from "@/lib/products";
 import { ProductCard } from "@/components/products/ProductCards";
 import { Stamp } from "@/components/scene/Stamp";
 import type { Entry, FamilyId } from "@/lib/types";
+import { handOffTag } from "@/lib/atlasTag";
 
 /**
  * "Your Scents at a Glance" (11/4 feedback, B tier; renamed 11/10 because "Scent Profile" is a retired term;
@@ -78,17 +79,20 @@ export function ScentSummary({ compact = false }: { compact?: boolean }) {
   return (
     <section className="card" style={{ display: "flex", flexDirection: "column", gap: 22 }}>
       <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-        <h2 className="h-section" style={{ fontSize: compact ? 26 : 30 }}>Your Scents at a Glance</h2>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8, flex: "1 1 320px" }}>
+          <h2 className="h-section" style={{ fontSize: compact ? 26 : 30 }}>Your Scents at a Glance</h2>
+          <p className="lead" style={{ margin: 0, fontSize: 17 }}>A summary of the scents and settings you’ve recorded so far. Your most recorded family may be different from your favorite.</p>
+        </div>
         <button type="button" role="switch" aria-checked={showingSample} className="switch" onClick={() => setUseSample((v) => !v)} disabled={saved.length === 0}>
           Sample data
           <span className="switch__track" aria-hidden="true"><span className="switch__knob" /></span>
         </button>
       </div>
-      {showingSample && saved.length === 0 ? <p className="muted" style={{ margin: 0 }}>Showing sample pages until you save your own.</p> : null}
+      {showingSample && saved.length === 0 ? <p className="muted" style={{ margin: 0 }}>You’re viewing sample pages. Your own saved entries will appear as you add them.</p> : null}
 
       <div style={{ display: "flex", flexWrap: "wrap", gap: 18 }}>
         <div className="stat" style={{ flex: "2 1 360px" }}>
-          <span className="label-mono">Families, All Time</span>
+          <span className="label-mono">Most Recorded Scent Families</span>
           <div style={{ display: "flex", height: 22, borderRadius: 999, overflow: "hidden", gap: 3 }}>
             {famRows.map(([f, n]) => <span key={f} title={familyById(f).label} style={{ flex: `${n} 1 0`, background: familyById(f).hex }} />)}
           </div>
@@ -102,13 +106,13 @@ export function ScentSummary({ compact = false }: { compact?: boolean }) {
           {top ? (
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
               <Stamp family={top} size={56} />
-              <span style={{ fontSize: 15, whiteSpace: "nowrap" }}>Most used: <span className="hl" style={{ "--hl": `${familyById(top).hex}66` } as CSSProperties}>{familyById(top).label}</span></span>
+              <span style={{ fontSize: 15, whiteSpace: "nowrap" }}>Most recorded: <span className="hl" style={{ "--hl": `${familyById(top).hex}66` } as CSSProperties}>{familyById(top).label}</span></span>
             </div>
           ) : null}
         </div>
         <div className="stat" style={{ flex: "1 1 220px" }}>
-          <span className="label-mono">How It Felt</span>
-          {emotionRows.length ? <Bars rows={emotionRows.slice(0, 5)} color="#A0A6C8" labelOf={(k) => EMOTION_OPTIONS.find((e) => e.id === k)?.label ?? k} /> : <span className="muted">No emotions recorded yet.</span>}
+          <span className="label-mono">Feelings You Recorded</span>
+          {emotionRows.length ? <Bars rows={emotionRows.slice(0, 5)} color="#A0A6C8" labelOf={(k) => EMOTION_OPTIONS.find((e) => e.id === k)?.label ?? k} /> : <span className="muted">No feelings recorded yet.</span>}
         </div>
         <div className="stat" style={{ flex: "1 1 220px" }}>
           <span className="label-mono">Time of Day</span>
@@ -116,7 +120,7 @@ export function ScentSummary({ compact = false }: { compact?: boolean }) {
         </div>
         {!compact ? (
           <div className="stat" style={{ flex: "1 1 220px" }}>
-            <span className="label-mono">Product Types</span>
+            <span className="label-mono">Fragrance Formats</span>
             {typeRows.length ? <Bars rows={typeRows} color="#4C527A" labelOf={(k) => sourceLabel(k as Parameters<typeof sourceLabel>[0])} /> : <span className="muted">—</span>}
           </div>
         ) : null}
@@ -126,7 +130,7 @@ export function ScentSummary({ compact = false }: { compact?: boolean }) {
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           <span className="label-mono">Your Tags</span>
           <div className="chips">
-            {tagRows.map(([t, n]) => <Link key={t} href={`/atlas?tag=${t}`} className="tag" style={{ textDecoration: "none" }}>#{t} <span className="muted" style={{ marginLeft: 6 }}>{n}</span></Link>)}
+            {tagRows.map(([t, n]) => <Link key={t} href="/atlas?tab=scentprint" onClick={() => handOffTag(t)} className="tag" style={{ textDecoration: "none" }}>#{t} <span className="muted" style={{ marginLeft: 6 }}>{n}</span></Link>)}
           </div>
         </div>
       ) : null}
@@ -135,14 +139,14 @@ export function ScentSummary({ compact = false }: { compact?: boolean }) {
         <div className="try-next">
           {/* 11/18 (Tiffany): the suggestions sit on the title's line; the three cards are one size */}
           <div className="try-next__head">
-            <span className="label-mono">Try Next</span>
+            <span className="label-mono">Something New to Explore</span>
             {tryNext.map((f) => (
-              <Link key={f} href={`/rooms?family=${f}`} className="chip" style={{ textDecoration: "none" }}><span className="chip__dot" style={{ background: familyById(f).hex }} />{familyById(f).label} · next to {familyById(top).label.split(" ")[0]} on the wheel</Link>
+              <Link key={f} href={`/rooms?family=${f}`} className="chip" style={{ textDecoration: "none" }}><span className="chip__dot" style={{ background: familyById(f).hex }} />Explore {familyById(f).label} alongside {familyById(top).label} on the wheel</Link>
             ))}
             {pair ? (
               <Link href={`/rooms?family=${pair[0]}`} className="chip" style={{ textDecoration: "none" }}>
                 <span className="chip__dot" style={{ background: familyById(pair[0]).hex }} /><span className="chip__dot" style={{ background: familyById(pair[1]).hex, marginLeft: -10 }} />
-                {familyById(pair[0]).label} + {familyById(pair[1]).label} blend well
+                Explore {familyById(pair[0]).label} and {familyById(pair[1]).label} for a new scent direction
               </Link>
             ) : null}
           </div>

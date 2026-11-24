@@ -7,14 +7,14 @@ import { Icon, type IconName } from "@/components/ui/Icon";
 /**
  * v2 (11/23, Tiffany's Notion "Capstone Draft", 01–02): the text on the left changes; the board on the right stays
  * exactly as it is (Tiffany 11/23: "首页的main visual … 维持原样"). "Scent is an afterimage." moves to About Olfia.
- * The line is her positioning sentence cut to one line (decision 2); the three lines are hers, with "in the moment"
- * and "full of memories" (decision 3); both buttons share one style, in sentence case.
+ * Copy v1 (Tiffany, 11/24, docs/copy/olfia-site-copy-v1.md §1.1): the approved lead (Option A, exact), one line per
+ * feature, and "Capture a scent" as the first button. Both buttons share one style, in sentence case.
  */
-const HERO_LINE = "A personal home fragrance platform that connects scent, space, and memory.";
+const HERO_LINE = "A personal home fragrance platform to explore scents, design room atmospheres, and document your sensory experiences.";
 const DOES: Array<{ icon: IconName; name: string; line: string }> = [
-  { icon: "penLine", name: "Capture", line: "Keep a scent you noticed in the moment." },
-  { icon: "doorOpen", name: "Rooms", line: "Design your space with the ideal scent in mind." },
-  { icon: "map", name: "Atlas", line: "Your personal scent archive, full of memories." },
+  { icon: "penLine", name: "Capture", line: "Record the scents you encounter in everyday life." },
+  { icon: "doorOpen", name: "Rooms", line: "Explore fragrance and design your ideal room atmosphere." },
+  { icon: "map", name: "Scent Atlas", line: "Your personal archive of scents, spaces, and memories." },
 ];
 
 /**
@@ -139,13 +139,13 @@ export function Hero() {
           ))}
         </ul>
         <div className="anim-rise hero__ctas" style={{ animationDelay: "0.24s" }}>
-          <Link href="/capture" className="btn btn--primary">Start the capture</Link>
+          <Link href="/capture" className="btn btn--primary">Capture a scent</Link>
           <Link href={`/rooms?family=${families}`} className="btn btn--primary">Design your space</Link>
         </div>
       </div>
 
       <div className="hero__board anim-fade" style={{ animationDelay: "0.2s" }}>
-        <svg viewBox="0 0 760 640" role="group" aria-label="Scent design board: tap a pinned reference to try it on the room sketch">
+        <svg viewBox="0 0 760 640" role="group" aria-label="Scent design board: select a pinned reference to try it on the room sketch">
           <defs>
             <filter id="hb-cork" x="0" y="0" width="100%" height="100%">
               <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="7" result="n" />
@@ -284,7 +284,7 @@ export function Hero() {
           </g>
 
           {/* reference 1: bookshop photograph */}
-          <g role="button" tabIndex={0} aria-pressed={ref === "books" || both} aria-label={`${REFS.books.name}: try it on the sketch`} onClick={() => pick("books")} onKeyDown={onKey("books")} style={card("books", -7)} className="hero__ref">
+          <g role="button" tabIndex={0} aria-pressed={ref === "books" || both} aria-label={REFS.books.name} onClick={() => pick("books")} onKeyDown={onKey("books")} style={card("books", -7)} className="hero__ref">
             <g filter="url(#hb-shadow)">
               <rect x="22" y="170" width="168" height="206" fill="#FBFAF6" />
             </g>
@@ -305,7 +305,7 @@ export function Hero() {
           </g>
 
           {/* reference 2: courtyard sketch */}
-          <g role="button" tabIndex={0} aria-pressed={ref === "garden" || both} aria-label={`${REFS.garden.name}: try it on the sketch`} onClick={() => pick("garden")} onKeyDown={onKey("garden")} style={card("garden", 6)} className="hero__ref">
+          <g role="button" tabIndex={0} aria-pressed={ref === "garden" || both} aria-label={REFS.garden.name} onClick={() => pick("garden")} onKeyDown={onKey("garden")} style={card("garden", 6)} className="hero__ref">
             <g filter="url(#hb-shadow)">
               <path d="M598 262 l14 -4 14 3 16 -4 14 4 16 -3 14 4 16 -4 16 3 14 -2 V470 H598 Z" fill="#EEF0E2" />
             </g>

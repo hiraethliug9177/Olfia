@@ -17,7 +17,7 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: { default: `Olfia — ${strings.brand.invitation}`, template: "%s · Olfia" },
-  description: `${strings.brand.awareness} ${strings.brand.invitation}`,
+  description: "Explore fragrance families, design room atmospheres, and keep a personal scent journal with Olfia, a home fragrance platform.",
   openGraph: { title: "Olfia", description: strings.brand.cover, type: "website", siteName: "Olfia", images: [SHARE_IMAGE] },
   twitter: { card: "summary_large_image" },
 };

@@ -171,7 +171,7 @@ export function CaptureForm() {
     add(entry);
     track("creation_complete", { mode: "capture" });
     setSavedId(entry.id);
-    show("Saved to your Scent Atlas", "/atlas", "Open the Atlas");
+    show("Saved to your Scent Atlas", "/atlas", "Open Scent Atlas");
     reset();
   };
 
@@ -188,7 +188,9 @@ export function CaptureForm() {
         <div key={current} className="flow__step" style={{ display: "flex", flexDirection: "column", gap: 20 }}>
           {current === "season" ? (
             <>
-              <h2 className="flow__q">Which <em>season</em> is it?</h2>
+              {/* copy v1 (Tiffany 11/24, §2): a lead at the start and a hint at the last step only; nine steps kept */}
+              <p className="lead">Record a scent from today or a moment you still remember. Use Skip when you’re unsure about a detail.</p>
+              <h2 className="flow__q">What <em>season</em> was it?</h2>
               <div className="opts">
                 {SEASON_OPTIONS.map((o) => <Opt key={o.id} on={season === o.id} onClick={() => setSeason(o.id)} dot={o.paper}>{o.label}</Opt>)}
               </div>
@@ -197,7 +199,7 @@ export function CaptureForm() {
 
           {current === "daypart" ? (
             <>
-              <h2 className="flow__q">What <em>time</em> of day?</h2>
+              <h2 className="flow__q"><em>When</em> did you notice it?</h2>
               <div className="opts">
                 {DAYPART_OPTIONS.map((o) => <Opt key={o.id} on={daypart === o.id} onClick={() => setDaypart(o.id)} dot={LIGHT[o.id] === "rgba(255, 255, 255, 0)" ? "#F8F6F0" : LIGHT[o.id].replace("0.16", "0.9")}>{o.label}</Opt>)}
               </div>
@@ -215,7 +217,7 @@ export function CaptureForm() {
 
           {current === "occasion" ? (
             <>
-              <h2 className="flow__q">What&rsquo;s the <em>occasion</em>?</h2>
+              <h2 className="flow__q">What was <em>happening</em> at the time?</h2>
               <div className="opts">
                 {OCCASION_OPTIONS.map((o) => <Opt key={o.id} on={occasion === o.id} onClick={() => setOccasion(occasion === o.id ? null : o.id)}>{o.label}</Opt>)}
               </div>
@@ -224,7 +226,7 @@ export function CaptureForm() {
 
           {current === "source" ? (
             <>
-              <h2 className="flow__q">What is the scent <em>coming from</em>?</h2>
+              <h2 className="flow__q">Where did the scent <em>come from</em>?</h2>
               <div className="opts">
                 {SOURCE_OPTIONS.map((o) => <Opt key={o.id} on={source === o.id} onClick={() => setSource(o.id)}>{o.label}</Opt>)}
               </div>
@@ -233,7 +235,7 @@ export function CaptureForm() {
 
           {current === "what" ? (
             <>
-              <h2 className="flow__q">What <em>is</em> it?</h2>
+              <h2 className="flow__q">Tell us more about the <em>source</em>.</h2>
               <div role="tablist" aria-label="Record by" className="seg" style={{ width: 280, maxWidth: "100%" }}>
                 <span className="seg__thumb" aria-hidden="true" style={{ left: mode === "product" ? 5 : "50%", width: "calc(50% - 5px)" }} />
                 <button type="button" role="tab" aria-selected={mode === "product"} className="seg__opt" onClick={() => setMode("product")}>A product</button>
@@ -242,8 +244,8 @@ export function CaptureForm() {
               {mode === "product" ? (
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 14 }}>
                   <label className="field" style={{ flex: "1 1 220px" }}>
-                    Product
-                    <input className="input" type="text" value={productName} onChange={(e) => setProductName(e.target.value)} placeholder="Brand or shop" maxLength={80} />
+                    Brand or shop
+                    <input className="input" type="text" value={productName} onChange={(e) => setProductName(e.target.value)} placeholder="e.g. Diptyque" maxLength={80} />
                   </label>
                   <label className="field" style={{ flex: "1 1 220px" }}>
                     Scent name
@@ -262,9 +264,9 @@ export function CaptureForm() {
 
           {current === "families" ? (
             <>
-              <h2 className="flow__q">Which <em>families</em> does it belong to? <span className="field__hint" style={{ fontSize: 18, fontFamily: "var(--font-ui)" }}>Pick one or two</span></h2>
+              <h2 className="flow__q">Which fragrance <em>families</em> describe it? <span className="field__hint" style={{ fontSize: 18, fontFamily: "var(--font-ui)" }}>Choose up to two</span></h2>
               {mode === "method" && method ? (
-                <p className="lead">We&rsquo;ve picked the usual families for that. Change them if it smelled different.</p>
+                <p className="lead">We’ve suggested some families based on your source. Choose the ones that match what you smelled.</p>
               ) : null}
               <div className="opts">
                 {FAMILIES.map((f) => (
@@ -281,7 +283,7 @@ export function CaptureForm() {
 
           {current === "emotions" ? (
             <>
-              <h2 className="flow__q">How did it make you <em>feel</em>? <span className="field__hint" style={{ fontSize: 18, fontFamily: "var(--font-ui)" }}>Up to two</span></h2>
+              <h2 className="flow__q">How did it make you <em>feel</em>? <span className="field__hint" style={{ fontSize: 18, fontFamily: "var(--font-ui)" }}>Choose up to two</span></h2>
               <div className="chips">
                 {EMOTION_OPTIONS.map((e) => (
                   <button key={e.id} type="button" className="chip" aria-pressed={emotions.includes(e.id)} onClick={() => toggleEmotion(e.id)} style={{ minHeight: 48, fontSize: 17 }}>{e.label}</button>
@@ -292,8 +294,9 @@ export function CaptureForm() {
 
           {current === "finish" ? (
             <>
-              <h2 className="flow__q">Keep it or <em>let it go</em>?</h2>
-              <div role="radiogroup" aria-label="Feelings" className="chips">
+              <h2 className="flow__q">How did you <em>like</em> the scent?</h2>
+              <p className="field__hint" style={{ margin: 0 }}>You can save scents you loved and ones you would rather avoid.</p>
+              <div role="radiogroup" aria-label="How you liked the scent" className="chips">
                 <button type="button" role="radio" aria-checked={feeling === "loved"} className="chip" onClick={() => setFeeling("loved")} style={{ minHeight: 56, borderRadius: 16, fontSize: 18 }}>
                   <Icon name="check" />
                   Loved it
@@ -305,11 +308,11 @@ export function CaptureForm() {
               </div>
               <label className="field">
                 Name this moment
-                <input className="input" type="text" value={momentName} onChange={(e) => { setNameTouched(true); setMomentName(e.target.value); }} maxLength={60} />
+                <input className="input" type="text" value={momentName} onChange={(e) => { setNameTouched(true); setMomentName(e.target.value); }} maxLength={60} placeholder="Sunday morning, windows open" />
               </label>
               <label className="field">
-                One line worth keeping <span className="field__hint">(optional)</span>
-                <input className="input" type="text" value={sentence} onChange={(e) => setSentence(e.target.value)} maxLength={140} placeholder="What it was like, or why you want to remember it" />
+                A note to remember <span className="field__hint">(optional)</span>
+                <input className="input" type="text" value={sentence} onChange={(e) => setSentence(e.target.value)} maxLength={140} placeholder="Coffee on the table, rain drifting in through the window…" />
               </label>
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 <span style={{ fontSize: 17, fontWeight: 600 }}>Tags</span>
@@ -318,7 +321,7 @@ export function CaptureForm() {
                 </div>
                 {custom.length < 3 ? (
                   <div style={{ display: "flex", gap: 8, maxWidth: 360 }}>
-                    <input className="input" type="text" value={customDraft} onChange={(e) => setCustomDraft(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addCustom(); } }} placeholder="add your own" maxLength={24} aria-label="Add a tag" />
+                    <input className="input" type="text" value={customDraft} onChange={(e) => setCustomDraft(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addCustom(); } }} placeholder="e.g. rainy day, reading" maxLength={24} aria-label="Add a tag" />
                     <button type="button" className="btn btn--ghost btn--sm" onClick={addCustom} style={{ flex: "none", height: 52 }}>Add</button>
                   </div>
                 ) : null}
@@ -338,7 +341,7 @@ export function CaptureForm() {
         </div>
         {savedId ? (
           <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
-            <Link href={`/card?from=${savedId}`} className="btn btn--ghost">Make a Scent Card from the last one</Link>
+            <Link href={`/card?from=${savedId}`} className="btn btn--ghost">Make a Scent Card from this entry</Link>
           </div>
         ) : null}
       </div>

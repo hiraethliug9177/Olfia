@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { GiftCardStudio } from "@/components/gifts/GiftCardStudio";
 
-export const metadata: Metadata = { title: "Gift card", robots: { index: false } };
+export const metadata: Metadata = { title: "Gift Card", robots: { index: false } };
 
 export default function GiftCardPage() {
   return (

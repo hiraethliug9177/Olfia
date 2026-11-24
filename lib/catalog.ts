@@ -1,6 +1,6 @@
 import type { Daypart, EmotionId, FamilyId, MethodId, Occasion, PlacedItem, RoomKind, Season, SourceKind, TimeOfDay } from "@/lib/types";
 
-/* ---------- Scent families (wheel order: neighbours blend well) ---------- */
+/* ---------- Scent families (wheel order; copy v1 makes no claim that neighbours blend) ---------- */
 
 export interface Material {
   id: string;
@@ -129,18 +129,6 @@ export function areNeighbours(a: FamilyId, b: FamilyId): boolean {
   const n = FAMILIES.length;
   const d = Math.abs(familyIndex(a) - familyIndex(b));
   return d === 1 || d === n - 1;
-}
-
-export function blendHint(ids: FamilyId[]): string {
-  if (ids.length < 2) return "pick two to see if they blend";
-  for (let i = 0; i < ids.length; i++) {
-    for (let j = i + 1; j < ids.length; j++) {
-      if (areNeighbours(ids[i], ids[j])) {
-        return `${familyById(ids[i]).label.toLowerCase()} + ${familyById(ids[j]).label.toLowerCase()} blend well`;
-      }
-    }
-  }
-  return "an unusual pair, try a neighbour on the wheel";
 }
 
 /** Photo-cut-out stand-in: a textured "window" in the material's colours. */
@@ -498,7 +486,7 @@ export const SOURCE_OPTIONS: Array<{ id: SourceKind; label: string }> = [
   { id: "incense", label: "Incense" },
   { id: "spray", label: "Room spray" },
   { id: "oil", label: "Essential oil" },
-  { id: "fragrance-free", label: "Fragrance-free / none" },
+  { id: "fragrance-free", label: "Fragrance-free / No specific source" },
   { id: "other", label: "Other" },
 ];
 

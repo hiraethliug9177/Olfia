@@ -1,5 +1,6 @@
 import { FAMILIES, areNeighbours, familyById } from "@/lib/catalog";
 import type { FamilyId } from "@/lib/types";
+import { QUIZ_PROMPTS } from "@/lib/copy/quizCopy";
 
 /**
  * Scent quiz (2026-11-09). Spec: claude/olfia-scent-quiz.md in the Capstone project.
@@ -33,91 +34,91 @@ const q = (id: string, layer: QuizQuestion["layer"], prompt: string, em: string,
 
 export const QUESTIONS: QuizQuestion[] = [
   // Energy
-  q("q1", "who", "After a long week, you recharge with…", "recharge", [
+  q("q1", "who", QUIZ_PROMPTS.q1, "recharge", [
     { label: "A night out", letter: "E", fam: { citrus: 1 } },
     { label: "A quiet evening alone", letter: "I", fam: { woody: 1 } },
     { label: "One close friend, one couch", letter: "I", fam: { gourmand: 1 } },
   ], "EI"),
-  q("q2", "who", "In a new city, you…", "new city", [
+  q("q2", "who", QUIZ_PROMPTS.q2, "new city", [
     { label: "Ask strangers for tips", letter: "E", fam: { citrus: 1 } },
     { label: "Wander alone with headphones", letter: "I", fam: { fresh: 1 } },
     { label: "Plan the day around one good meal", letter: "E", fam: { gourmand: 1 } },
   ], "EI"),
-  q("q3", "who", "Your phone is…", "phone", [
+  q("q3", "who", QUIZ_PROMPTS.q3, "phone", [
     { label: "Always buzzing", letter: "E", fam: { spicy: 1 } },
     { label: "On silent since forever", letter: "I", fam: { green: 1 } },
   ], "EI"),
   // Noticing
-  q("q4", "who", "Walking into a room, you notice first…", "notice", [
+  q("q4", "who", QUIZ_PROMPTS.q4, "notice", [
     { label: "How it looks", letter: "S", fam: { floral: 1 } },
     { label: "How it feels", letter: "N", fam: { woody: 1 } },
   ], "SN"),
-  q("q5", "who", "The stories you love are…", "stories", [
+  q("q5", "who", QUIZ_PROMPTS.q5, "stories", [
     { label: "About real people", letter: "S", fam: { gourmand: 1 } },
     { label: "About worlds that don’t exist", letter: "N", fam: { fresh: 1 } },
   ], "SN"),
-  q("q6", "who", "Instructions: you…", "Instructions", [
+  q("q6", "who", QUIZ_PROMPTS.q6, "instructions", [
     { label: "Read every step", letter: "S", fam: { green: 1 } },
     { label: "Skim, then figure it out", letter: "N", fam: { citrus: 1 } },
   ], "SN"),
   // Deciding
-  q("q7", "who", "A friend is upset. You first…", "first", [
+  q("q7", "who", QUIZ_PROMPTS.q7, "first", [
     { label: "Ask what happened", letter: "F", fam: { floral: 1 } },
     { label: "Suggest what to do", letter: "T", fam: { fresh: 1 } },
   ], "TF"),
-  q("q8", "who", "Big choices come from…", "Big choices", [
+  q("q8", "who", QUIZ_PROMPTS.q8, "big decision", [
     { label: "Your head", letter: "T", fam: { woody: 1 } },
     { label: "Your gut", letter: "F", fam: { spicy: 1 } },
   ], "TF"),
-  q("q9", "who", "The compliment you keep…", "keep", [
+  q("q9", "who", QUIZ_PROMPTS.q9, "compliment", [
     { label: "“You’re so sharp”", letter: "T", fam: { citrus: 1 } },
     { label: "“You’re so kind”", letter: "F", fam: { gourmand: 1 } },
   ], "TF"),
   // Planning
-  q("q10", "who", "Your weekend is…", "weekend", [
+  q("q10", "who", QUIZ_PROMPTS.q10, "weekends", [
     { label: "Planned by Thursday", letter: "J", fam: { green: 1 } },
     { label: "Decided Saturday morning", letter: "P", fam: { citrus: 1 } },
   ], "JP"),
-  q("q11", "who", "Your desk is…", "desk", [
+  q("q11", "who", QUIZ_PROMPTS.q11, "desk", [
     { label: "A clear surface", letter: "J", fam: { fresh: 1 } },
     { label: "A creative mess", letter: "P", fam: { woody: 1 } },
   ], "JP"),
-  q("q12", "who", "Deadlines…", "Deadlines", [
+  q("q12", "who", QUIZ_PROMPTS.q12, "deadlines", [
     { label: "Done early", letter: "J", fam: { spicy: 1 } },
     { label: "Done in the last hour, brilliantly", letter: "P", fam: { gourmand: 1 } },
   ], "JP"),
   // What you reach for
-  q("q13", "reach", "Pick a weather", "weather", [
+  q("q13", "reach", QUIZ_PROMPTS.q13, "weather", [
     { label: "First warm day of spring", fam: { floral: 2 } },
     { label: "Rain on the window", fam: { fresh: 2 } },
     { label: "Golden autumn afternoon", fam: { spicy: 2 } },
     { label: "Clear cold morning", fam: { green: 2 } },
   ]),
-  q("q14", "reach", "Pick a texture", "texture", [
+  q("q14", "reach", QUIZ_PROMPTS.q14, "texture", [
     { label: "Linen", fam: { fresh: 2 } },
     { label: "Worn leather", fam: { woody: 2 } },
     { label: "Velvet", fam: { spicy: 2 } },
     { label: "Fresh-cut grass", fam: { green: 2 } },
   ]),
-  q("q15", "reach", "Your comfort drink", "comfort", [
+  q("q15", "reach", QUIZ_PROMPTS.q15, "comfort", [
     { label: "Black coffee", fam: { gourmand: 2 } },
     { label: "Herbal tea", fam: { green: 2 } },
     { label: "Hot chocolate", fam: { gourmand: 2, spicy: 1 } },
     { label: "Sparkling water with lemon", fam: { citrus: 2 } },
   ]),
-  q("q16", "reach", "Your ideal window view", "window", [
+  q("q16", "reach", QUIZ_PROMPTS.q16, "window", [
     { label: "The sea", fam: { fresh: 2 } },
     { label: "A forest", fam: { woody: 2 } },
     { label: "A garden", fam: { floral: 2 } },
     { label: "An orchard", fam: { citrus: 2 } },
   ]),
-  q("q17", "reach", "A smell that takes you back", "takes you back", [
+  q("q17", "reach", QUIZ_PROMPTS.q17, "takes you back", [
     { label: "A bakery", fam: { gourmand: 2 } },
     { label: "Fresh laundry", fam: { fresh: 2 } },
     { label: "A bonfire", fam: { woody: 2, spicy: 1 } },
     { label: "Flowers at a market", fam: { floral: 2 } },
   ]),
-  q("q18", "reach", "Pick a colour", "colour", [
+  q("q18", "reach", QUIZ_PROMPTS.q18, "color", [
     { label: "Deep green", swatch: "#4E5A2A", fam: { green: 2 } },
     { label: "Warm brown", swatch: "#8A5A33", fam: { woody: 2 } },
     { label: "Pale blue", swatch: "#B7D3D6", fam: { fresh: 2 } },
@@ -126,14 +127,14 @@ export const QUESTIONS: QuizQuestion[] = [
     { label: "Amber", swatch: "#B4552E", fam: { spicy: 2 } },
     { label: "Caramel", swatch: "#D4A26A", fam: { gourmand: 2 } },
   ]),
-  q("q19", "reach", "Your idea of luxury", "luxury", [
+  q("q19", "reach", QUIZ_PROMPTS.q19, "luxury", [
     { label: "A quiet morning", fam: { fresh: 2 } },
     { label: "A long dinner", fam: { gourmand: 2 } },
     { label: "Flowers delivered", fam: { floral: 2 } },
     { label: "A fireplace", fam: { woody: 2, spicy: 1 } },
   ]),
   // Seasonal question: swap each season (winter version below).
-  q("q20", "reach", "Christmas smells like…", "Christmas", [
+  q("q20", "reach", QUIZ_PROMPTS.q20, "Christmas", [
     { label: "Pine", fam: { woody: 2 } },
     { label: "Cinnamon", fam: { spicy: 2 } },
     { label: "Gingerbread", fam: { gourmand: 2 } },

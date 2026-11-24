@@ -27,9 +27,9 @@ export function QuizInvite() {
         <ResultCard r={shown} />
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 16, flex: "1 1 340px", minWidth: 0 }}>
-        <h2 className="h-section">{r ? `You are ${r.archetype.name}.` : "Which scent is you?"}</h2>
+        <h2 className="h-section">{r ? `You are ${r.archetype.name}.` : "Which scent feels like you?"}</h2>
         <p className="lead">
-          {r ? r.archetype.voice : "Twenty questions about how you live. You get one of sixteen characters, the scent family that fits, and a room to start from."}
+          {r ? r.archetype.voice : "Twenty questions about your habits and sensory preferences. Meet one of sixteen scent characters, discover fragrance families to explore, and find a room to start with."}
         </p>
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "12px 24px", paddingTop: 4 }}>
           <Link href="/quiz" className="btn btn--primary">{r ? "See your result" : "Take the quiz"}</Link>

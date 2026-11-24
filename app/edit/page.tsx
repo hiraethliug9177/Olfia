@@ -17,6 +17,7 @@ export default function EditPage() {
           <span className="np-mast__tag">Culture, fragrance,<br className="np-mast__br" /> and the art of living.</span>
         </div>
         <h1 className="np-mast__title">The Olfia Edit</h1>
+        <p className="np-mast__lead">An ongoing collection of stories about fragrance and the worlds it opens up. We explore familiar materials, the cultural meanings of scent, and the ways people use fragrance to shape their surroundings and express themselves.</p>
       </header>
 
       <LibraryBlock />

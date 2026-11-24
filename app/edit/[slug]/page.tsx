@@ -77,12 +77,12 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
         </div>
 
         <aside id="try" className="story-side article__try anchor" aria-labelledby="try-h">
-          <h2 id="try-h" className="story-side__h">Try This</h2>
+          <h2 id="try-h" className="story-side__h">Imagine the room</h2>
           <div className="story-card" style={{ background: scentWash(a.families) }}>
             <h3 className="story-card__head">{a.tryThis.title}</h3>
             {a.tryThis.paras.map((p, i) => <p key={i}><Rich text={p} /></p>)}
             {/* 11/18 (Tiffany): the button says only this; the room still opens in the story's families */}
-            <Link href={`/rooms?family=${a.families.join(",")}`} className="btn btn--primary btn--sm story-card__btn">Build This Room</Link>
+            <Link href={`/rooms?family=${a.families.join(",")}`} className="btn btn--primary btn--sm story-card__btn">Build this room</Link>
           </div>
         </aside>
 
@@ -90,7 +90,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
           <section className="article__object">
             {a.objectImage ? <ObjectPhoto image={a.objectImage} /> : null}
             <div style={{ display: "flex", flexDirection: "column", gap: 12, flex: "1 1 300px", minWidth: 0 }}>
-              <span className="edit-card__meta">The take-home edit</span>
+              <span className="edit-card__meta">The Take-Home Edit</span>
               <h2 style={{ fontSize: 30 }}><Rich text={a.object.name} /></h2>
               {a.takeHome.paras.map((p, i) => <p key={i}><Rich text={p} /></p>)}
               {a.object.notes ? <p className="muted" style={{ fontSize: 15 }}>{a.object.notes}</p> : null}

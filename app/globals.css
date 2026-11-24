@@ -1335,3 +1335,73 @@ body::after {
 /* in the narrow panel beside the stage (laptops), both choices step down to 13px so "Afternoon" and "Bathroom" fit */
 .editor__panel { container-type: inline-size; }
 @container (max-width: 300px) { .editor__panel .seg__opt { font-size: 13px; } }
+
+/* ---------- Copy v1 (Tiffany 11/24): plain styles for the new copy blocks; the design pass comes later ---------- */
+.signup__body { margin: 0; font-size: 15px; color: var(--slate); }
+.row-head__body { flex-basis: 100%; margin: 4px 0 0; color: var(--slate); max-width: 72ch; }
+.sources { font-size: 14px; color: var(--slate); }
+.sources summary { cursor: pointer; font-weight: 600; color: var(--deep); width: fit-content; }
+.sources ul { margin: 8px 0 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; }
+.sources a { color: var(--deep); }
+.sources__note { margin: 8px 0 0; }
+.fam-facts { margin: 0; display: grid; gap: 10px; }
+.fam-facts dt { font-family: var(--font-ui); font-size: 14px; font-weight: 600; color: var(--slate); }
+.fam-facts dd { margin: 2px 0 0; }
+.recipe { padding: 14px 18px; border-radius: 18px; background: rgba(255, 255, 255, 0.7); }
+.recipe summary { cursor: pointer; font-weight: 600; color: var(--deep); }
+.recipe__title { margin: 10px 0 6px; font-family: var(--font-display); font-size: 22px; font-weight: 600; }
+.recipe__parts { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 0 0 6px; font-family: var(--font-ui); font-size: 14px; color: var(--slate); }
+.recipe__hint { font-size: 14px; }
+.about__concept--long { grid-template-columns: minmax(0, 1fr); }
+.ways { display: flex; flex-direction: column; gap: 28px; margin: 18px 0 28px; }
+.way { display: grid; grid-template-columns: minmax(0, 220px) minmax(0, 1fr); gap: 28px; align-items: center; }
+.way:nth-child(even) { grid-template-columns: minmax(0, 1fr) minmax(0, 220px); }
+.way:nth-child(even) .way__pic { order: 2; }
+.way__pic { margin: 0; display: flex; justify-content: center; }
+.way__pic img { width: 100%; max-width: 200px; height: auto; }
+.way__text { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+.way__text p { margin: 0; }
+.way__feature { display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-ui); font-size: 14px; font-weight: 600; color: var(--slate); }
+.way__title { margin: 0; font-family: var(--font-display); font-size: 26px; font-weight: 600; }
+@media (max-width: 640px) {
+  .way, .way:nth-child(even) { grid-template-columns: minmax(0, 1fr); }
+  .way:nth-child(even) .way__pic { order: 0; }
+  .way__pic img { max-width: 160px; }
+}
+/* My Scentprint (Atlas): the map, three favourites, preferences, tags — plain layout until the design pass */
+.scentprint { display: flex; flex-direction: column; gap: 32px; }
+.scentprint__map { display: flex; flex-wrap: wrap; align-items: center; gap: 24px 40px; }
+.scentprint__mapcol { flex: 1 1 380px; max-width: 480px; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.scentmap { width: 100%; max-width: 480px; height: auto; overflow: visible; }
+.scentmap__label { font-family: var(--font-ui); font-size: 13px; fill: var(--slate); }
+.scentprint__favs { flex: 1 1 280px; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 18px; }
+.fav { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 18px 12px; border-radius: 18px; background: var(--white, #fff); text-align: center; }
+.fav__art { width: 72px; height: 72px; display: flex; align-items: flex-end; justify-content: center; }
+.fav__icon { width: 72px; height: 72px; display: flex; align-items: center; justify-content: center; color: var(--deep); }
+.fav__name { font-family: var(--font-display); font-size: 20px; font-weight: 600; }
+.scentprint__prefs { display: flex; flex-direction: column; gap: 14px; }
+.scentprint__tags { display: flex; flex-direction: column; gap: 14px; }
+.gifts-page__intro { display: flex; flex-direction: column; gap: 10px; max-width: 640px; }
+.gifts-page__mode { margin: -12px 0 24px; max-width: 640px; color: var(--slate); }
+.gift-card-panel__lead { margin: 0 0 4px; color: var(--slate); }
+.lib-guide-intro { max-width: 72ch; margin: 0 0 20px; }
+.guide-text p { margin: 0 0 12px; max-width: 72ch; }
+.guide-text__more { display: block; }
+.guide-text__more[hidden] { display: none; }
+.guide-text__toggle { padding: 0; border: 0; background: none; font-weight: 600; color: var(--deep); text-decoration: underline; text-underline-offset: 4px; cursor: pointer; }
+.recipe--open { display: flex; flex-direction: column; gap: 6px; }
+.recipe__label { font-family: var(--font-ui); font-size: 14px; font-weight: 600; color: var(--slate); }
+.np-mast__lead { margin: 14px auto 0; max-width: 68ch; color: var(--slate); text-align: center; }
+.quiz-profile { display: flex; flex-direction: column; gap: 10px; padding: 20px 22px; border-radius: 18px; background: var(--mist); }
+.quiz-profile p { margin: 0; }
+.quiz-profile__h { margin: 0; font-family: var(--font-display); font-size: 26px; font-weight: 600; }
+.quiz-profile__hint { font-size: 14px; }
+.plans__lead { margin: 0; max-width: 72ch; font-size: 17px; }
+.plans__hint { margin: 0; font-size: 15px; }
+.plans__lead { margin: 0; max-width: 72ch; font-size: 17px; }
+.plans__hint { margin: 0; font-size: 15px; }
+.privacy__body h2 { margin: 10px 0 0; font-family: var(--font-display); font-size: 24px; font-weight: 600; }
+.privacy__body h2:first-child { margin-top: 0; }
+.privacy__body p { margin: 0; }
+.privacy__body ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; }
+.privacy__body a { color: var(--deep); }

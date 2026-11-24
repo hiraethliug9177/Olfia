@@ -51,7 +51,7 @@ export function EditList() {
           </div>
           <div className="np-tabs np-tabs--quiet" role="group" aria-label="Month">
             {["All", ...months].map((m) => (
-              <button key={m} type="button" className="np-tab" aria-pressed={month === m} onClick={() => setMonth(m)}>{m === "All" ? "All dates" : m}</button>
+              <button key={m} type="button" className="np-tab" aria-pressed={month === m} onClick={() => setMonth(m)}>{m === "All" ? "All months" : m}</button>
             ))}
           </div>
         </div>
@@ -64,7 +64,7 @@ export function EditList() {
               {rest.map((a) => <ArticleCard key={a.slug} a={a} variant="row" />)}
             </div>
           ) : (
-            <p className="muted" style={{ padding: "24px 0" }}>No stories for this topic and month yet.</p>
+            <p className="muted" style={{ padding: "24px 0" }}>No stories match these filters. Try another topic or month.</p>
           )}
         </section>
       </div>

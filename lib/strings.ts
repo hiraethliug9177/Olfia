@@ -19,14 +19,14 @@ export const strings = {
   },
   /** Email sign-up (Kit). Button and note: Tiffany 11/15. */
   signup: {
-    // The line above the email box (footer and story pages). Written by Claude on 11/17 at Tiffany's request
-    // ("你写就行"); hers to change. Hidden while empty.
-    heading: "Let the scent stay a little longer.",
+    // The line above the email box and the line under it (footer). Tiffany's copy v1, 11/24 (§0.3). Hidden while empty.
+    heading: "A little more to discover.",
+    body: "Stay in touch for news and inspiration from Olfia.",
     button: "Count me in",
-    note: "Occasional inspirations from Olfia. Unsubscribe anytime.",
+    note: "Occasional notes from Olfia. Unsubscribe anytime.",
     found: "Where did you find Olfia?",
     foundOptions: ["Instagram", "RedNote", "Pinterest", "A friend", "Google", "Somewhere else"],
     done: "You’re in. Welcome to Olfia.",
-    failed: "That didn't go through. Please try again.",
+    failed: "We couldn’t save your subscription. Please try again.",
   },
 };

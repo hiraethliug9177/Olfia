@@ -12,6 +12,7 @@ import { Stamp } from "@/components/scene/Stamp";
 import { dotDate } from "@/lib/dates";
 import { Icon } from "@/components/ui/Icon";
 import { Character } from "@/components/quiz/Character";
+import { QUIZ_PROFILES, QUIZ_PROFILE_HINT } from "@/lib/copy/quizCopy";
 
 /** Result card: the archetype's character, name, Tiffany's line, family by colour + stamp. Exported as a 1080-wide PNG. */
 export function ResultCard({ r, cardRef }: { r: QuizResult; cardRef?: Ref<HTMLDivElement> }) {
@@ -115,14 +116,16 @@ export function Quiz() {
       }
       track("quiz_share", { method: prefer });
     } catch {
-      show("Couldn’t make the image. Try again?");
+      show("Couldn’t create the image. Please try again.");
     } finally {
       setBusy(false);
     }
   };
 
   if (result) {
-    const neighbours = blendsWith(result.family).map(familyById);
+    // copy v1 (§9.3): a suggestion to explore, not a layering claim; the wheel neighbour that isn't the second family
+    const explore = blendsWith(result.family).find((f) => f !== result.second) ?? null;
+    const profile = (QUIZ_PROFILES as Record<string, string>)[result.code];
     return (
       <div style={{ display: "flex", flexWrap: "wrap", gap: 48, alignItems: "center" }}>
         <div style={{ flex: "1 1 320px", minWidth: 0, display: "flex", justifyContent: "center" }}>
@@ -132,8 +135,16 @@ export function Quiz() {
           <h1 className="h-page">You are {result.archetype.name}.</h1>
           <p className="lead">{result.archetype.voice}</p>
           <p>
-            Your scent is {familyById(result.family).label}{result.second ? `, with a second note of ${familyById(result.second).label}` : ""}. It layers well with {neighbours.map((n) => n.label).join(" and ")}.
+            Your result suggests {familyById(result.family).label}{result.second ? `, with ${familyById(result.second).label} as a secondary family` : ""}.
+            {explore ? ` For another scent direction, explore ${familyById(explore).label}.` : null}
           </p>
+          {profile ? (
+            <section className="quiz-profile" aria-labelledby="quiz-profile-h">
+              <h2 id="quiz-profile-h" className="quiz-profile__h">Your scent personality</h2>
+              <p>{profile}</p>
+              <p className="muted quiz-profile__hint">{QUIZ_PROFILE_HINT}</p>
+            </section>
+          ) : null}
           <Link href={`/rooms?family=${[result.family, result.second].filter(Boolean).join(",")}`} className="btn btn--primary" style={{ alignSelf: "flex-start" }}>Design a room in this style</Link>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
             <button type="button" className="btn btn--ghost btn--sm" disabled={busy} onClick={() => exportCard("download")}><Icon name="download" size={18} />{busy ? "Making image…" : "Save card"}</button>
@@ -148,8 +159,9 @@ export function Quiz() {
   return (
     <div className="flow" style={{ maxWidth: 720 }}>
       <div>
-        <h1 className="h-page" style={{ marginBottom: 12 }}>Which scent is you?</h1>
-        <p className="lead">Twenty quick questions. Tap what feels right.</p>
+        <h1 className="h-page" style={{ marginBottom: 12 }}>Which scent feels like you?</h1>
+        <p className="lead">Twenty questions about everyday life and the things you enjoy. Choose the answer that feels most like you.</p>
+        <p className="muted" style={{ margin: "8px 0 0", fontSize: 15 }}>This is a playful guide to fragrance discovery. There are no right or wrong answers.</p>
       </div>
       <div className="flow__bar" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progress)} aria-label="Quiz progress">
         <span style={{ width: `${progress}%` }} />

@@ -68,7 +68,7 @@ export function Shelf() {
     setReading(true);
     const g = await readLink(link);
     setReading(false);
-    if (!g) { setError("That doesn't look like a web address."); return; }
+    if (!g) { setError("Enter a valid website address."); return; }
     setGuess(g);
     setDraft({ ...EMPTY, name: g.name, brand: g.brand, kind: g.kind, families: g.families, url: g.url, image: g.image, imageFrom: g.image ? "link" : undefined, productId: g.productId });
     track("shelf_link_read", { from: g.from, matched: g.productId ? 1 : 0 });
@@ -77,12 +77,12 @@ export function Shelf() {
   const onPhoto = async (file: File | undefined) => {
     setError("");
     if (!file) return;
-    if (!file.type.startsWith("image/")) { setError("Please choose a photo."); return; }
+    if (!file.type.startsWith("image/")) { setError("Choose a photo to continue, or skip it."); return; }
     try {
       const data = await shrinkPhoto(file);
       setDraft((d) => ({ ...(d ?? EMPTY), image: data, imageFrom: "upload" }));
     } catch {
-      setError("That photo could not be opened. Try a JPEG or PNG.");
+      setError("We couldn’t open that photo. Try a JPEG or PNG file.");
     }
   };
 
@@ -92,7 +92,7 @@ export function Shelf() {
   const reset = () => { setDraft(null); setGuess(null); setLink(""); setError(""); if (fileRef.current) fileRef.current.value = ""; };
 
   const add = () => {
-    if (!draft || !draft.name.trim()) { setError("Give it a name first."); return; }
+    if (!draft || !draft.name.trim()) { setError("Enter a fragrance name before saving."); return; }
     const item: ShelfItem = {
       id: newId(),
       createdAt: new Date().toISOString(),
@@ -111,19 +111,19 @@ export function Shelf() {
     if (!saveShelf(next)) {
       // most likely the browser is out of room for photos; keep the item without its picture
       const lighter = [{ ...item, image: item.imageFrom === "link" ? item.image : undefined }, ...items];
-      if (!saveShelf(lighter)) { setError("This browser is out of space. Remove an item and try again."); return; }
+      if (!saveShelf(lighter)) { setError("Your browser storage is full. Remove an item and try again."); return; }
       setItems(lighter);
-      show("Added to your shelf without the photo (the browser is full)");
+      show("Fragrance saved without its photo. Your browser storage is full.");
     } else {
       setItems(next);
-      show("Added to your shelf");
+      show("Added to your Fragrance Shelf");
     }
     track("shelf_item_added", { mode: draft.imageFrom === "upload" ? "photo" : "link" });
     reset();
   };
 
   const remove = (id: string) => {
-    if (!window.confirm("Remove this from your shelf?")) return;
+    if (!window.confirm("Remove this fragrance from your Fragrance Shelf?")) return;
     const next = items.filter((i) => i.id !== id);
     saveShelf(next);
     setItems(next);
@@ -131,9 +131,11 @@ export function Shelf() {
 
   return (
     <div className="shelf">
+      {/* copy v1 (Tiffany 11/24, §5.4) */}
+      <p className="lead" style={{ margin: 0 }}>Keep the fragrances you own or use in one place, with a note about when and how you enjoy them.</p>
       <section className="shelf-add" aria-labelledby="shelf-add-h">
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-          <h2 id="shelf-add-h" style={{ fontSize: 30 }}>Add to my shelf</h2>
+          <h2 id="shelf-add-h" style={{ fontSize: 30 }}>Add to your Fragrance Shelf</h2>
           <div role="tablist" aria-label="Add by" className="seg" style={{ width: 320, maxWidth: "100%" }}>
             <span className="seg__thumb" aria-hidden="true" style={{ left: mode === "link" ? 5 : "50%", width: "calc(50% - 5px)" }} />
             <button type="button" role="tab" aria-selected={mode === "link"} className="seg__opt" onClick={() => setMode("link")}>Paste a link</button>
@@ -157,13 +159,13 @@ export function Shelf() {
               <span>{draft?.imageFrom === "upload" ? "Choose another photo" : "Choose a photo of your bottle, candle or diffuser"}</span>
               <input ref={fileRef} type="file" accept="image/*" className="sr-only" onChange={(e) => void onPhoto(e.target.files?.[0])} />
             </label>
-            {!draft ? <button type="button" className="btn btn--ghost" onClick={() => setDraft({ ...EMPTY })}>Skip the photo</button> : null}
+            {!draft ? <button type="button" className="btn btn--ghost" onClick={() => setDraft({ ...EMPTY })}>Skip photo</button> : null}
           </div>
         )}
         {error ? <p className="error" role="alert">{error}</p> : null}
         {guess && mode === "link" ? (
           <p className="muted" style={{ fontSize: 15 }}>
-            {guess.productId ? "Found it in Olfia's product list." : guess.from === "page" ? "Read from the product page. Check the details below." : "Read from the address. Check the details below."}
+            {guess.productId ? "Found a match in Olfia’s fragrance catalog." : guess.from === "page" ? "We found details on the product page. Review them before saving." : "We found possible details from the link. Check them before saving."}
           </p>
         ) : null}
 
@@ -183,7 +185,7 @@ export function Shelf() {
 
             <div className="shelf-fields">
               <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
-                <label className="field" style={{ flex: "1 1 220px" }}>Name<input className="input" value={draft.name} onChange={(e) => set("name", e.target.value)} maxLength={80} placeholder="Feu de Bois" /></label>
+                <label className="field" style={{ flex: "1 1 220px" }}>Fragrance name<input className="input" value={draft.name} onChange={(e) => set("name", e.target.value)} maxLength={80} placeholder="Feu de Bois" /></label>
                 <label className="field" style={{ flex: "1 1 180px" }}>Brand<input className="input" value={draft.brand} onChange={(e) => set("brand", e.target.value)} maxLength={40} placeholder="Diptyque" /></label>
               </div>
               <span className="label-mono">Type</span>
@@ -192,7 +194,7 @@ export function Shelf() {
                   <button key={o.id} type="button" className="chip" aria-pressed={draft.kind === o.id} onClick={() => set("kind", o.id)}>{o.label}</button>
                 ))}
               </div>
-              <span className="label-mono">Families <span className="field__hint">(up to two)</span></span>
+              <span className="label-mono">Scent families <span className="field__hint">(up to two)</span></span>
               <div className="chips">
                 {FAMILIES.map((f) => (
                   <button key={f.id} type="button" className="chip" aria-pressed={draft.families.includes(f.id)} onClick={() => toggleFam(f.id)}>
@@ -210,7 +212,7 @@ export function Shelf() {
                 <input className="input" value={draft.note} onChange={(e) => set("note", e.target.value)} maxLength={120} placeholder="Two sprays in the hallway before guests arrive" />
               </label>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
-                <button type="button" className="btn btn--primary" onClick={add}>Add to my shelf</button>
+                <button type="button" className="btn btn--primary" onClick={add}>Add to your Fragrance Shelf</button>
                 <button type="button" className="btn btn--ghost" onClick={reset}>Cancel</button>
               </div>
             </div>
@@ -233,7 +235,7 @@ export function Shelf() {
                 ) : null}
                 <span className="hand" style={{ fontSize: 22 }}>{ROUTINES.find((r) => r.id === it.routine)?.label.toLowerCase()}{it.note ? ` · ${it.note}` : ""}</span>
                 <span style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 4 }}>
-                  {it.url ? <a href={it.url} target="_blank" rel="noopener noreferrer" className="btn btn--ghost btn--sm" style={{ height: 38 }}>Open link<Icon name="external" size={16} /></a> : null}
+                  {it.url ? <a href={it.url} target="_blank" rel="noopener noreferrer" className="btn btn--ghost btn--sm" style={{ height: 38 }}>View product<Icon name="external" size={16} /></a> : null}
                   <button type="button" className="btn btn--ghost btn--sm" style={{ height: 38 }} onClick={() => remove(it.id)} aria-label={`Remove ${it.name}`}><Icon name="trash" size={16} />Remove</button>
                 </span>
               </span>
@@ -241,7 +243,7 @@ export function Shelf() {
           ))}
         </div>
       ) : (
-        <p className="hand" style={{ fontSize: 26, color: "var(--deep)" }}>nothing on your shelf yet</p>
+        <p className="hand" style={{ fontSize: 26, color: "var(--deep)" }}>Start a collection of the fragrances you use.</p>
       )}
     </div>
   );

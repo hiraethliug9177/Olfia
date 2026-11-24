@@ -100,7 +100,7 @@ export function GiftCardStudio() {
       track("gift_card", { action: "download", product: p.id });
       show("Gift card saved");
     } catch {
-      show("Couldn’t make the image. Try again?");
+      show("Couldn’t create the image. Please try again.");
     } finally {
       setBusy(false);
     }
@@ -132,7 +132,7 @@ export function GiftCardStudio() {
       track("gift_card", { action: "link", product: p.id });
       show("Link copied");
     } catch {
-      show("Couldn’t copy the link.");
+      show("Couldn’t copy the link. Try again.");
     }
   };
 
@@ -162,8 +162,9 @@ export function GiftCardStudio() {
 
         <section className="gift-card-panel" aria-labelledby="gift-card-h">
           <h1 id="gift-card-h" className="gift-card-panel__title">{name ? `For ${name}` : "Gift card"}</h1>
+          <p className="gift-card-panel__lead">Make a personal card with a fragrance in mind, and add a few words for the person you’re thinking of.</p>
           <div className="gift-field">
-            <label htmlFor="gc-to">For</label>
+            <label htmlFor="gc-to">To</label>
             <input id="gc-to" className="input" value={to} maxLength={40} autoComplete="off" placeholder="Their name" onChange={(e) => { setTo(e.target.value); writeDraft({ to: e.target.value }); }} />
           </div>
           <div className="gift-field">
@@ -183,13 +184,13 @@ export function GiftCardStudio() {
             </span>
             {p.url ? (
               <ProductLink href={p.url} product={{ id: p.id, brand: p.brand, family: p.families[0], tier: p.tier }} className="hero__link gift-card-panel__out">
-                Open on {p.brand}’s site<Icon name="external" size={18} />
+                View on {p.brand}’s website<Icon name="external" size={18} />
               </ProductLink>
             ) : null}
           </div>
 
           <div className="gift-card-panel__actions">
-            <button type="button" className="btn btn--primary" onClick={onDownload} disabled={busy}><Icon name="download" size={18} />Download image</button>
+            <button type="button" className="btn btn--primary" onClick={onDownload} disabled={busy}><Icon name="download" size={18} />Save image</button>
             {canShare ? <button type="button" className="btn btn--ghost" onClick={onShare} disabled={busy}><Icon name="share" size={18} />Share</button> : null}
             <button type="button" className="btn btn--ghost" onClick={onCopy}><Icon name="link" size={18} />Copy link</button>
             <button type="button" className="btn btn--ghost" onClick={onSave} disabled={saved}><Icon name={saved ? "bookmarkCheck" : "bookmark"} size={18} />{saved ? "Saved to Scent Atlas" : "Save to Scent Atlas"}</button>

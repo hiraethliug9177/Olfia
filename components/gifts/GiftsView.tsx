@@ -107,17 +107,26 @@ export function GiftsView() {
   return (
     <div className="wrap page gifts-page">
       <div className="gifts-page__head">
-        <h1 className="h-page">Gifts</h1>
+        <div className="gifts-page__intro">
+          <h1 className="h-page">Gifts</h1>
+          <p className="lead" style={{ margin: 0 }}>A fragrance can be a way to think about someone’s home, their habits, and the things they enjoy.</p>
+        </div>
         <div className="gift-toggle" role="group" aria-label="Who the gift is for">
-          <button type="button" aria-pressed={mode === "me"} onClick={() => setMode("me")}>For me</button>
-          <button type="button" aria-pressed={mode === "someone"} onClick={() => setMode("someone")}>For someone</button>
+          <button type="button" aria-pressed={mode === "me"} onClick={() => setMode("me")}>For myself</button>
+          <button type="button" aria-pressed={mode === "someone"} onClick={() => setMode("someone")}>For someone else</button>
         </div>
       </div>
+
+      <p className="gifts-page__mode">
+        {mode === "me"
+          ? "Explore a new fragrance inspired by your scent preferences or the atmosphere you want to create."
+          : "Think about the spaces they enjoy and the scents they might like. Choose a family to begin exploring."}
+      </p>
 
       {mode === "someone" ? (
         <div className="gift-choose">
           <div className="gift-choose__to">
-            <label htmlFor="gift-to">For</label>
+            <label htmlFor="gift-to">Recipient</label>
             <input
               id="gift-to"
               className="input"
@@ -131,7 +140,7 @@ export function GiftsView() {
               }}
             />
           </div>
-          <FamilyChips value={someoneFamily} onPick={pickFamily} label="Their scent" />
+          <FamilyChips value={someoneFamily} onPick={pickFamily} label="Fragrance families they might like" />
         </div>
       ) : quiz ? (
         <div className="gift-me">
@@ -145,13 +154,13 @@ export function GiftsView() {
             <FamilyLine ids={meFamilies} />
           </div>
           <div className="gift-me__side">
-            <span>{entries.length ? "From your quiz and your Scent Atlas" : "From your quiz"}</span>
+            <span>{entries.length ? "Inspired by your quiz result and Scent Atlas" : "Inspired by your quiz result"}</span>
             <Link href="/quiz">Retake the quiz</Link>
           </div>
         </div>
       ) : (
         <div className="gift-choose">
-          <FamilyChips value={meFamilies[0]} onPick={pickFamily} label={atlasFams.length && !chosen ? "From your Scent Atlas" : "Your scent"} />
+          <FamilyChips value={meFamilies[0]} onPick={pickFamily} label={atlasFams.length && !chosen ? "Inspired by your Scent Atlas" : "Choose a scent family"} />
           <Link href="/quiz" className="btn btn--ghost btn--sm gift-choose__quiz">Take the quiz</Link>
         </div>
       )}
@@ -160,7 +169,7 @@ export function GiftsView() {
         {scenes.map((s) => <GiftPick key={`${mode}-${s.p.id}`} scene={s} mode={mode} to={to} />)}
       </div>
 
-      <p className="muted" style={{ fontSize: 14, marginTop: 32 }}>Links open the brand’s site. Olfia doesn’t sell products.</p>
+      <p className="muted" style={{ fontSize: 14, marginTop: 32 }}>Product links take you to the brand’s website. Olfia does not sell fragrances.</p>
     </div>
   );
 }

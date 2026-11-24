@@ -6,6 +6,7 @@ import { FAMILIES, familyById } from "@/lib/catalog";
 import { monthLabel, partOfDay } from "@/lib/dates";
 import type { CaptureEntry, Entry, FamilyId } from "@/lib/types";
 import { Stamp } from "@/components/scene/Stamp";
+import { handOffTag } from "@/lib/atlasTag";
 
 /**
  * The month's record (Tiffany 11/10: "月度记录改版"), drawn as a ticket with a stub.
@@ -63,7 +64,7 @@ export function MonthRecord({ entries, year, month }: { entries: Entry[]; year: 
         </dl>
         {empty ? (
           <div className="record__empty">
-            <span className="hand" style={{ fontSize: 26, color: "var(--deep)" }}>no stamps in {name} yet</span>
+            <span className="hand" style={{ fontSize: 26, color: "var(--deep)" }}>No entries recorded in {name} yet.</span>
             <Link href="/capture" className="btn btn--primary btn--sm">Capture a scent</Link>
           </div>
         ) : (
@@ -81,7 +82,7 @@ export function MonthRecord({ entries, year, month }: { entries: Entry[]; year: 
         {share[0] ? (
           <div className="record__top">
             <Stamp family={share[0].f.id} size={64} rot={-6} />
-            <span>Most used <span className="hl" style={{ "--hl": `${familyById(share[0].f.id).hex}66` } as CSSProperties}>{share[0].f.label}</span></span>
+            <span>Most recorded <span className="hl" style={{ "--hl": `${familyById(share[0].f.id).hex}66` } as CSSProperties}>{share[0].f.label}</span></span>
           </div>
         ) : null}
       </div>
@@ -118,7 +119,7 @@ export function MonthRecord({ entries, year, month }: { entries: Entry[]; year: 
           <span className="record__label">Tags</span>
           {topTags.length ? (
             <div className="chips" style={{ gap: 6 }}>
-              {topTags.map(([t, n]) => <Link key={t} href={`/atlas?tab=tags&tag=${encodeURIComponent(t)}`} className="tag" style={{ textDecoration: "none", minHeight: 28, fontSize: 13 }}>#{t}<span style={{ marginLeft: 6, opacity: 0.7 }}>{n}</span></Link>)}
+              {topTags.map(([t, n]) => <Link key={t} href="/atlas?tab=scentprint" onClick={() => handOffTag(t)} className="tag" style={{ textDecoration: "none", minHeight: 28, fontSize: 13 }}>#{t}<span style={{ marginLeft: 6, opacity: 0.7 }}>{n}</span></Link>)}
             </div>
           ) : <span className="muted" style={{ fontSize: 15 }}>—</span>}
         </div>

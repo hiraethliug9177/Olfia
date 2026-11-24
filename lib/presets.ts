@@ -36,7 +36,7 @@ export const ROOM_PRESETS: RoomPreset[] = [
     id: "bedroom-morning",
     scene: "reading-corner",
     name: "Bedroom, morning",
-    line: "Bergamot mist from the diffuser, blinds half up, sheets still warm.",
+    line: "A trace of bergamot from the diffuser, blinds half up, sheets still warm.",
     families: ["citrus", "fresh"],
     time: "morning",
     items: [
@@ -52,7 +52,7 @@ export const ROOM_PRESETS: RoomPreset[] = [
     id: "study-afternoon",
     scene: "reading-corner",
     name: "Study, afternoon",
-    line: "Cedar incense in slanting sun, a pencil tucked behind one ear.",
+    line: "Cedar incense in slanting sun, an unfinished sketch, a pencil tucked behind one ear.",
     families: ["woody", "green"],
     time: "afternoon",
     items: [
@@ -70,7 +70,7 @@ export const ROOM_PRESETS: RoomPreset[] = [
     id: "living-night",
     scene: "reading-corner",
     name: "Living room, late",
-    line: "A vanilla-clove candle, the record on side two, shoes kicked off.",
+    line: "A vanilla-clove candle, the record on side two, shoes kicked off after the last guest has left.",
     families: ["gourmand", "spicy"],
     time: "night",
     items: [

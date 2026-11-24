@@ -4,6 +4,7 @@ import { productById } from "@/lib/products";
 import { ARCHETYPES, loadQuiz, saveQuiz } from "@/lib/quiz";
 import { newId, useAtlas } from "@/lib/store";
 import { markSample } from "@/lib/mockAuth";
+import { PREFS_KEY } from "@/lib/prefs";
 
 /**
  * Sample pages on request (Tiffany 11/15: first visits start clean; the "See a sample" button in the
@@ -13,7 +14,6 @@ import { markSample } from "@/lib/mockAuth";
  * character. Everything stays in this browser; "Clear this browser" in My Page removes it.
  * (11/10–11/15 the samples loaded by themselves on a first visit, for the class review.)
  */
-const PREFS_KEY = "olfia.prefs.v1";
 
 function shelfItem(productId: string, routine: ShelfItem["routine"], note: string, daysAgo: number): ShelfItem | null {
   const p = productById(productId);

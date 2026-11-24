@@ -14,7 +14,6 @@ export interface LibraryStory {
   researchNote: string;
 }
 
-export const LIBRARY_INTRO = "Seven fragrance families, seven little stories.";
 
 export const STORIES: LibraryStory[] = [
   {

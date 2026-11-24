@@ -4,6 +4,7 @@ import {
   ArrowLeft, ArrowRight, BookOpen, Bookmark, BookmarkCheck, CalendarDays, Check, ChevronDown, ChevronLeft, ChevronRight, CircleUserRound, Clock, Compass, Copy, Download,
   DoorOpen, Drama, ExternalLink, Flame, FlaskConical, FlipHorizontal2, Gift, House, Image, ImagePlus, Instagram, Layers, Link2, Mail, Map as MapIcon, MapPin,
   Menu, Minus, Newspaper, Pause, PenLine, PencilRuler, Pin, Play, Plus, Redo2, RotateCcw, RotateCw, Scroll, SendToBack, Share2, Trash2, Undo2, X,
+  Bath, Heart, Laptop, Leaf, Moon, PartyPopper, Sparkles, Sun, Users,
   type LucideIcon,
 } from "lucide-react";
 
@@ -67,6 +68,16 @@ const ICONS = {
   // v2 (11/23): About Olfia on Home (the loop's Discover step; The Olfia Edit)
   compass: Compass,
   newspaper: Newspaper,
+  // copy v1 (11/24): My Scentprint's favorite ritual, one icon per Capture occasion
+  sun: Sun,
+  heart: Heart,
+  partyPopper: PartyPopper,
+  leaf: Leaf,
+  bath: Bath,
+  moon: Moon,
+  laptop: Laptop,
+  users: Users,
+  sparkles: Sparkles,
 } satisfies Record<string, LucideIcon>;
 
 export type IconName = keyof typeof ICONS;

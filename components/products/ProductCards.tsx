@@ -45,10 +45,18 @@ const WHEN_FILTER: Record<When, { season?: Season; daypart?: Daypart }> = {
   cold: { season: "winter" },
 };
 
+/** Copy v1 (Tiffany 11/24, §4.3): "Shares the {family} scent family with your design." */
+function sharesLine(shared: FamilyId[]): string {
+  const names = shared.map((id) => familyById(id).label);
+  return names.length === 1
+    ? `Shares the ${names[0]} scent family with your design.`
+    : `Shares the ${names.slice(0, -1).join(", ")} and ${names[names.length - 1]} scent families with your design.`;
+}
+
 export function ProductCard({ p, match, onSimilar, place }: { p: Product; match?: FamilyId[]; onSimilar?: (id: string) => void; place?: string }) {
   const f = familyById(p.families[0]);
   const shared = (match ?? []).filter((id) => p.families.includes(id));
-  const why = shared.length ? `Shares ${shared.map((id) => familyById(id).label).join(" and ")} with this room` : p.families.map((id) => familyById(id).label).join(" and ");
+  const why = shared.length ? sharesLine(shared) : p.families.map((id) => familyById(id).label).join(" and ");
   const body = (
     <>
       <NameTile brand={p.brand} kind={sourceLabel(p.type)} family={f.id} />
@@ -63,14 +71,14 @@ export function ProductCard({ p, match, onSimilar, place }: { p: Product; match?
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
       {p.url ? (
-        <ProductLink className="pcard" href={p.url} place={place} product={{ id: p.id, brand: p.brand, family: p.families[0], tier: p.tier }} ariaLabel={`${p.brand} ${p.name}, opens the brand's site`}>
+        <ProductLink className="pcard" href={p.url} place={place} product={{ id: p.id, brand: p.brand, family: p.families[0], tier: p.tier }} ariaLabel={`${p.brand} ${p.name}, opens the brand’s website`}>
           {body}
           <span className="pcard__out"><Icon name="external" size={18} /></span>
         </ProductLink>
       ) : (
         <div className="pcard">{body}</div>
       )}
-      {onSimilar ? <button type="button" className="hero__link" onClick={() => onSimilar(p.id)} style={{ alignSelf: "flex-start", border: 0, background: "transparent", padding: 0, fontSize: 15 }}>More like this</button> : null}
+      {onSimilar ? <button type="button" className="hero__link" onClick={() => onSimilar(p.id)} style={{ alignSelf: "flex-start", border: 0, background: "transparent", padding: 0, fontSize: 15 }}>Explore similar fragrances</button> : null}
     </div>
   );
 }
@@ -93,7 +101,7 @@ export function seasonText(s: Season[]): string {
 }
 
 /**
- * The detailed card of Rooms' "Matches this room" (Tiffany 11/18: four products, more about each): what it is and
+ * The detailed card of Rooms' Fragrance Matches (formerly "Matches this room") (Tiffany 11/18: four products, more about each): what it is and
  * its size and price (checked on the brand's site 11/17), its notes, when it suits, and the families it shares with
  * the room. Facts only; nothing here is written as Olfia copy.
  */
@@ -101,8 +109,8 @@ export function ProductDetailCard({ p, match, onSimilar }: { p: Product; match: 
   const f = familyById(p.families[0]);
   const shared = match.filter((id) => p.families.includes(id));
   const dots = shared.length ? shared : p.families;
-  const why = shared.length ? `Shares ${shared.map((id) => familyById(id).label).join(" and ")} with this room` : p.families.map((id) => familyById(id).label).join(" and ");
-  const price = p.price ? [p.price, p.size].filter(Boolean).join(" · ") : p.url ? null : "In stores only";
+  const why = shared.length ? sharesLine(shared) : p.families.map((id) => familyById(id).label).join(" and ");
+  const price = p.price ? [p.price, p.size].filter(Boolean).join(" · ") : p.url ? null : "Available in stores only";
   const body = (
     <>
       <NameTile brand={p.brand} kind={sourceLabel(p.type)} family={f.id} />
@@ -125,19 +133,19 @@ export function ProductDetailCard({ p, match, onSimilar }: { p: Product; match: 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 10, minWidth: 0 }}>
       {p.url ? (
-        <ProductLink className="pcard" href={p.url} product={{ id: p.id, brand: p.brand, family: p.families[0], tier: p.tier }} ariaLabel={`${p.brand} ${p.name}, opens the brand's site`}>
+        <ProductLink className="pcard" href={p.url} product={{ id: p.id, brand: p.brand, family: p.families[0], tier: p.tier }} ariaLabel={`${p.brand} ${p.name}, opens the brand’s website`}>
           {body}
           <span className="pcard__out"><Icon name="external" size={18} /></span>
         </ProductLink>
       ) : (
         <div className="pcard">{body}</div>
       )}
-      {onSimilar ? <button type="button" className="hero__link" onClick={() => onSimilar(p.id)} style={{ alignSelf: "flex-start", border: 0, background: "transparent", padding: 0, fontSize: 15 }}>More like this</button> : null}
+      {onSimilar ? <button type="button" className="hero__link" onClick={() => onSimilar(p.id)} style={{ alignSelf: "flex-start", border: 0, background: "transparent", padding: 0, fontSize: 15 }}>Explore similar fragrances</button> : null}
     </div>
   );
 }
 
-export function ProductCards({ families, title = "Recreate this at home", limit = 4, compact = false }: { families: FamilyId[]; title?: string; limit?: number; compact?: boolean }) {
+export function ProductCards({ families, title = "Recreate this at home", lead, limit = 4, compact = false }: { families: FamilyId[]; title?: string; lead?: string; limit?: number; compact?: boolean }) {
   const [when, setWhen] = useState<When>("any");
   const [similar, setSimilar] = useState<string | null>(null);
 
@@ -152,6 +160,7 @@ export function ProductCards({ families, title = "Recreate this at home", limit 
         <h2 style={{ fontSize: compact ? 26 : 30 }}>{title}</h2>
         {similar ? <button type="button" className="chip" onClick={() => setSimilar(null)}>Back to this room</button> : null}
       </div>
+      {lead ? <p className="lead" style={{ margin: 0 }}>{lead}</p> : null}
       {!compact ? (
         <div className="chips" role="group" aria-label="When">
           {WHEN.map((w) => (
@@ -164,9 +173,9 @@ export function ProductCards({ families, title = "Recreate this at home", limit 
           {list.map((p) => <ProductDetailCard key={p.id} p={p} match={families} onSimilar={compact ? undefined : setSimilar} />)}
         </div>
       ) : (
-        <p className="muted">Nothing matches that combination yet.</p>
+        <p className="muted">No fragrances match these selections yet. Try another time filter or scent family.</p>
       )}
-      <p className="muted" style={{ fontSize: 14 }}>Links open the brand’s site. Olfia doesn’t sell products.</p>
+      <p className="muted" style={{ fontSize: 14 }}>Product links take you to the brand’s website. Olfia does not sell fragrances.</p>
     </section>
   );
 }

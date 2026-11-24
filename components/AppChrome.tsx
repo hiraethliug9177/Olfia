@@ -22,23 +22,24 @@ type NavItem = { href: string; label: string; match: string[]; note?: string; su
 /**
  * Main navigation, v2 (Tiffany's Notion "Capstone Draft", 11/23): the Olfia wordmark is the way home (the house
  * icon is gone), five entries, and one account icon on the right. Each entry opens its first page; its menu opens
- * on hover or keyboard focus. The Edit has no menu. The "Make a Scent Card" button left the header: Scent cards
- * sits in the Capture menu. The one menu line so far is hers ("Your personal archive of scent."); the others wait
- * for her words, so they are left out rather than drafted.
+ * on hover or keyboard focus. The Edit has no menu. The "Make a Scent Card" button left the header: Scent Cards
+ * sits in the Capture menu. The one menu line is hers ("Your personal archive of scent."). Labels follow her copy
+ * v1 (11/24, docs/copy/olfia-site-copy-v1.md §0.2): Capture a scent, Scent Cards, Fragrance Matches,
+ * Fragrance Shelf, Scent Journal.
  * Old menus (11/10–11/21) are in git history.
  */
 export const NAV: NavItem[] = [
   { href: "/capture", label: "Capture", match: ["/capture", "/card"], sub: [
-    { href: "/capture", label: "Record a scent" },
-    { href: "/card", label: "Scent cards" },
+    { href: "/capture", label: "Capture a scent" },
+    { href: "/card", label: "Scent Cards" },
   ] },
   { href: "/rooms", label: "Rooms", match: ["/rooms"], sub: [
     { href: "/rooms#editor", label: "Create an atmosphere" },
-    { href: "/rooms#products", label: "Fragrance matches" },
+    { href: "/rooms#products", label: "Fragrance Matches" },
   ] },
   { href: "/atlas?tab=shelf", label: "Scent Atlas", match: ["/atlas"], note: "Your personal archive of scent.", sub: [
-    { href: "/atlas?tab=shelf", label: "Fragrance shelf" },
-    { href: "/atlas?tab=calendar", label: "Scent journals" },
+    { href: "/atlas?tab=shelf", label: "Fragrance Shelf" },
+    { href: "/atlas?tab=journal", label: "Scent Journal" },
   ] },
   { href: "/gifts", label: "Discover", match: ["/gifts", "/scentpedia"], sub: [
     { href: "/gifts", label: "Olfia · Gifts" },
@@ -139,7 +140,7 @@ export function Header() {
       loadSample((added) => {
         if (!added) return;
         track("sample_loaded", { place: asked ? "link" : "demo" });
-        if (asked) showToast("Sample pages added");
+        if (asked) showToast("Sample pages added to your Scent Atlas", "/atlas", "Open Scent Atlas");
       });
     } catch {
       // storage blocked: nothing to load

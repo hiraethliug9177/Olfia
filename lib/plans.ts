@@ -29,7 +29,7 @@ export const PLAN_ROWS: PlanRow[] = [
   { feature: "Capture and Scent Cards", free: true, plus: true },
   { feature: "Rooms you can keep", free: String(FREE_ROOMS), plus: "No limit" },
   { feature: "Scentpedia and The Olfia Edit", free: true, plus: true },
-  { feature: "Recommendations, each with its reason", free: true, plus: true },
+  { feature: "Fragrance recommendations with matching reasons", free: true, plus: true },
   { feature: "Monthly analysis and seasonal picks", free: true, plus: true },
   { feature: "Photo View: your room beside its collage", free: false, plus: true },
   { feature: "Saved Scent View settings", free: false, plus: true },
@@ -38,15 +38,15 @@ export const PLAN_ROWS: PlanRow[] = [
 
 /** The short list on each plan's card: what it adds. */
 export const PLAN_CARDS: Record<PlanId, { name: string; points: string[] }> = {
-  free: { name: "Free", points: ["Capture, Rooms and your Scent Atlas", `Keep ${FREE_ROOMS} rooms`, "Recommendations, each with its reason"] },
-  plus: { name: "Olfia Plus", points: ["Everything in Free", "Keep as many rooms as you like", "Photo View and saved Scent View settings", "More Scent Card templates and stamps"] },
+  free: { name: "Free", points: ["Capture, Rooms and your Scent Atlas", "Save up to two rooms", "Fragrance recommendations with matching reasons"] },
+  plus: { name: "Olfia Plus", points: ["Everything in Free", "Save unlimited rooms", "Photo View and saved Scent View settings", "More Scent Card templates and stamps"] },
 };
 
-/** Claude's drafts (11/23), hers to rewrite. */
+/** Tiffany's copy v1 (11/24, §10.5). */
 export const PLAN_FAQ: Array<{ q: string; a: string }> = [
-  { q: "When does Olfia Plus open?", a: "It isn’t open yet. Leave your email and you’ll hear first." },
-  { q: "Where is my Scent Atlas saved?", a: "In this browser only, for now. Nothing goes to a server, and Export my data in Settings makes a copy." },
-  { q: "Can I cancel anytime?", a: "Nothing is charged today. When Olfia Plus opens, its terms will be shown before you join." },
+  { q: "When does Olfia Plus open?", a: "It isn’t open yet. Leave your email to receive updates about the launch." },
+  { q: "Where is my Scent Atlas saved?", a: "Your Atlas entries are stored in this browser. Use Export my data in Settings to download a copy." },
+  { q: "Will I be charged for joining the waitlist?", a: "Joining the waitlist does not start a paid subscription. Pricing and subscription terms will be available before you join Plus." },
 ];
 
 const usd = (n: number) => `$${n % 1 === 0 ? n.toFixed(0) : n.toFixed(2)}`;
