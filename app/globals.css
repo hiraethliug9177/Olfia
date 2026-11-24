@@ -195,29 +195,42 @@ html { scroll-padding-top: 80px; }
   transition: color 0.3s;
 }
 .hd__link:hover { color: var(--deep); }
-/* the current page: a Periwinkle deep line under its entry */
-.hd__link[aria-current="page"]::after { content: ""; position: absolute; left: 18px; right: 18px; bottom: 4px; height: 2px; border-radius: 1px; background: var(--deep); }
+/* the current page: a filled Mist pill (her note, 11/24 evening: "把现在的下划线显示换成填充选中"; was a line under it) */
+.hd__link[aria-current="page"] { background: var(--mist); color: var(--ink); }
 .hd__link--icon { padding: 0; }
-.hd__link--icon[aria-current="page"]::after { left: 10px; right: 10px; bottom: 0; }
+.hd__cta { white-space: nowrap; }
+/* below 1001px the button would crowd the five entries (it needs about 880px with no room to breathe); Scent Cards
+   stays in the Capture menu, and phones have the button at the foot of their menu */
+@media (max-width: 1000px) { .hd__cta { display: none !important; } }
 .hd__list { list-style: none; margin: 0; }
 .hd__list--end { display: flex; padding: 0; }
 .hd__item { position: relative; }
 .hd__end { flex: 1 1 0; display: flex; justify-content: flex-end; align-items: center; gap: 8px; }
 /* each entry's menu opens on hover or keyboard focus, in 0.15s */
+/* every menu is the same width (her note, 11/24 evening): the longest line, "Culture, fragrance, and the art of living."
+   (42 characters of IBM Plex Mono at 13px), on one row */
+/* centred under its entry: the shift lives in transform (--hd-x), because the build dropped a separate translate next
+   to transform here, which left every menu starting at its entry's middle and, at 376px, past the right edge */
 .hd__sub {
-  position: absolute; left: 50%; top: calc(100% + 12px); z-index: 50; min-width: 240px; padding: 8px;
-  translate: -50% 0; border-radius: 20px; background: rgba(255,255,255,0.96); backdrop-filter: blur(18px);
+  --hd-x: -50%;
+  position: absolute; left: 50%; top: calc(100% + 12px); z-index: 50; width: 376px; padding: 8px;
+  border-radius: 20px; background: rgba(255,255,255,0.96); backdrop-filter: blur(18px);
   box-shadow: 0 18px 40px rgba(41,42,49,0.16); border: 1px solid rgba(255,255,255,0.95);
-  opacity: 0; visibility: hidden; transform: translateY(6px); transition: opacity 0.15s, transform 0.15s var(--ease), visibility 0s linear 0.15s;
+  opacity: 0; visibility: hidden; transform: translate(var(--hd-x), 6px); transition: opacity 0.15s, transform 0.15s var(--ease), visibility 0s linear 0.15s;
 }
-.hd__sub--end { left: auto; right: 0; translate: none; }
+.hd__sub--end { --hd-x: 0px; left: auto; right: 0; }
+/* from 821 to 860px a centred menu under The Edit would pass the screen's right edge: there it hangs from its right */
+@media (max-width: 860px) { .hd__list > .hd__item:last-child > .hd__sub { --hd-x: 0px; left: auto; right: 0; } }
 .hd__sub::before { content: ""; position: absolute; left: 0; right: 0; top: -16px; height: 16px; }
 .hd__sub ul { list-style: none; margin: 0; padding: 0; }
-.hd__item:hover > .hd__sub, .hd__item:has(:focus-visible) > .hd__sub { opacity: 1; visibility: visible; transform: none; transition: opacity 0.15s, transform 0.15s var(--ease); }
+.hd__item:hover > .hd__sub, .hd__item:has(:focus-visible) > .hd__sub { opacity: 1; visibility: visible; transform: translate(var(--hd-x), 0); transition: opacity 0.15s, transform 0.15s var(--ease); }
 /* while the pointer is over the row, only the entry under it keeps its menu (11/10 fix); Esc shuts a menu (data-shut) */
-.hd__list:hover > .hd__item:not(:hover) > .hd__sub, .hd__item[data-shut] > .hd__sub { opacity: 0; visibility: hidden; transform: translateY(6px); transition: none; }
+.hd__list:hover > .hd__item:not(:hover) > .hd__sub, .hd__item[data-shut] > .hd__sub { opacity: 0; visibility: hidden; transform: translate(var(--hd-x), 6px); transition: none; }
 .hd__note { margin: 6px 14px 6px; font-size: 13px; color: var(--slate); white-space: nowrap; }
 .hd__sub a { display: flex; align-items: center; min-height: 42px; padding: 0 14px; border-radius: 12px; color: var(--ink); text-decoration: none; font-size: 15px; white-space: nowrap; }
+/* a round bullet before every menu entry, in the brand colours in turn */
+.hd__dot { flex: none; width: 8px; height: 8px; margin-right: 12px; border-radius: 50%; }
+.hd__sub ul:only-child { margin-top: 0; }
 .hd__sub a:hover { background: var(--mist); color: var(--ink); }
 .hd__sub a[aria-current="page"] { font-weight: 600; }
 .hd__burger { width: 48px; height: 48px; align-items: center; justify-content: center; border: 0; border-radius: 50%; background: rgba(255,255,255,0.75); color: var(--ink); box-shadow: 0 8px 28px rgba(41,42,49,0.08); }
@@ -236,7 +249,8 @@ html { scroll-padding-top: 80px; }
 .hd__menu-group:last-child { border-bottom: 0; }
 .hd__menu a { display: flex; align-items: center; color: var(--ink); text-decoration: none; }
 .hd__menu-main { min-height: 46px; font-size: 18px; font-weight: 600; }
-.hd__menu-main[aria-current="page"] { text-decoration: underline; text-decoration-color: var(--deep); text-decoration-thickness: 2px; text-underline-offset: 7px; }
+.hd__menu-main[aria-current="page"] { align-self: flex-start; margin: 0 -14px; padding: 0 14px; border-radius: 999px; background: var(--mist); }
+.hd__menu a.hd__menu-cta { flex: none; align-self: flex-start; margin-top: 18px; color: var(--ivory); }
 .hd__menu-sub a { min-height: 40px; font-size: 15px; color: var(--slate); }
 .hd__menu-sub a[aria-current="page"] { color: var(--ink); font-weight: 600; }
 @media (max-width: 820px) {
@@ -876,7 +890,6 @@ a.pcard:hover { color: var(--ink); transform: translateY(-3px); }
 /* a pick's room: the scene page cropped to its stage, so no page title, date or torn edge shows */
 .gift-room { position: relative; aspect-ratio: 780 / 927; overflow: hidden; background: var(--paper); }
 .gift-room .scene-sheet { margin-top: -17.04%; filter: none; }
-.gifts-page__head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px 28px; margin-bottom: 32px; }
 .gift-toggle { display: inline-flex; gap: 4px; padding: 5px; border-radius: 999px; background: var(--mist); }
 .gift-toggle button { height: 44px; padding: 0 22px; border: 0; border-radius: 999px; background: transparent; font-family: var(--font-ui); font-size: 15px; font-weight: 500; color: var(--ink); cursor: pointer; }
 .gift-toggle button[aria-pressed="true"] { background: var(--deep); color: #fff; }
@@ -886,12 +899,21 @@ a.pcard:hover { color: var(--ink); transform: translateY(-3px); }
 .gift-choose__fams { flex: 1 1 560px; min-width: 0; margin: 0; padding: 0; border: 0; }
 .gift-choose__fams legend { padding: 0; margin-bottom: 8px; }
 .gift-choose__chips { display: flex; flex-wrap: wrap; gap: 8px; }
-.gift-chip { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line); background: #fff; font-family: var(--font-ui); font-size: 14px; color: var(--ink); cursor: pointer; }
+.gift-chip { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line); background: #fff; font-family: var(--font-ui); font-size: 14px; color: var(--ink); white-space: nowrap; cursor: pointer; }
 .gift-chip:hover { border-color: var(--deep); }
 .gift-chip[aria-pressed="true"] { border: 2px solid var(--deep); padding: 0 15px; background: var(--mist); font-weight: 600; }
-/* "For" and "Their scent" start on one line; the quiz button sits level with the chips */
+/* "For" and "Their scent" start on one line */
 .gift-choose { align-items: flex-start; }
-.gift-choose__quiz { margin-left: auto; align-self: flex-end; }
+/* her note (11/24 evening): on a computer the seven family buttons sit on one row, smaller and sharing the width
+   (beside the recipient's name too, as on 11/18); narrower screens let them wrap */
+@media (min-width: 1280px) {
+  .gift-choose { flex-wrap: nowrap; column-gap: 24px; }
+  .gift-choose__to { flex: 0 0 180px; }
+  .gift-choose__fams { flex: 1 1 0; }
+  .gift-choose__chips { flex-wrap: nowrap; gap: 4px; }
+  .gift-chip { flex: 1 1 auto; min-height: 40px; padding: 0 8px; gap: 7px; font-size: 13px; }
+  .gift-chip[aria-pressed="true"] { padding: 0 7px; }
+}
 .gift-me { align-items: center; padding: 22px 28px; }
 .gift-me__fig { flex: none; display: flex; align-items: flex-end; justify-content: center; width: 124px; height: 124px; border-radius: 50%; overflow: hidden; }
 .gift-me__fig img { display: block; width: 104px; height: auto; }
@@ -950,7 +972,6 @@ a.pcard:hover { color: var(--ink); transform: translateY(-3px); }
 @media (max-width: 640px) {
   .gift-choose, .gift-me { padding: 20px; }
   .gift-me__side { align-items: flex-start; margin-left: 0; text-align: left; }
-  .gift-choose__quiz { margin-left: 0; }
   .gift-card-panel { padding: 22px; }
   .gift-card-panel__title { font-size: 36px; }
 }
@@ -977,8 +998,10 @@ a.pcard:hover { color: var(--ink); transform: translateY(-3px); }
 .ico-morph[data-open="true"] > svg:nth-child(2) { opacity: 1; transform: none; }
 
 @media (max-width: 560px) {
-  .folder-tabs { padding-left: 8px; gap: 4px; }
-  .folder-tab { height: 46px; padding: 0 14px; font-size: 14px; white-space: nowrap; }
+  /* the four tabs are wider than a phone: the row scrolls on its own, so the page does not move sideways (found 11/24) */
+  .folder-tabs { padding-left: 8px; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+  .folder-tabs::-webkit-scrollbar { display: none; }
+  .folder-tab { flex: none; height: 46px; padding: 0 14px; font-size: 14px; white-space: nowrap; }
   .cal-scroll { padding: 20px 12px 24px; }
   .card { padding: 20px; }
   .dial-panel { padding: 22px; }
@@ -1005,14 +1028,49 @@ body::after {
 
 
 /* ---------- The Olfia Edit as a newspaper section front (11/10) ---------- */
-.np-mast { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 16px 0 22px; margin-bottom: 40px; border-top: 3px solid var(--ink); border-bottom: 1px solid var(--ink); text-align: center; }
-/* 11/18 (Tiffany): the line sits on the date's row, set apart on a solid Mist ground */
-.np-mast__line { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 14px; }
-.np-mast__date { min-width: 29ch; font-size: 14px; color: var(--slate); text-align: right; }
-.np-mast__title { font-family: var(--font-display); font-size: clamp(52px, 8vw, 120px); font-weight: 700; line-height: 0.95; letter-spacing: -0.03em; }
-.np-mast__tag { padding: 3px 12px; border-radius: 999px; background: var(--mist); font-size: 14px; color: var(--ink); }
-.np-mast__br { display: none; }
-@media (max-width: 560px) { .np-mast__tag { padding: 5px 14px; border-radius: 14px; font-size: 13px; text-align: center; } .np-mast__br { display: inline; } .np-mast__date { min-width: 0; text-align: center; } }
+/* 11/24 evening (her mockup and mood board): a newspaper masthead. A heavy rule, then her line, the nameplate and a
+   date stamp wheel on one row; under them one ruled line: today's family on the left, the day's motto and the week's
+   edition on the right. */
+.np-mast { margin-bottom: 0; border-top: 4px solid var(--ink); }
+.np-mast__top { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 24px; padding: 16px 0 14px; border-bottom: 2px solid var(--ink); }
+.np-mast__motto { justify-self: start; margin: 0; font-family: var(--font-display); font-style: italic; font-weight: 600; font-size: clamp(17px, 1.5vw, 22px); line-height: 1.22; text-align: center; color: var(--ink); text-wrap: nowrap; }
+.np-mast__title { margin: 0; font-family: var(--font-display); font-size: clamp(52px, 7vw, 108px); font-weight: 700; line-height: 0.95; letter-spacing: -0.03em; text-align: center; white-space: nowrap; }
+.np-mast__stamp { justify-self: end; width: clamp(128px, 11.6vw, 168px); aspect-ratio: 1; rotate: -4deg; }
+.np-mast__bar { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 28px; padding: 9px 0 8px; border-bottom: 2px solid var(--ink); font-size: 14px; font-weight: 600; }
+.np-mast__bar p { margin: 0; }
+.np-mast__pick { white-space: nowrap; }
+.np-mast__fam { display: inline-flex; align-items: center; gap: 7px; margin-left: 4px; color: var(--ink); text-decoration: none; }
+.np-mast__fam:hover { color: var(--deep); text-decoration: underline; text-underline-offset: 4px; }
+.np-mast__issue { text-align: right; text-wrap: balance; }
+.np-mast__line q { font-family: var(--font-display); font-style: italic; font-weight: 500; font-size: 16px; }
+.np-mast__by { font-weight: 400; color: var(--slate); }
+.np-mast__ed { white-space: nowrap; }
+.np-mast__ed sup { font-size: 0.68em; }
+/* the date stamp: ink lines, the months on the rim, this month's days inside; today's marks breathe between apricot
+   and periwinkle */
+.np-wheel { display: block; width: 100%; height: 100%; overflow: visible; }
+.np-wheel__rim { fill: rgba(255,255,255,0.35); stroke: var(--ink); stroke-width: 2.4; }
+.np-wheel__line { fill: none; stroke: var(--ink); stroke-width: 1.1; }
+.np-wheel__month { font-family: var(--font-ui); font-size: 10.5px; font-weight: 600; letter-spacing: 0.04em; fill: var(--ink); }
+.np-wheel__year { font-family: var(--font-display); font-size: 15px; font-weight: 700; letter-spacing: 0.06em; fill: var(--ink); }
+.np-wheel__day { font-family: var(--font-ui); font-size: 7.6px; fill: var(--ink); }
+.np-wheel__day.is-on { font-weight: 700; }
+.np-wheel__band { fill: none; stroke: var(--apricot); stroke-width: 15; stroke-linecap: round; animation: np-breathe 5s ease-in-out infinite; }
+.np-wheel__today { fill: var(--apricot); animation: np-breathe-fill 5s ease-in-out infinite; }
+@keyframes np-breathe { 0%, 100% { stroke: var(--apricot); } 50% { stroke: var(--peri); } }
+@keyframes np-breathe-fill { 0%, 100% { fill: var(--apricot); } 50% { fill: var(--peri); } }
+@media (prefers-reduced-motion: reduce) { .np-wheel__band, .np-wheel__today { animation: none; } }
+.np-mast__lead { margin: 18px 0 36px; color: var(--slate); }
+/* narrower screens: the nameplate takes its own row, her line and the stamp share the next */
+@media (max-width: 900px) {
+  .np-mast__top { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "title title" "motto stamp"; row-gap: 14px; }
+  .np-mast__title { grid-area: title; }
+  .np-mast__motto { grid-area: motto; text-align: left; }
+  .np-mast__stamp { grid-area: stamp; }
+  .np-mast__bar { flex-direction: column; align-items: flex-start; }
+  .np-mast__issue { text-align: left; }
+}
+@media (max-width: 560px) { .np-mast__title { font-size: clamp(40px, 12.4vw, 60px); } .np-mast__stamp { width: 120px; } }
 .np-grid { display: grid; grid-template-columns: minmax(0, 2.1fr) minmax(280px, 1fr); gap: 48px; align-items: start; margin-top: 56px; }
 .np-main { display: flex; flex-direction: column; gap: 28px; min-width: 0; }
 .np-filters { display: flex; flex-direction: column; gap: 10px; padding-bottom: 18px; border-bottom: 1px solid var(--ink); }
@@ -1338,8 +1396,7 @@ body::after {
 .fav__name { font-family: var(--font-display); font-size: 20px; font-weight: 600; }
 .scentprint__prefs { display: flex; flex-direction: column; gap: 14px; }
 .scentprint__tags { display: flex; flex-direction: column; gap: 14px; }
-.gifts-page__intro { display: flex; flex-direction: column; gap: 10px; max-width: 640px; }
-.gifts-page__mode { margin: -12px 0 24px; max-width: 640px; color: var(--slate); }
+.gifts-page__lead { margin-bottom: 28px; }
 .gift-card-panel__lead { margin: 0 0 4px; color: var(--slate); }
 .lib-guide-intro { max-width: none; margin: 0 0 20px; }
 .guide-text p { margin: 0 0 12px; max-width: 72ch; }
@@ -1348,14 +1405,12 @@ body::after {
 .guide-text__toggle { padding: 0; border: 0; background: none; font-weight: 600; color: var(--deep); text-decoration: underline; text-underline-offset: 4px; cursor: pointer; }
 .recipe--open { display: flex; flex-direction: column; gap: 6px; }
 .recipe__label { font-family: var(--font-ui); font-size: 14px; font-weight: 600; color: var(--slate); }
-.np-mast__lead { margin: 14px auto 0; max-width: 68ch; color: var(--slate); text-align: center; }
 .quiz-profile { display: flex; flex-direction: column; gap: 10px; padding: 20px 22px; border-radius: 18px; background: var(--mist); }
 .quiz-profile p { margin: 0; }
 .quiz-profile__h { margin: 0; font-family: var(--font-display); font-size: 26px; font-weight: 600; }
 .quiz-profile__hint { font-size: 14px; }
-.plans__lead { margin: 0; max-width: 72ch; font-size: 17px; }
-.plans__hint { margin: 0; font-size: 15px; }
-.plans__lead { margin: 0; max-width: 72ch; font-size: 17px; }
+/* the plan's description runs the full width, like every page description (her note, 11/24 evening) */
+.plans__lead { margin: 0; max-width: none; font-size: 17px; text-wrap: pretty; }
 .plans__hint { margin: 0; font-size: 15px; }
 .privacy__body h2 { margin: 10px 0 0; font-family: var(--font-display); font-size: 24px; font-weight: 600; }
 .privacy__body h2:first-child { margin-top: 0; }
@@ -1369,12 +1424,14 @@ body::after {
 p, li, dd, blockquote { text-wrap: pretty; }
 h1, h2, h3, h4, .h-page, .h-section { text-wrap: balance; }
 .just, .vocab__lines p, .receipt__p, .scentprint__ai-text, .way__text p, .letter-card p, .guide-text p, .lib-guide-intro, .privacy__body p,
-.prose p, .dial-panel p, .dial-panel dd, .scentprint__lead, .quiz-profile p, .story-card p, .lib-story p {
+.prose p, .dial-panel p, .dial-panel dd, .scentprint__lead, .quiz-profile p, .story-card p, .lib-story p,
+.page-lead, .plans__lead, .studio-head > .lead {
   text-align: justify; text-justify: inter-word; hyphens: auto; -webkit-hyphens: auto;
 }
 @media (max-width: 640px) {
   .just, .vocab__lines p, .receipt__p, .scentprint__ai-text, .way__text p, .letter-card p, .guide-text p, .lib-guide-intro, .privacy__body p,
-  .prose p, .dial-panel p, .dial-panel dd, .scentprint__lead, .quiz-profile p, .story-card p, .lib-story p { text-align: left; hyphens: manual; }
+  .prose p, .dial-panel p, .dial-panel dd, .scentprint__lead, .quiz-profile p, .story-card p, .lib-story p,
+  .page-lead, .plans__lead, .studio-head > .lead { text-align: left; hyphens: manual; }
 }
 
 
@@ -1383,7 +1440,6 @@ h1, h2, h3, h4, .h-page, .h-section { text-wrap: balance; }
 .about__part .about__h { margin: 0; }
 
 /* About: How it Works on white, two entries to a card */
-.about__part--white { padding: clamp(24px, 3vw, 44px); border-radius: 30px; background: #fff; box-shadow: var(--shadow-card); }
 .ways-card { display: flex; flex-direction: column; justify-content: center; padding: 10px clamp(22px, 2.4vw, 32px); border-radius: 26px; background: var(--mist); }
 .ways-card .way, .ways-card .way:nth-child(even) { grid-template-columns: clamp(96px, 11vw, 136px) minmax(0, 1fr); gap: clamp(18px, 2vw, 28px); align-items: center; padding: 22px 0; }
 .ways-card .way:nth-child(even) .way__pic { order: 0; }
@@ -1428,13 +1484,24 @@ h1, h2, h3, h4, .h-page, .h-section { text-wrap: balance; }
   .about__body { gap: 72px; }
 }
 /* Footer (Tiffany 11/24): contact icons beside the sign-up row */
-.ft__signup { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 40px; align-items: end; }
-.ft__contact { display: flex; align-items: center; gap: 14px; align-self: end; margin-bottom: 30px; padding-top: 0; }
-.ft__contact-label { font-family: var(--font-ui); font-size: 14px; font-weight: 600; color: var(--slate); white-space: nowrap; }
-.ft__icons { padding-top: 0; }
-.ft__icon { width: 44px; height: 44px; color: var(--ink); transition: background 0.2s, color 0.2s; }
+/* her notes (11/24 evening): the heading is bold and its line sits beside it on the same row; "Contact us @" takes the
+   heading's style on that row, and the two icons are as tall as the email box, on its row. The sign-up block and the
+   contact block share three rows (heading, boxes, note) through subgrid. */
+.ft .signup__heading { font-weight: 600; line-height: 1.2; }
+.ft .signup__top { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 18px; }
+.ft__signup { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 40px; row-gap: 16px; }
+.ft__contact { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; padding-top: 0; }
+.ft__contact-label { font-family: var(--font-display); font-size: 22px; font-weight: 600; line-height: 1.2; color: var(--ink); white-space: nowrap; }
+.ft__icons { display: flex; gap: 10px; padding-top: 0; }
+.ft__icon { width: 42px; height: 42px; color: var(--ink); transition: background 0.2s, color 0.2s; }
 .ft__icon:hover { background: var(--peri-soft); color: var(--deep); }
-@media (max-width: 760px) { .ft__signup { grid-template-columns: minmax(0, 1fr); row-gap: 16px; } .ft__contact { margin-bottom: 0; } }
+@media (max-width: 760px) { .ft__signup { grid-template-columns: minmax(0, 1fr); } }
+@media (min-width: 761px) {
+  .ft__signup { grid-template-rows: auto auto auto; row-gap: 8px; }
+  .ft__signup > .signup { grid-column: 1; grid-row: 1 / span 3; display: grid; grid-template-rows: subgrid; row-gap: 8px; max-width: none; }
+  .ft__signup > .signup > .signup__note { grid-row: 3; }
+  .ft__contact { grid-column: 2; grid-row: 1 / span 2; display: grid; grid-template-rows: subgrid; row-gap: 8px; align-items: center; }
+}
 .quiz-notes { margin: 0; font-size: 15px; color: var(--slate); }
 .about__links .btn { height: 40px; padding: 0 16px; font-size: 14px; }
 @media (min-width: 861px) { .about__links { flex-wrap: nowrap; } }
@@ -1723,7 +1790,6 @@ span.note-tag { cursor: default; }
   .ways-card .way, .ways-card .way:nth-child(even), .ways-card--solo .way { grid-template-columns: minmax(0, 1fr); gap: 10px; }
   .ways-card .way__pic { justify-content: flex-start; }
   .ways-card .way__pic img { width: auto; max-width: 120px; max-height: 88px; }
-  .about__part--white { padding: 20px 16px; }
 }
 
 /* Scentpedia head (Tiffany 11/24, "match the title's height"): beside the title the line sets on two lines whose top meets
@@ -1742,7 +1808,9 @@ span.note-tag { cursor: default; }
 .pmatch-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
 @media (max-width: 960px) { .pmatch-grid { grid-template-columns: minmax(0, 1fr); } }
 .pmatch-wrap { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
-.pmatch { display: flex; flex-direction: column; flex: 1; border-radius: 22px; background: #fff; box-shadow: var(--shadow-card); overflow: hidden; }
+/* her note (11/24 evening): the cards stand apart from the section's white ground, on Ivory with a hairline, as the
+   Free plan card does */
+.pmatch { display: flex; flex-direction: column; flex: 1; border-radius: 22px; background: var(--ivory); border: 1px solid rgba(41,42,49,0.08); box-shadow: 0 8px 22px rgba(41,42,49,0.05); overflow: hidden; }
 .pmatch__top { display: grid; grid-template-columns: 168px minmax(0, 1fr); gap: 20px; padding: 18px 20px 16px 18px; flex: 1; }
 .pmatch__pic { align-self: start; border-radius: 16px; overflow: hidden; }
 .pmatch__pic .ptile { height: 208px; }
@@ -1782,14 +1850,13 @@ span.note-tag { cursor: default; }
    the desk is a mix of Ivory and Mist, lines are Charcoal at low strength. */
 
 /* the head: on a computer the title (one line) and its lead share a row, the lead's last line on the title's baseline */
+/* her notes (11/24 evening, "每个主页的short description与标题显示调整"): under a page title its description is one
+   paragraph across the full width; a control that belongs to the whole page (a month, a switch) sits on the title's row */
+.page-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 32px; }
+.page-lead { max-width: none; margin: 14px 0 0; text-wrap: pretty; }
 .studio-head { display: flex; flex-direction: column; gap: 10px; margin: 0 0 22px; }
 .studio-head > .h-page { font-size: clamp(34px, 2.1vw + 12px, 42px); line-height: 1.04; letter-spacing: -0.02em; }
-.studio-head > .lead { margin: 0; font-size: 14px; line-height: 1.6; max-width: 62ch; text-wrap: balance; }
-@media (min-width: 1100px) {
-  .studio-head { flex-direction: row; align-items: flex-end; align-items: last baseline; justify-content: space-between; gap: 48px; }
-  .studio-head > .h-page { flex: none; white-space: nowrap; }
-  .studio-head > .lead { flex: 0 1 auto; max-width: 68ch; }
-}
+.studio-head > .lead { margin: 0; font-size: 15px; line-height: 1.6; max-width: none; text-wrap: pretty; }
 
 /* shared parts */
 .ws, .desk {
@@ -1912,10 +1979,38 @@ span.note-tag { cursor: default; }
 .ws__tray .ws-tabs { flex: none; justify-content: space-between; gap: 8px; padding: 0 18px; }
 .ws__tray .ws-tab { font-size: 13px; }
 .ws__tray-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; gap: 20px; padding: 16px 18px 20px; scrollbar-width: thin; }
-.ws__hint { flex: none; margin: 0; padding: 11px 18px 14px; border-top: 1px solid var(--line); font-size: 13px; line-height: 1.5; color: var(--slate); }
+/* her note (11/24 evening): the guide lines float as small notes that close with × (RoomEditor's Guide) */
+.ws-anchor, .ws-fold__body { position: relative; }
+.ws-guide {
+  position: absolute; z-index: 6; display: flex; align-items: flex-start; gap: 8px; padding: 11px 8px 12px 14px;
+  border-radius: 14px; border: 1px solid rgba(41,42,49,0.08); background: #fff; box-shadow: 0 14px 32px rgba(41,42,49,0.16);
+  font-size: 13px; font-weight: 400; line-height: 1.55; color: var(--ink); animation: guide-in 0.35s var(--ease) both;
+}
+.ws-guide::before { content: ""; position: absolute; left: 24px; top: -7px; width: 12px; height: 12px; background: #fff; border-left: 1px solid rgba(41,42,49,0.08); border-top: 1px solid rgba(41,42,49,0.08); rotate: 45deg; }
+.ws-guide__text { flex: 1 1 auto; min-width: 0; padding-top: 2px; }
+.ws-guide__x { flex: none; width: 28px; height: 28px; display: grid; place-items: center; margin-top: -3px; border: 0; border-radius: 50%; background: transparent; color: var(--slate); cursor: pointer; }
+.ws-guide__x:hover { background: var(--mist); color: var(--ink); }
+.ws-guide--below { left: 0; right: 0; top: calc(100% + 10px); }
+.ws-guide--tray { left: 12px; right: 12px; bottom: 12px; }
+.ws-guide--tray::before { display: none; }
+@keyframes guide-in { from { opacity: 0; transform: translateY(4px); } }
+@media (prefers-reduced-motion: reduce) { .ws-guide { animation: none; } }
+/* Scent families as one row that opens (her note, 11/24 evening: "改成toggle显示") */
+.ws-fold__head { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 40px; padding: 0; border: 0; background: none; text-align: left; cursor: pointer; }
+.ws-fold__dots { display: inline-flex; align-items: center; gap: 5px; }
+.ws-fold__dots .chip__dot { width: 12px; height: 12px; }
+.ws-fold__chev { margin-left: auto; color: var(--slate); transition: rotate 0.2s var(--ease); }
+.ws-fold.is-open .ws-fold__chev { rotate: 180deg; }
+.ws-fold__head:hover .ws-fold__chev { color: var(--deep); }
+.ws-fold__body { display: flex; flex-direction: column; gap: 10px; }
+/* Name your room in the bar, in the choices' box */
+.ws-pick__input { display: block; width: 100%; height: 44px; padding: 0 14px; border: 1px solid var(--line); border-radius: 12px; background: #fff; font-size: 21px; font-weight: 700; color: var(--ink); transition: border-color 0.2s; }
+.ws-pick__input:hover { border-color: rgba(76,82,122,0.55); }
+.ws-pick__input::placeholder { color: rgba(92,94,107,0.7); }
 .ws__handle { display: none; }
 .ws-shelf { display: flex; flex-direction: column; gap: 10px; }
-.ws-shelf__h { margin: 0; font-family: var(--font-ui); font-size: 13px; font-weight: 600; line-height: 1.4; color: var(--slate); }
+/* her note (11/24 evening): a shelf's heading sits on a Mist band, so it reads apart from the labels under the pictures */
+.ws-shelf__h { margin: 0; padding: 6px 10px; border-radius: 8px; background: var(--mist); font-family: var(--font-ui); font-size: 13px; font-weight: 600; line-height: 1.4; color: var(--ink); }
 .ws-tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 10px; }
 .ws-tiles--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px 8px; }
 .ws-tile { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 0; padding: 0; border: 0; background: none; color: var(--ink); cursor: pointer; }
@@ -1985,7 +2080,7 @@ span.note-tag { cursor: default; }
   .ws__tray-in { position: static; }
   .ws__tray .ws__handle { display: flex; align-self: center; justify-content: center; align-items: center; width: 64px; height: 22px; padding: 0; border: 0; background: none; }
   .ws__tray .ws__handle span { width: 40px; height: 4px; border-radius: 999px; background: rgba(41,42,49,0.28); }
-  .ws__tray:not(.is-open) .ws__tray-body, .ws__tray:not(.is-open) .ws__hint { display: none; }
+  .ws__tray:not(.is-open) .ws__tray-body, .ws__tray:not(.is-open) .ws-guide--tray { display: none; }
   .ws__tray-body { max-height: 46svh; }
   .ws-tiles, .ws-tiles--3 { grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); }
 }

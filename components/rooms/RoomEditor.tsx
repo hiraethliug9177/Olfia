@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import type { CSSProperties, ChangeEvent, DragEvent as ReactDragEvent, KeyboardEvent as ReactKeyboardEvent, MouseEvent as ReactMouseEvent, PointerEvent as ReactPointerEvent } from "react";
+import type { CSSProperties, ChangeEvent, DragEvent as ReactDragEvent, KeyboardEvent as ReactKeyboardEvent, MouseEvent as ReactMouseEvent, PointerEvent as ReactPointerEvent, ReactNode } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   EMOTION_OPTIONS,
@@ -75,9 +75,11 @@ const VIEWS: Array<{ id: View; label: string }> = [
 ];
 
 /**
- * Tiffany's Rooms flow (Notion, 11/24): choose a feeling, a space and a fragrance, then style the atmosphere, discover
- * matching products and save. The first three are the intention bar above a new room; which families a feeling brings
- * and which room a space opens are Claude's reading (each feeling also sets the same feeling in Scent View).
+ * Tiffany's Rooms flow (Notion, 11/24): choose a feeling and a space, then style the atmosphere, discover matching
+ * products and save. Her notes of 11/24 (evening): the Room setting (Reading Corner, Kitchen, Bathroom) joined Choose a
+ * space, so the six rooms are one list (each opens its Home preset); Choose your fragrance left the bar (fragrances
+ * are added from the Scent shelf, one or more), and Name your room took its place. Which families a feeling brings is
+ * Claude's reading (each feeling also sets the same feeling in Scent View).
  */
 const START_FEELINGS: Array<{ id: EmotionId; label: string; families: FamilyId[] }> = [
   { id: "calm", label: "Calm", families: ["green", "fresh"] },
@@ -85,17 +87,17 @@ const START_FEELINGS: Array<{ id: EmotionId; label: string; families: FamilyId[]
   { id: "energized", label: "Energized", families: ["citrus", "green"] },
   { id: "fresh-start", label: "Refreshed", families: ["fresh", "citrus"] },
 ];
+/** The six rooms, in the order and wording of her copy v1 room list; each lays out its Home preset (lib/presets.ts). */
 const START_SPACES: Array<{ id: string; label: string }> = [
-  { id: "bedroom-morning", label: "Bedroom" },
   { id: "living-night", label: "Living room" },
+  { id: "bedroom-morning", label: "Bedroom" },
   { id: "study-afternoon", label: "Study" },
+  { id: "reading-night", label: "Reading corner" },
+  { id: "kitchen-morning", label: "Kitchen" },
+  { id: "bath-evening", label: "Bathroom" },
 ];
-const START_FRAGRANCES: Array<{ id: string; label: string }> = [
-  { id: "candle", label: "Candle" },
-  { id: "diffuser", label: "Diffuser" },
-  { id: "incense", label: "Incense" },
-  { id: "spray", label: "Room spray" },
-];
+/** A plain candle, diffuser, incense or spray already in the room carries over into a new space. */
+const BASIC_SCENTS = new Set(["candle", "diffuser", "incense", "spray"]);
 const MATERIAL_IDS = new Set(FAMILIES.flatMap((f) => f.materials.map((m) => m.id)));
 const STICKER_SPOTS: Array<[number, number]> = [[0.78, 0.46], [0.6, 0.42], [0.88, 0.6]];
 
@@ -176,6 +178,20 @@ const LEAVE = {
   go: "Leave without saving",
 };
 
+/**
+ * The guide lines of Rooms float as small notes with × (her note, 11/24 evening: "改成可以点击关闭的浮动弹窗引导").
+ * A closed note stays closed in this browser (TIPS_KEY, cleared with the rest by Clear this browser).
+ */
+const TIPS_KEY = "olfia.tips.v1";
+function Guide({ className, onClose, children }: { className?: string; onClose: () => void; children: ReactNode }) {
+  return (
+    <div className={`ws-guide${className ? ` ${className}` : ""}`} role="note">
+      <div className="ws-guide__text">{children}</div>
+      <button type="button" className="ws-guide__x" aria-label="Close this tip" onClick={onClose}><Icon name="x" size={16} /></button>
+    </div>
+  );
+}
+
 export function RoomEditor() {
   const router = useRouter();
   const params = useSearchParams();
@@ -225,8 +241,12 @@ export function RoomEditor() {
   const [split, setSplit] = useState(50);
   const [photoNote, setPhotoNote] = useState<string | null>(null);
   const [stagePx, setStagePx] = useState(560);
-  /** the intention bar's choices for a new room (feeling and space; the fragrance reads from the room itself) */
+  /** the intention bar's choices (feeling and space) */
   const [start, setStart] = useState<{ feel?: EmotionId; space?: string }>({});
+  /** Scent families fold into one row until opened (her note, 11/24 evening) */
+  const [famOpen, setFamOpen] = useState(false);
+  /** the guide notes closed in this browser; null until read, so no note flashes before it is known */
+  const [tipsShut, setTipsShut] = useState<string[] | null>(null);
 
   // 11/24 handoff: unsaved changes are asked about before anything replaces the room, and a dragged object lifts
   const [ask, setAsk] = useState<Ask | null>(null);
@@ -377,19 +397,26 @@ export function RoomEditor() {
 
   useEffect(() => () => endGesture(), []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // which guide notes this browser has closed
+  useEffect(() => {
+    try {
+      const v = JSON.parse(window.localStorage.getItem(TIPS_KEY) ?? "[]") as unknown;
+      setTipsShut(Array.isArray(v) ? v.filter((x): x is string => typeof x === "string") : []);
+    } catch {
+      setTipsShut([]);
+    }
+  }, []);
+  const tipOn = (id: string) => tipsShut !== null && !tipsShut.includes(id);
+  const shutTip = (id: string) => {
+    const next = [...(tipsShut ?? []), id];
+    setTipsShut(next);
+    try { window.localStorage.setItem(TIPS_KEY, JSON.stringify(next)); } catch { /* closed for this visit */ }
+  };
+
   /** Anything that replaces the room on the page asks first while there are unsaved changes (P0, 11/24 handoff). */
   const guard = (message: Omit<Ask, "run">, run: () => void) => {
     if (dirty) setAsk({ ...message, run });
     else run();
-  };
-
-  /** A room tab starts a new page of that room, keeping the families already chosen. */
-  const openScene = (id: string) => {
-    if (id === sceneId) return;
-    guard(
-      { title: "Start a new room?", text: `${sceneName(id)} opens as a new room. The changes you made here haven’t been saved yet.`, go: "Start a new room" },
-      () => router.replace(`/rooms?scene=${id}&family=${families.join(",")}`, { scroll: false }),
-    );
   };
 
   /** New room and the saved rooms below: the same question before the room on the page is left. */
@@ -451,8 +478,8 @@ export function RoomEditor() {
     }
   };
 
-  // The intention bar. A feeling or a fragrance changes nothing a space would undo, so a room that had no unsaved
-  // changes still has none after them; a space lays out a preset, so it asks first when there are changes.
+  // The intention bar. A feeling changes nothing a space would undo, so a room that had no unsaved changes still has
+  // none after it; a space lays out a preset, so it asks first when there are changes.
   const pickFeeling = (f: (typeof START_FEELINGS)[number]) => {
     const wasClean = !dirty;
     record();
@@ -469,7 +496,7 @@ export function RoomEditor() {
     const fams = feel ? feel.families : preset.families;
     const scentKind = items.find((i) => isScentItem(i.kind))?.kind;
     let next = restick(preset.items, fams);
-    if (scentKind && START_FRAGRANCES.some((o) => o.id === scentKind)) next = swapScent(next, scentKind);
+    if (scentKind && BASIC_SCENTS.has(scentKind)) next = swapScent(next, scentKind);
     record();
     setSceneId(preset.scene);
     setTime(preset.time);
@@ -486,13 +513,6 @@ export function RoomEditor() {
       { title: `Use the ${label.toLowerCase()} layout?`, text: "It replaces the arrangement you have made. You can undo this afterwards.", go: "Use this layout" },
       () => pickSpace(id),
     );
-  };
-  const pickFragrance = (kind: string) => {
-    const wasClean = !dirty;
-    setSelected(null);
-    setNoteFor(null);
-    commit(swapScent(items, kind));
-    if (wasClean) markClean();
   };
 
   /** Fragrance Matches → Add to room: a cut-out of the same kind of product, carrying the product's notes on its tag. */
@@ -715,8 +735,6 @@ export function RoomEditor() {
       else setSensory((cur) => ({ ...cur, [id]: v }));
     });
   const impression = impressionWords(senseValues);
-  const fragranceKind = items.find((i) => isScentItem(i.kind))?.kind ?? "";
-  const fragranceValue = START_FRAGRANCES.some((o) => o.id === fragranceKind) ? fragranceKind : "";
   const viewIndex = VIEWS.findIndex((v) => v.id === view);
   const notesOn = view === "scent" ? scentNotes : showNotes;
 
@@ -728,9 +746,16 @@ export function RoomEditor() {
       <span className="switch__track" aria-hidden="true"><span className="switch__knob" /></span>
     </button>
   );
-  const strengthNote = <p className="ws-note">Scent strength represents your imagined atmosphere, rather than a measured concentration.</p>;
+  // her note (11/24 evening): the three IBM Plex Mono guide lines float as small notes that close with ×, and stay
+  // closed in this browser
+  const strengthGuide = tipOn("strength") ? (
+    <Guide className="ws-guide--below" onClose={() => shutTip("strength")}>
+      Scent strength represents your imagined atmosphere, rather than a measured concentration.
+    </Guide>
+  ) : null;
 
-  // the intention bar: feeling → space → fragrance, three compact choices in a row (11/24 handoff, §3.4)
+  // the intention bar: feeling → space → name, three compact fields in a row (11/24 handoff, §3.4; her notes of the
+  // same evening put Name your room in place of Choose your fragrance)
   const intentSteps = [
     {
       id: "feel",
@@ -740,7 +765,6 @@ export function RoomEditor() {
       pick: (v: string) => { const f = START_FEELINGS.find((x) => x.id === v); if (f) pickFeeling(f); },
     },
     { id: "space", title: "Choose a space", value: start.space ?? "", opts: START_SPACES, pick: chooseSpace },
-    { id: "fragrance", title: "Choose your fragrance", value: fragranceValue, opts: START_FRAGRANCES, pick: pickFragrance },
   ];
 
   const shelves = (() => {
@@ -757,23 +781,30 @@ export function RoomEditor() {
     return groups.map((g) => ({ title: g, list: trayItems.filter((it) => (it.group ?? "Objects") === g) })).filter((s) => s.list.length);
   })();
 
+  // her note (11/24 evening): the suggestion of a neighbouring family floats as a small note under the family buttons
+  const near = FAMILIES.filter((f) => !families.includes(f.id) && families.some((id) => areNeighbours(id, f.id))).slice(0, 1);
+  const exploreOn = famOpen && near.length > 0 && families.length < 3 && tipOn("explore");
+  const exploreGuide =
+    exploreOn ? (
+      <Guide className="ws-guide--below" onClose={() => shutTip("explore")}>
+        {/* copy v1 (11/24, §4.1): one suggestion, "Explore {family} as an additional scent."; the family is the button */}
+        <span className="ws-explore">
+          <span>Explore</span>
+          {near.map((f) => (
+            <button key={f.id} type="button" className="chip" onClick={() => toggleFamily(f.id)}>
+              <span className="chip__dot" style={{ background: f.hex }} />
+              {f.label}
+            </button>
+          ))}
+          <span>as an additional scent.</span>
+        </span>
+      </Guide>
+    ) : null;
+
   const roomSettings = (
     <>
-      <label className="ws-field">
-        Name your room
-        <input className="input hand" type="text" value={nickname} maxLength={40} onChange={(e) => setNickname(e.target.value)} placeholder="rain, chapter three" />
-      </label>
-
-      {/* 11/18 (Tiffany): the room is one more setting, below the name and in the same style as Time of day */}
-      <div className="ws-group">
-        <span className="ws-label" id="ws-room">Room</span>
-        <div role="radiogroup" aria-labelledby="ws-room" className="seg seg--soft seg--fit">
-          {SCENES.map((x) => (
-            <button key={x.id} type="button" role="radio" aria-checked={sceneId === x.id} className="seg__opt" onClick={() => openScene(x.id)}>{x.name}</button>
-          ))}
-        </div>
-      </div>
-
+      {/* her notes (11/24 evening): Name your room moved to the bar above the room, and the Room setting joined
+          Choose a space there */}
       <div className="ws-group">
         <span className="ws-label" id="ws-time">Time of day</span>
         <div role="radiogroup" aria-labelledby="ws-time" className="seg seg--soft">
@@ -785,48 +816,50 @@ export function RoomEditor() {
 
       {windowSwitch}
 
-      <div className="ws-group">
-        <span className="ws-label">Scent families <span className="field__hint">Choose up to three</span></span>
-        <div className="chips">
-          {FAMILIES.map((f) => (
-            <button key={f.id} type="button" className="chip" aria-pressed={families.includes(f.id)} onClick={() => toggleFamily(f.id)}>
-              <span className="chip__dot" style={{ background: f.hex }} />
-              {f.label}
-            </button>
-          ))}
-        </div>
-        {(() => {
-          // copy v1 (11/24, §4.1): one suggestion, "Explore {family} as an additional scent."; the family is the button
-          const near = FAMILIES.filter((f) => !families.includes(f.id) && families.some((id) => areNeighbours(id, f.id))).slice(0, 1);
-          return near.length && families.length < 3 ? (
-            <div className="ws-explore">
-              <span>Explore</span>
-              {near.map((f) => (
-                <button key={f.id} type="button" className="chip" onClick={() => toggleFamily(f.id)}>
+      {/* her note (11/24 evening): Scent families fold into one row ("改成toggle显示，现在太占地方了"); the row shows the
+          chosen families' dots, and a click opens the seven buttons */}
+      <div className={`ws-group ws-fold${famOpen ? " is-open" : ""}`}>
+        <button type="button" className="ws-fold__head" aria-expanded={famOpen} aria-controls="ws-fams" onClick={() => setFamOpen((v) => !v)}>
+          <span className="ws-label">Scent families</span>
+          <span className="ws-fold__dots">
+            {families.map((id) => <span key={id} className="chip__dot" style={{ background: familyById(id).hex }} aria-hidden="true" />)}
+            <span className="sr-only">{families.map((id) => familyById(id).label).join(", ")}</span>
+          </span>
+          <Icon name="chevronDown" size={18} className="ws-fold__chev" />
+        </button>
+        {famOpen ? (
+          <div id="ws-fams" className="ws-fold__body">
+            <span className="field__hint">Choose up to three</span>
+            <div className="chips">
+              {FAMILIES.map((f) => (
+                <button key={f.id} type="button" className="chip" aria-pressed={families.includes(f.id)} onClick={() => toggleFamily(f.id)}>
                   <span className="chip__dot" style={{ background: f.hex }} />
                   {f.label}
                 </button>
               ))}
-              <span>as an additional scent.</span>
             </div>
-          ) : null;
-        })()}
+            {exploreGuide}
+          </div>
+        ) : null}
       </div>
 
-      <label className="ws-field">
-        Scent strength
-        <input
-          className="rng"
-          type="range"
-          min={20}
-          max={100}
-          value={strength}
-          style={{ "--v": `${((strength - 20) / 80) * 100}%` } as CSSProperties}
-          onChange={(e) => { const v = Number(e.target.value); live(() => setStrength(v)); }}
-        />
-        <span className="rng-ends" style={{ fontWeight: 400 }}><span>barely there</span><span>fills the room</span></span>
-      </label>
-      {strengthNote}
+      <div className="ws-anchor">
+        <label className="ws-field">
+          Scent strength
+          <input
+            className="rng"
+            type="range"
+            min={20}
+            max={100}
+            value={strength}
+            style={{ "--v": `${((strength - 20) / 80) * 100}%` } as CSSProperties}
+            onChange={(e) => { const v = Number(e.target.value); live(() => setStrength(v)); }}
+          />
+          <span className="rng-ends" style={{ fontWeight: 400 }}><span>barely there</span><span>fills the room</span></span>
+        </label>
+        {/* one floating note at a time here: the family suggestion, while it is open, covers this spot */}
+        {exploreOn ? null : strengthGuide}
+      </div>
     </>
   );
 
@@ -878,20 +911,26 @@ export function RoomEditor() {
         </div>
       </div>
 
-      {windowSwitch}
-      {strengthNote}
+      <div className="ws-anchor">
+        {windowSwitch}
+        {strengthGuide}
+      </div>
     </>
   );
 
   // 11/24 handoff (P1): Photo View shows only what a photo needs; the room settings stay in Room View
+  // her note (11/24 evening, "Still showing 2 identical button functions"): Add a photo of your room is only on the
+  // room picture; the panel shows Replace photo and Remove once there is a photo
   const photoSettings = (
     <>
-      <div className="ws-photo-actions">
-        <button type="button" className="btn btn--ghost" onClick={() => fileRef.current?.click()}>
-          <Icon name="imagePlus" size={20} />{photo ? "Replace photo" : "Add a photo of your room"}
-        </button>
-        {photo ? <button type="button" className="tool" aria-label="Remove the photo" onClick={removePhoto}><Icon name="trash" /></button> : null}
-      </div>
+      {photo ? (
+        <div className="ws-photo-actions">
+          <button type="button" className="btn btn--ghost" onClick={() => fileRef.current?.click()}>
+            <Icon name="imagePlus" size={20} />Replace photo
+          </button>
+          <button type="button" className="tool" aria-label="Remove the photo" onClick={removePhoto}><Icon name="trash" /></button>
+        </div>
+      ) : null}
       <p className="ws-note">Your photo stays in this browser.</p>
       {photoNote ? <span className="field__error" role="status">{photoNote}</span> : null}
     </>
@@ -942,25 +981,30 @@ export function RoomEditor() {
   return (
     <div className="rooms-page">
       <section id="editor" aria-label="Room editor" className="ws anchor">
-        {!entryId ? (
-          <div className="ws__intent" role="group" aria-label="Start a room">
-            {intentSteps.map((s, i) => (
-              <div key={s.id} style={{ display: "contents" }}>
-                {i ? <Icon name="arrowRight" size={18} className="ws__intent-arrow" /> : null}
-                <label className="ws-pick">
-                  <span>{s.title}</span>
-                  <span className="ws-pick__box">
-                    <select className="ws-pick__select" value={s.value} onChange={(e) => s.pick(e.target.value)}>
-                      <option value="" disabled hidden>—</option>
-                      {s.opts.map((o) => <option key={o.id} value={o.id}>{o.label}</option>)}
-                    </select>
-                    <Icon name="chevronDown" size={18} className="ws-pick__chev" />
-                  </span>
-                </label>
-              </div>
-            ))}
-          </div>
-        ) : null}
+        <div className="ws__intent" role="group" aria-label="Your room">
+          {intentSteps.map((s, i) => (
+            <div key={s.id} style={{ display: "contents" }}>
+              {i ? <Icon name="arrowRight" size={18} className="ws__intent-arrow" /> : null}
+              <label className="ws-pick">
+                <span>{s.title}</span>
+                <span className="ws-pick__box">
+                  <select className="ws-pick__select" value={s.value} onChange={(e) => s.pick(e.target.value)}>
+                    <option value="" disabled hidden>—</option>
+                    {s.opts.map((o) => <option key={o.id} value={o.id}>{o.label}</option>)}
+                  </select>
+                  <Icon name="chevronDown" size={18} className="ws-pick__chev" />
+                </span>
+              </label>
+            </div>
+          ))}
+          <Icon name="arrowRight" size={18} className="ws__intent-arrow" />
+          <label className="ws-pick">
+            <span>Name your room</span>
+            <span className="ws-pick__box">
+              <input className="ws-pick__input hand" type="text" value={nickname} maxLength={40} onChange={(e) => setNickname(e.target.value)} placeholder="rain, chapter three" />
+            </span>
+          </label>
+        </div>
 
         <aside className={`ws__tray${drawer ? " is-open" : ""}`} aria-label="Furniture, scent and materials">
           <div className="ws__tray-in">
@@ -989,7 +1033,9 @@ export function RoomEditor() {
                 </div>
               ))}
             </div>
-            <p className="ws__hint">Select an object to add it, then drag it into place.</p>
+            {tipOn("tray") ? (
+              <Guide className="ws-guide--tray" onClose={() => shutTip("tray")}>Select an object to add it, then drag it into place.</Guide>
+            ) : null}
           </div>
         </aside>
 

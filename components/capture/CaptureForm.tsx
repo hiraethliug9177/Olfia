@@ -268,8 +268,7 @@ export function CaptureForm() {
         <div key={current} className="flow__step" style={{ display: "flex", flexDirection: "column", gap: 20 }}>
           {current === "season" ? (
             <>
-              {/* copy v1 (Tiffany 11/24, §2): a lead at the start and a hint at the last step only; nine steps kept */}
-              <p className="lead">Record a scent from today or a moment you still remember. Use Skip when you’re unsure about a detail.</p>
+              {/* copy v1 (Tiffany 11/24, §2): the lead now sits under the page title (her note, 11/24 evening); nine steps kept */}
               <h2 className="flow__q">What <em>season</em> was it?</h2>
               <div className="opts">
                 {SEASON_OPTIONS.map((o) => <Opt key={o.id} on={season === o.id} onClick={() => setSeason(o.id)} dot={o.paper}>{o.label}</Opt>)}

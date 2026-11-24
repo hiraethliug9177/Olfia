@@ -45,8 +45,12 @@ export function SignupForm({ place, heading = true }: { place: string; heading?:
 
   return (
     <form className="signup" onSubmit={submit}>
-      {heading && s.heading ? <p className="signup__heading">{s.heading}</p> : null}
-      {heading && s.body ? <p className="signup__body">{s.body}</p> : null}
+      {heading && (s.heading || s.body) ? (
+        <div className="signup__top">
+          {s.heading ? <p className="signup__heading">{s.heading}</p> : null}
+          {s.body ? <p className="signup__body">{s.body}</p> : null}
+        </div>
+      ) : null}
       <div className="signup__row">
         <input
           className="input"

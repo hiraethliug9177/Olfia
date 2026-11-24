@@ -5,7 +5,6 @@ import { Fragment, useEffect, useRef, useState, type CSSProperties, type MouseEv
 import { Icon, type IconName } from "@/components/ui/Icon";
 import { CardDeck } from "@/components/ui/CardDeck";
 import { Stamp } from "@/components/scene/Stamp";
-import { strings } from "@/lib/strings";
 import { CONCEPT, CREATOR_LETTER, HOW_IT_WORKS } from "@/lib/copy/about";
 
 /**
@@ -149,9 +148,9 @@ export function About() {
 
   return (
     <section id="about" className="wrap section" aria-labelledby="about-title">
+      {/* her note (11/24 evening): the line beside the title ("Make your scent, create your rooms.") is removed */}
       <div className="split-head">
         <h2 id="about-title" className="h-section">About Olfia</h2>
-        <p className="lead split-head__end">{strings.brand.cover}</p>
       </div>
       <div className="about">
         <nav className="about__toc" aria-label="About Olfia">
@@ -192,12 +191,14 @@ export function About() {
             />
           </section>
 
-          <section id="how-it-works" className="about__part about__part--white" aria-labelledby="how-h">
+          {/* her note (11/24 evening): no white panel behind How it Works (its cards are unchanged), and its two lines are
+              one paragraph in the lead's style across the full width */}
+          <section id="how-it-works" className="about__part" aria-labelledby="how-h">
             <CardDeck
               label="How it Works"
               look="file-folder"
               head={<h3 id="how-h" className="about__h" tabIndex={-1}>How it Works</h3>}
-              intro={<><h4 className="about__h4">{HOW_IT_WORKS.title}</h4><p className="lead" style={{ margin: 0 }}>{HOW_IT_WORKS.lead}</p></>}
+              intro={<p className="lead page-lead" style={{ margin: 0 }}>{HOW_IT_WORKS.title} {HOW_IT_WORKS.lead}</p>}
               cards={ways.map((pair, i) => ({
                 key: pair.map((e) => e.feature).join("+"),
                 label: pair.map((e) => e.feature).join(" and "),

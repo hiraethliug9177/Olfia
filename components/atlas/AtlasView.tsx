@@ -124,12 +124,10 @@ export function AtlasView() {
 
   return (
     <div>
-      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-end", justifyContent: "space-between", gap: 20, marginBottom: 26 }}>
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          <h1 className="h-page">Scent Atlas</h1>
-          <p className="lead" style={{ fontSize: 18 }}>Your rooms, ideas, and scent notes, all in one place.</p>
-          <p style={{ margin: 0, maxWidth: 640 }}>As your collection grows, revisit familiar scents, rediscover details from past days, and notice how your records change with the seasons.</p>
-        </div>
+      {/* her note (11/24 evening): the two sentences are one paragraph across the full width; the month sits on the
+          title's row */}
+      <div className="page-head">
+        <h1 className="h-page">Scent Atlas</h1>
         {tab === 0 ? (
           <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 18, fontWeight: 600 }}>
             <button type="button" className="tool" aria-label="Previous month" onClick={() => shift(-1)} style={{ borderRadius: "50%" }}>
@@ -142,6 +140,7 @@ export function AtlasView() {
           </div>
         ) : null}
       </div>
+      <p className="lead page-lead" style={{ marginBottom: 26 }}>Your rooms, ideas, and scent notes, all in one place. As your collection grows, revisit familiar scents, rediscover details from past days, and notice how your records change with the seasons.</p>
 
       <div role="tablist" aria-label="Atlas views" className="folder-tabs">
         {TAB_LABELS.map((label, i) => (

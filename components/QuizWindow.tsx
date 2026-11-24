@@ -7,18 +7,30 @@ import { Icon } from "@/components/ui/Icon";
 import { track } from "@/lib/analytics";
 import { loadQuiz, type QuizResult } from "@/lib/quiz";
 
-/** × closes the window for good in this browser; the quiz stays reachable from Scentpedia. */
-const CLOSED_KEY = "olfia.quizwindow.v1";
+/**
+ * × closes the window for this visit only (her answer, 11/24 evening: "× 只关这一次"); it opens again on the next
+ * visit. Until then × closed it for good in this browser (localStorage, OLD_KEY), which is cleared once.
+ */
+const CLOSED_KEY = "olfia.quizwindow.v2";
+const OLD_KEY = "olfia.quizwindow.v1";
+/**
+ * Home, Gifts and My Page invite the quiz (her note, 11/24 evening: the Gifts quiz button becomes this popup, it is
+ * back on Home and also on My Page): there the open window pops up 2 s after the page opens, needs no scrolling, and
+ * stays open until the footer comes on screen.
+ */
+const INVITE = ["/", "/gifts", "/account"];
+const POP_MS = 2000;
 /** Before the quiz the window shows The Guardian, the character the quiz invite has shown since 11/9. */
 const SAMPLE = "istj";
 
 /**
  * 05 Find your scent personality (v2, Tiffany's Notion 11/23): a small window at the bottom right of every page,
- * in place of the quiz section that used to sit on Home. It fades in once the first screen has scrolled by, folds
- * into a circle (on phones from the start; by itself in Capture, Rooms and Scent Card, from About Olfia down, and over
- * the footer, where it would cover things), and × closes it. It stays off the quiz page. After the quiz it shows your
- * own character. In Rooms and Scent Card it rises above the studio's bar when the bar is at the foot of the screen, so
- * it never sits on Save (11/24 handoff).
+ * in place of the quiz section that used to sit on Home. On Home, Gifts and My Page it pops up open 2 s after the page
+ * opens (11/24 evening); elsewhere it fades in once the first screen has scrolled by. It folds into a circle (on phones
+ * from the start; by itself in Capture, Rooms and Scent Card, from About Olfia down except on the three invite pages,
+ * and over the footer, where it would cover things), and × closes it for the visit. It stays off the quiz page. After
+ * the quiz it shows your own character. In Rooms and Scent Card it rises above the studio's bar when the bar is at the
+ * foot of the screen, so it never sits on Save (11/24 handoff).
  */
 export function QuizWindow() {
   const path = usePathname() ?? "/";
@@ -36,9 +48,10 @@ export function QuizWindow() {
 
   useEffect(() => {
     try {
-      setClosed(window.localStorage.getItem(CLOSED_KEY) === "closed");
+      setClosed(window.sessionStorage.getItem(CLOSED_KEY) === "closed");
+      window.localStorage.removeItem(OLD_KEY);
     } catch {
-      // storage blocked: the window shows, and × hides it for this visit
+      // storage blocked: the window shows, and × hides it until the page is reloaded
     }
     setReady(true);
     const mq = window.matchMedia("(max-width: 640px)");
@@ -53,18 +66,25 @@ export function QuizWindow() {
     setChoice((c) => (c === "open" ? null : c));
   }, [path]);
 
-  // the first time only: after the first screen has scrolled by, not the moment a page opens
+  // the first time only: on Home, Gifts and My Page 2 s after the page opens; elsewhere once the first screen has
+  // scrolled by, not the moment a page opens
   useEffect(() => {
     if (shown) return;
+    if (INVITE.includes(path)) {
+      const t = window.setTimeout(() => setShown(true), POP_MS);
+      return () => window.clearTimeout(t);
+    }
     const check = () => { if (window.scrollY > window.innerHeight * 0.7) setShown(true); };
     check();
     window.addEventListener("scroll", check, { passive: true });
     return () => window.removeEventListener("scroll", check);
   }, [shown, path]);
 
-  // folded from About Olfia down (Home), and wherever the footer is on screen, so it covers no links there
+  // folded wherever the footer is on screen, so it covers no links there, and (except on Home, Gifts and My Page) from
+  // About Olfia down
   useEffect(() => {
-    const about = document.getElementById("about");
+    const invite = INVITE.includes(path);
+    const about = invite ? null : document.getElementById("about");
     const foot = document.querySelector<HTMLElement>(".ft__panel");
     let raf = 0;
     const read = () => {
@@ -108,7 +128,7 @@ export function QuizWindow() {
   const code = (result?.code ?? SAMPLE).toLowerCase();
   const pick = (c: "open" | "mini") => { moved.current = true; setChoice(c); };
   const close = () => {
-    try { window.localStorage.setItem(CLOSED_KEY, "closed"); } catch { /* this visit only */ }
+    try { window.sessionStorage.setItem(CLOSED_KEY, "closed"); } catch { /* until the page is reloaded */ }
     setClosed(true);
     track("quiz_window", { action: "close" });
   };

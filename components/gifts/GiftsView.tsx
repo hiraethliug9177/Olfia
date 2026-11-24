@@ -106,18 +106,18 @@ export function GiftsView() {
 
   return (
     <div className="wrap page gifts-page">
-      <div className="gifts-page__head">
-        <div className="gifts-page__intro">
-          <h1 className="h-page">Gifts</h1>
-          <p className="lead" style={{ margin: 0 }}>A fragrance can be a way to think about someone’s home, their habits, and the things they enjoy.</p>
-        </div>
+      {/* her note (11/24 evening): the two sentences are one paragraph across the full width; the switch sits on the
+          title's row */}
+      <div className="page-head">
+        <h1 className="h-page">Gifts</h1>
         <div className="gift-toggle" role="group" aria-label="Who the gift is for">
           <button type="button" aria-pressed={mode === "me"} onClick={() => setMode("me")}>For myself</button>
           <button type="button" aria-pressed={mode === "someone"} onClick={() => setMode("someone")}>For someone else</button>
         </div>
       </div>
 
-      <p className="gifts-page__mode">
+      <p className="lead page-lead gifts-page__lead">
+        A fragrance can be a way to think about someone’s home, their habits, and the things they enjoy.{" "}
         {mode === "me"
           ? "Explore a new fragrance inspired by your scent preferences or the atmosphere you want to create."
           : "Think about the spaces they enjoy and the scents they might like. Choose a family to begin exploring."}
@@ -160,8 +160,8 @@ export function GiftsView() {
         </div>
       ) : (
         <div className="gift-choose">
+          {/* her note (11/24 evening): the Take the quiz button became the quiz popup, which opens on this page by itself */}
           <FamilyChips value={meFamilies[0]} onPick={pickFamily} label={atlasFams.length && !chosen ? "Inspired by your Scent Atlas" : "Choose a scent family"} />
-          <Link href="/quiz" className="btn btn--ghost btn--sm gift-choose__quiz">Take the quiz</Link>
         </div>
       )}
 

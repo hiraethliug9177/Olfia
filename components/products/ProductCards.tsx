@@ -248,7 +248,8 @@ export function ProductCards({
         <h2 style={{ fontSize: compact ? 26 : 30 }}>{title}</h2>
         {similar ? <button type="button" className="chip" onClick={() => setSimilar(null)}>Back to this room</button> : null}
       </div>
-      {lead ? <p className="lead" style={{ margin: 0 }}>{lead}</p> : null}
+      {/* her note (11/24 evening): one paragraph across the full width */}
+      {lead ? <p className="lead page-lead" style={{ margin: 0 }}>{lead}</p> : null}
       {!compact ? (
         <div className="chips" role="group" aria-label="When">
           {WHEN.map((w) => (

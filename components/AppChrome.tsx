@@ -21,32 +21,40 @@ type NavItem = { href: string; label: string; match: string[]; note?: string; su
 
 /**
  * Main navigation, v2 (Tiffany's Notion "Capstone Draft", 11/23): the Olfia wordmark is the way home (the house
- * icon is gone), five entries, and one account icon on the right. Each entry opens its first page; its menu opens
- * on hover or keyboard focus. The Edit has no menu. The "Make a Scent Card" button left the header: Scent Cards
- * sits in the Capture menu. The one menu line is hers ("Your personal archive of scent."). Labels follow her copy
- * v1 (11/24, docs/copy/olfia-site-copy-v1.md §0.2): Capture a scent, Scent Cards, Fragrance Matches,
- * Fragrance Shelf, Scent Journal.
+ * icon is gone), five entries, the "Make a Scent Card" button and one account icon on the right. Each entry opens its
+ * first page; its menu opens on hover or keyboard focus. Labels follow her copy v1 (11/24,
+ * docs/copy/olfia-site-copy-v1.md §0.2).
+ * Her notes of 11/24 (evening, "Your paragraph text" p.1): every menu opens with one line of hers on a single row,
+ * all menus are the same width, every entry has a round bullet in the brand colours, Scent Atlas also lists My
+ * Scentprint and Favorites, The Edit's menu is its line alone, the current page is a filled pill instead of a line
+ * under it, and the Make a Scent Card button is back. Her Discover line reads "possibilites" in her notes; the page
+ * spells it "possibilities".
  * Old menus (11/10–11/21) are in git history.
  */
 export const NAV: NavItem[] = [
-  { href: "/capture", label: "Capture", match: ["/capture", "/card"], sub: [
+  { href: "/capture", label: "Capture", match: ["/capture", "/card"], note: "Record your instant feelings.", sub: [
     { href: "/capture", label: "Capture a scent" },
     { href: "/card", label: "Scent Cards" },
   ] },
-  { href: "/rooms", label: "Rooms", match: ["/rooms"], sub: [
+  { href: "/rooms", label: "Rooms", match: ["/rooms"], note: "Make your scents, create your rooms.", sub: [
     { href: "/rooms#editor", label: "Create an atmosphere" },
     { href: "/rooms#products", label: "Fragrance Matches" },
   ] },
   { href: "/atlas?tab=shelf", label: "Scent Atlas", match: ["/atlas"], note: "Your personal archive of scent.", sub: [
     { href: "/atlas?tab=shelf", label: "Fragrance Shelf" },
     { href: "/atlas?tab=journal", label: "Scent Journal" },
+    { href: "/atlas?tab=scentprint", label: "My Scentprint" },
+    { href: "/atlas?tab=favorites", label: "Favorites" },
   ] },
-  { href: "/gifts", label: "Discover", match: ["/gifts", "/scentpedia"], sub: [
+  { href: "/gifts", label: "Discover", match: ["/gifts", "/scentpedia"], note: "Explore home fragrance possibilities.", sub: [
     { href: "/gifts", label: "Olfia · Gifts" },
     { href: "/scentpedia", label: "Scentpedia" },
   ] },
-  { href: "/edit", label: "The Edit", match: ["/edit"], sub: [] },
+  { href: "/edit", label: "The Edit", match: ["/edit"], note: "Culture, fragrance, and the art of living.", sub: [] },
 ];
+
+/** The round bullets in the menus take the brand colours in turn (apricot, periwinkle, periwinkle deep), as in 11/10. */
+const DOTS = ["var(--apricot)", "var(--peri)", "var(--deep)"];
 
 /** The account icon (Lucide CircleUserRound). Saved joins its menu once it exists. */
 export const ACCOUNT: NavItem = { href: "/account", label: "My Page", match: ["/account"], sub: [
@@ -89,7 +97,7 @@ function Entry({ n, cur, here, icon }: { n: NavItem; cur: boolean; here: (s: Sub
   const [shut, setShut] = useState(false);
   const link = useRef<HTMLAnchorElement>(null);
   const onKey = (e: KeyboardEvent<HTMLLIElement>) => {
-    if (e.key !== "Escape" || !n.sub.length) return;
+    if (e.key !== "Escape" || !(n.sub.length || n.note)) return;
     setShut(true);
     link.current?.focus();
   };
@@ -101,16 +109,21 @@ function Entry({ n, cur, here, icon }: { n: NavItem; cur: boolean; here: (s: Sub
       <Link ref={link} href={n.href} onClick={go(n.href)} className={`hd__link${icon ? " hd__link--icon" : ""}`} aria-current={cur ? "page" : undefined} aria-label={icon ? n.label : undefined}>
         {icon ? <Icon name="user" size={24} /> : n.label}
       </Link>
-      {n.sub.length ? (
+      {n.sub.length || n.note ? (
         <div className={`hd__sub${icon ? " hd__sub--end" : ""}`}>
           {n.note ? <p className="hd__note">{n.note}</p> : null}
-          <ul aria-label={`${n.label} pages`}>
-            {n.sub.map((s) => (
-              <li key={s.href}>
-                <Link href={s.href} onClick={go(s.href)} aria-current={here(s) ? "page" : undefined}>{s.label}</Link>
-              </li>
-            ))}
-          </ul>
+          {n.sub.length ? (
+            <ul aria-label={`${n.label} pages`}>
+              {n.sub.map((s, i) => (
+                <li key={s.href}>
+                  <Link href={s.href} onClick={go(s.href)} aria-current={here(s) ? "page" : undefined}>
+                    <span className="hd__dot" style={{ background: DOTS[i % DOTS.length] }} aria-hidden="true" />
+                    {s.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          ) : null}
         </div>
       ) : null}
     </li>
@@ -186,6 +199,8 @@ export function Header() {
         </nav>
 
         <div className="hd__end">
+          {/* her note (11/24 evening): the Make a Scent Card button is back, a filled pill at the right end */}
+          <Link href="/card" className="btn btn--ink btn--sm hd__cta hd__full" aria-current={isActive(path, "/card") ? "page" : undefined}>Make a Scent Card</Link>
           <ul className="hd__list hd__list--end hd__full">
             <Entry n={ACCOUNT} cur={cur(ACCOUNT)} here={here} icon />
           </ul>
@@ -201,23 +216,28 @@ export function Header() {
               <Link href={n.href} aria-current={cur(n) ? "page" : undefined} className="hd__menu-main" onClick={(e) => { guardAccount(e, n.href); setOpen(false); }}>{n.label}</Link>
               {n.sub.length ? (
                 <div className="hd__menu-sub">
-                  {n.sub.map((s) => (
-                    <Link key={s.href} href={s.href} aria-current={here(s) ? "page" : undefined} onClick={(e) => { guardAccount(e, s.href); setOpen(false); }}>{s.label}</Link>
+                  {n.sub.map((s, i) => (
+                    <Link key={s.href} href={s.href} aria-current={here(s) ? "page" : undefined} onClick={(e) => { guardAccount(e, s.href); setOpen(false); }}>
+                      <span className="hd__dot" style={{ background: DOTS[i % DOTS.length] }} aria-hidden="true" />
+                      {s.label}
+                    </Link>
                   ))}
                 </div>
               ) : null}
             </div>
           ))}
+          <Link href="/card" className="btn btn--ink hd__menu-cta" onClick={() => setOpen(false)}>Make a Scent Card</Link>
         </nav>
       ) : null}
     </header>
   );
 }
 
-/** The last footer column: About Olfia and its three parts, all on Home (v2, 11/23). */
+/** The last footer column: About Olfia, The Concept and The Creator, all on Home (her note, 11/24 evening: How it
+ * Works and The Science leave the footer; they stay on Home). */
 const ABOUT: NavItem = {
   href: "/#about", label: "About Olfia", match: [],
-  sub: [{ href: "/#concept", label: "The Concept" }, { href: "/#how-it-works", label: "How it Works" }, { href: "/#science", label: "The Science" }, { href: "/#creator", label: "The Creator" }],
+  sub: [{ href: "/#concept", label: "The Concept" }, { href: "/#creator", label: "The Creator" }],
 };
 
 /**
