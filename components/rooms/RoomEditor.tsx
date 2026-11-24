@@ -23,15 +23,20 @@ import {
   uid,
 } from "@/lib/catalog";
 import {
+  SENSE_ROWS,
   SENSORY_DEFAULT,
-  SENSORY_SLIDERS,
+  artFor,
   emitPoint,
+  impressionWords,
+  intenseToStrength,
+  strengthToIntense,
   feelingShape,
   findProducts,
   isScentItem,
   noteWords,
   productNotes,
   roomNotes,
+  type SenseId,
   type SensoryValues,
 } from "@/lib/roomScent";
 import { shrinkPhoto } from "@/lib/shelf";
@@ -45,8 +50,10 @@ import { ScenePage } from "@/components/scene/ScenePage";
 import { ItemArt } from "@/components/scene/Cutout";
 import { Icon } from "@/components/ui/Icon";
 import { ProductCards } from "@/components/products/ProductCards";
+import type { Product } from "@/lib/products";
 import { ThirdRoom } from "@/components/plans/ThirdRoom";
 import { ScentFlow, type FlowSource } from "@/components/rooms/ScentFlow";
+import { SensorySwatch } from "@/components/rooms/SensorySwatch";
 import { FREE_ROOMS } from "@/lib/plans";
 
 const DEFAULT_FAMS: FamilyId[] = ["woody", "spicy"];
@@ -64,6 +71,53 @@ const VIEWS: Array<{ id: View; label: string }> = [
   { id: "scent", label: "Scent View" },
   { id: "photo", label: "Photo View" },
 ];
+
+/**
+ * Tiffany's Rooms flow (Notion, 11/24): choose a feeling, a space and a fragrance, then style the atmosphere, discover
+ * matching products and save. The first three are the row above a new room; which families a feeling brings and which
+ * room a space opens are Claude's reading (each feeling also sets the same feeling in Scent View).
+ */
+const START_FEELINGS: Array<{ id: EmotionId; label: string; families: FamilyId[] }> = [
+  { id: "calm", label: "Calm", families: ["green", "fresh"] },
+  { id: "cozy", label: "Cozy", families: ["gourmand", "spicy"] },
+  { id: "energized", label: "Energized", families: ["citrus", "green"] },
+  { id: "fresh-start", label: "Refreshed", families: ["fresh", "citrus"] },
+];
+const START_SPACES: Array<{ id: string; label: string }> = [
+  { id: "bedroom-morning", label: "Bedroom" },
+  { id: "living-night", label: "Living room" },
+  { id: "study-afternoon", label: "Study" },
+];
+const START_FRAGRANCES: Array<{ id: string; label: string }> = [
+  { id: "candle", label: "Candle" },
+  { id: "diffuser", label: "Diffuser" },
+  { id: "incense", label: "Incense" },
+  { id: "spray", label: "Room spray" },
+];
+const MATERIAL_IDS = new Set(FAMILIES.flatMap((f) => f.materials.map((m) => m.id)));
+const STICKER_SPOTS: Array<[number, number]> = [[0.78, 0.46], [0.6, 0.42], [0.88, 0.6]];
+
+/** The room's family stickers, swapped for another set of families (stickers already there stay where they are). */
+function restick(list: PlacedItem[], next: FamilyId[]): PlacedItem[] {
+  const wanted = new Set(next.flatMap((f) => familyById(f).materials.map((m) => m.id)));
+  const kept = list.filter((i) => !MATERIAL_IDS.has(i.kind) || wanted.has(i.kind));
+  const have = new Set(kept.map((i) => i.kind));
+  let z = Math.max(0, ...kept.map((i) => i.z));
+  const added = next.flatMap((f, n) => {
+    if (familyById(f).materials.some((m) => have.has(m.id))) return [];
+    const [x, y] = STICKER_SPOTS[n % STICKER_SPOTS.length];
+    z += 1;
+    return [{ uid: uid(), kind: familyById(f).materials[0].id, x, y, scale: 1, rot: -6, flip: 1 as const, z }];
+  });
+  return [...kept, ...added];
+}
+
+/** The room's first fragrance product becomes another kind, in the same spot (one is added if there is none). */
+function swapScent(list: PlacedItem[], kind: string): PlacedItem[] {
+  const i = list.findIndex((it) => isScentItem(it.kind));
+  if (i < 0) return [...list, { uid: uid(), kind, x: 0.55, y: 0.72, scale: 1, rot: 0, flip: 1, z: Math.max(0, ...list.map((it) => it.z)) + 1 }];
+  return list.map((it, j) => (j === i ? { ...it, kind, scale: 1 } : it));
+}
 
 /** Room photos for Photo View, shrunk and kept in this browser by room (never uploaded, never in a URL). */
 const PHOTO_KEY = "olfia.roomphoto.v1";
@@ -137,6 +191,8 @@ export function RoomEditor() {
   const [split, setSplit] = useState(50);
   const [photoNote, setPhotoNote] = useState<string | null>(null);
   const [stagePx, setStagePx] = useState(560);
+  /** the starting row's choices for a new room (feeling and space; the fragrance reads from the room itself) */
+  const [start, setStart] = useState<{ feel?: EmotionId; space?: string }>({});
 
   const stageRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -153,7 +209,7 @@ export function RoomEditor() {
     setNoteFor(null);
     if (!editId) {
       setEntryId(null); setCreatedAt(null); setNickname("");
-      setPast([]); setFuture([]); setSelected(null);
+      setPast([]); setFuture([]); setSelected(null); setStart({});
       setPhoto(readPhotos()[DRAFT] ?? null);
       // Opened from a Home preset: that exact room, ready to change.
       const preset = ROOM_PRESETS.find((r) => r.id === presetParam);
@@ -262,6 +318,49 @@ export function RoomEditor() {
       const [x, y] = spots[families.length] ?? [0.6, 0.4];
       commit([...items, { uid: uid(), kind: mats[0], x, y, scale: 1, rot: -6, flip: 1, z: topZ() + 1 }]);
     }
+  };
+
+  const pickFeeling = (f: (typeof START_FEELINGS)[number]) => {
+    setFamilies(f.families);
+    setFeelings([f.id]);
+    setStart((cur) => ({ ...cur, feel: f.id }));
+    commit(restick(items, f.families));
+  };
+  const pickSpace = (id: string) => {
+    const preset = ROOM_PRESETS.find((r) => r.id === id);
+    if (!preset) return;
+    const feel = START_FEELINGS.find((f) => f.id === start.feel);
+    const fams = feel ? feel.families : preset.families;
+    const scentKind = items.find((i) => isScentItem(i.kind))?.kind;
+    let next = restick(preset.items, fams);
+    if (scentKind && START_FRAGRANCES.some((o) => o.id === scentKind)) next = swapScent(next, scentKind);
+    setSceneId(preset.scene);
+    setTime(preset.time);
+    setFamilies(fams);
+    setStart((cur) => ({ ...cur, space: id }));
+    setSelected(null);
+    setNoteFor(null);
+    commit(next);
+  };
+  const pickFragrance = (kind: string) => {
+    setSelected(null);
+    setNoteFor(null);
+    commit(swapScent(items, kind));
+  };
+
+  /** Fragrance Matches → Add to room: a cut-out of the same kind of product, carrying the product's notes on its tag. */
+  const addProduct = (p: Product) => {
+    const def = artFor(p.type, p.id) ?? itemById(p.type);
+    if (!def) return;
+    const taken = items.filter((i) => isScentItem(i.kind)).map((i) => i.x);
+    const x = [0.3, 0.7, 0.5, 0.2, 0.8].find((c) => taken.every((t) => Math.abs(t - c) > 0.12)) ?? 0.5;
+    const it: PlacedItem = { uid: uid(), kind: def.id, x, y: 0.72, scale: 1, rot: 0, flip: 1, z: topZ() + 1, notes: productNotes(p) };
+    commit([...items, it]);
+    setSelected(it.uid);
+    setNoteFor(null);
+    if (view === "photo") setView("room");
+    document.getElementById("editor")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    show("Added to your room");
   };
 
   const onItemDown = (id: string, e: ReactPointerEvent<HTMLButtonElement>) => {
@@ -469,6 +568,13 @@ export function RoomEditor() {
     </label>
   );
 
+  const senseValues: Record<SenseId, number> = { ...sensory, intense: strengthToIntense(strength) };
+  const setSense = (id: SenseId, v: number) => {
+    if (id === "intense") setStrength(intenseToStrength(v));
+    else setSensory((cur) => ({ ...cur, [id]: v }));
+  };
+  const impression = impressionWords(senseValues);
+
   const windowSwitch = (
     <button type="button" role="switch" aria-checked={windowOpen} className="switch" onClick={() => setWindowOpen((v) => !v)}>
       Window open
@@ -488,6 +594,28 @@ export function RoomEditor() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
+      {!entryId ? (
+        <section aria-label="Start a room" className="card room-start">
+          {[
+            { title: "Choose a feeling", opts: START_FEELINGS.map((f) => ({ id: f.id, label: f.label, on: start.feel === f.id, pick: () => pickFeeling(f) })) },
+            { title: "Choose a space", opts: START_SPACES.map((o) => ({ id: o.id, label: o.label, on: start.space === o.id, pick: () => pickSpace(o.id) })) },
+            { title: "Choose your fragrance", opts: START_FRAGRANCES.map((o) => ({ id: o.id, label: o.label, on: items.find((i) => isScentItem(i.kind))?.kind === o.id, pick: () => pickFragrance(o.id) })) },
+          ].map((step, i) => (
+            <div key={step.title} className="room-start__step">
+              {i ? <Icon name="arrowRight" size={18} className="room-start__arrow" /> : null}
+              <div role="group" aria-label={step.title} className="room-start__group">
+                <span className="room-start__h">{step.title}</span>
+                <div className="room-start__opts">
+                  {step.opts.map((o) => (
+                    <button key={o.id} type="button" className="chip" aria-pressed={o.on} onClick={o.pick}>{o.label}</button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ))}
+        </section>
+      ) : null}
+
       <section id="editor" aria-label="Room editor" className={`editor editor--${view} anchor`}>
         <div className={`card editor__tray${drawer ? " is-open" : ""}`}>
           <button type="button" className="editor__handle" aria-expanded={drawer} aria-label={drawer ? "Close the drawer" : "Open the drawer"} onClick={() => setDrawer((v) => !v)}>
@@ -779,8 +907,6 @@ export function RoomEditor() {
             </>
           ) : (
             <>
-              {strengthField}
-
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 <span style={{ fontSize: 17, fontWeight: 600 }}>Feelings <span className="field__hint">Choose up to two</span></span>
                 <div className="chips" style={{ gap: 6 }}>
@@ -792,22 +918,31 @@ export function RoomEditor() {
                 </div>
               </div>
 
+              {/* Tiffany's sensory sketch (11/24): five sliders, the words above each track, then the impression they make */}
               <div className="senses">
-                {SENSORY_SLIDERS.map((s) => (
-                  <label key={s.id} className="sense">
-                    <span>{s.from}</span>
+                {SENSE_ROWS.map((r) => (
+                  <label key={r.id} className="sense">
+                    <span className="sense__ends"><span>{r.from}</span><span>{r.to}</span></span>
                     <input
                       className="range"
                       type="range"
                       min={0}
                       max={100}
-                      value={sensory[s.id]}
-                      aria-label={`${s.from} to ${s.to}`}
-                      onChange={(e) => setSensory((cur) => ({ ...cur, [s.id]: Number(e.target.value) }))}
+                      value={senseValues[r.id]}
+                      aria-label={`${r.from} to ${r.to}`}
+                      onChange={(e) => setSense(r.id, Number(e.target.value))}
                     />
-                    <span>{s.to}</span>
                   </label>
                 ))}
+                <span className="field__hint" style={{ fontWeight: 400 }}>Scent strength represents your imagined atmosphere, rather than a measured concentration.</span>
+              </div>
+
+              <div className="impression">
+                <SensorySwatch families={families} values={senseValues} />
+                <div className="impression__text">
+                  <span className="impression__h">Your sensory impression</span>
+                  {impression.length ? <span className="impression__words">{impression.join(" · ")}</span> : null}
+                </div>
               </div>
 
               {windowSwitch}
@@ -844,7 +979,15 @@ export function RoomEditor() {
 
 
       <section id="products" className="card anchor" style={{ marginTop: 8 }}>
-        <ProductCards families={families} roomNotes={roomNoteWords} title="Fragrance Matches" lead="Explore products with fragrance families in common with your room. Use the match as a starting point, then consider how the product smells to you." />
+        <ProductCards
+          families={families}
+          roomNotes={roomNoteWords}
+          feelings={feelings.map((id) => (id === "fresh-start" ? "fresh" : (EMOTION_OPTIONS.find((o) => o.id === id)?.label ?? id).toLowerCase()))}
+          room={(START_SPACES.find((o) => o.id === start.space)?.label ?? sceneName(sceneId)).toLowerCase()}
+          onAdd={addProduct}
+          title="Fragrance Matches"
+          lead="Explore products with fragrance families in common with your room. Use the match as a starting point, then consider how the product smells to you."
+        />
       </section>
 
       <ThirdRoom

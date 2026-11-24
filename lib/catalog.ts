@@ -325,6 +325,12 @@ export const SOURCES: ItemDef[] = [
   { id: "wax-milk", label: "Milk-glass lamp", category: "source", w: 0.113, aspect: 560 / 263, asset: "/assets/scent/wax-milk.webp", scentGroup: "Wax melts", scentType: "wax", emit: [0.47, 0.85] },
   { id: "wax-tulip", label: "Tulip lamp", category: "source", w: 0.136, aspect: 560 / 317, asset: "/assets/scent/wax-tulip.webp", scentGroup: "Wax melts", scentType: "wax", emit: [0.45, 0.86] },
   { id: "wax-brass", label: "Brass lamp", category: "source", w: 0.174, aspect: 560 / 405, asset: "/assets/scent/wax-brass.webp", scentGroup: "Wax melts", scentType: "wax", emit: [0.5, 0.86] },
+  // her answer on 11/24 ("香薰机不重新画了就这样"): the four diffusers with mist drawn in go back in as they are; the scent leaves
+  // where the drawn mist starts
+  { id: "aroma-white", label: "White diffuser", category: "source", w: 0.056, aspect: 560 / 185, asset: "/assets/scent/aroma-white.webp", scentGroup: "Aroma diffusers", scentType: "aroma", emit: [0.5, 0.28] },
+  { id: "aroma-pebble", label: "Pebble diffuser", category: "source", w: 0.135, aspect: 560 / 443, asset: "/assets/scent/aroma-pebble.webp", scentGroup: "Aroma diffusers", scentType: "aroma", emit: [0.5, 0.56] },
+  { id: "aroma-clay", label: "Clay diffuser", category: "source", w: 0.118, aspect: 560 / 387, asset: "/assets/scent/aroma-clay.webp", scentGroup: "Aroma diffusers", scentType: "aroma", emit: [0.5, 0.33] },
+  { id: "aroma-fluted", label: "Fluted diffuser", category: "source", w: 0.041, aspect: 560 / 134, asset: "/assets/scent/aroma-fluted.webp", scentGroup: "Aroma diffusers", scentType: "aroma", emit: [0.5, 0.24] },
   { id: "aroma-wood-lid", label: "Wood-lid diffuser", category: "source", w: 0.104, aspect: 560 / 343, asset: "/assets/scent/aroma-wood-lid.webp", scentGroup: "Aroma diffusers", scentType: "aroma", emit: [0.5, 0.04] },
   { id: "candle-rose", label: "Rose candle", category: "source", w: 0.104, aspect: 560 / 417, asset: "/assets/scent/candle-rose.webp", scentGroup: "Candles", scentType: "candle", emit: [0.47, 0.1] },
   { id: "candle-amber-bowl", label: "Amber bowl", category: "source", w: 0.175, aspect: 448 / 560, asset: "/assets/scent/candle-amber-bowl.webp", scentGroup: "Candles", scentType: "candle", emit: [0.5, 0.28] },

@@ -22,8 +22,8 @@ import { CONCEPT, CREATOR_LETTER, HOW_IT_WORKS } from "@/lib/copy/about";
  *   with a large first letter, with a few words marked as in a journal (highlighter, bold, a wavy underline).
  * Later the same day (her screenshots and "Tactile Card Deck Interaction System", modern skeuomorphic style):
  * - every part is a deck of cards leafed through with two buttons (components/ui/CardDeck): The Concept on landscape
- *   index cards, How it Works in folders with tabs, The Science on near-square receipts, The Creator's letter cards
- *   unchanged;
+ *   index cards (with drop caps and marked words, her note that night), How it Works in folders with tabs, The Creator's
+ *   letter cards unchanged; The Science's two receipts sit side by side instead (her note that night);
  * - the two notes that sat under How it Works are now their own part, The Science (/#science), before The Creator;
  * - her photo is in the Creator's frame (public/assets/about/creator.webp, cut to 4:5, photo data removed).
  * The words are unchanged.
@@ -59,6 +59,33 @@ const LETTER_MARKS: Mark[][] = [
   [{ text: "China and the United States", kind: "hl2" }, { text: "scent their homes, mark the seasons", kind: "hl" }, { text: "an entirely different association", kind: "b" }],
   [{ text: "aesthetics, modern art, and cultural anthropology", kind: "hl" }, { text: "a larger sensory experience", kind: "b" }, { text: "the stories they carry", kind: "u" }],
   [{ text: "making room for that curiosity", kind: "b" }, { text: "the atmosphere of their homes", kind: "hl2" }, { text: "keeping the experiences they want to remember", kind: "hl" }],
+];
+
+/**
+ * Words marked on The Concept's index cards, per card and paragraph (her note of 11/24: "像 the creator 那里给段落增加更丰富
+ * 的视觉元素"; the picks are Claude's, for her to change). Same four marks as the letter.
+ */
+const CONCEPT_MARKS: Mark[][][] = [
+  [
+    [{ text: "recognize before you remember", kind: "hl" }, { text: "an entire scene to mind", kind: "b" }],
+    [{ text: "cues to personal experiences", kind: "hl2" }, { text: "The associations are individual", kind: "u" }, { text: "an impression of it remains", kind: "hl" }],
+    [{ text: "a place to live in words and images", kind: "b" }],
+  ],
+  [
+    [{ text: "olfactory, our sense of smell", kind: "hl" }, { text: "the ones we are still imagining", kind: "u" }],
+    [{ text: "an atmosphere shaped by what happens in it", kind: "hl2" }, { text: "smellscape", kind: "b" }],
+    [{ text: "often overlooked dimension of a space", kind: "hl" }, { text: "an invitation to imagine an atmosphere", kind: "u" }],
+  ],
+  [
+    [{ text: "without much ceremony", kind: "u" }, { text: "Fragrance is already woven into these activities", kind: "hl" }],
+    [{ text: "everyday aesthetics", kind: "b" }, { text: "Both are part of its character.", kind: "hl2" }],
+    [{ text: "notice these changes and experiment with them", kind: "hl" }, { text: "Your own experiences are the starting point.", kind: "b" }],
+  ],
+  [
+    [{ text: "tells us something about its inhabitants", kind: "hl" }, { text: "learned through particular places, families, and communities", kind: "u" }],
+    [{ text: "the smell of historic libraries", kind: "hl2" }, { text: "walking through a place with attention to smell", kind: "b" }],
+    [{ text: "the plants, ingredients, and traditions behind fragrance", kind: "hl" }, { text: "the many meanings people give them", kind: "u" }],
+  ],
 ];
 
 function marked(text: string, marks: Mark[]): ReactNode {
@@ -143,14 +170,21 @@ export function About() {
               label="The Concept"
               look="vocabulary-card"
               head={<h3 id="concept-h" className="about__h" tabIndex={-1}>The Concept</h3>}
-              cards={CONCEPT.map((c) => ({
+              cards={CONCEPT.map((c, ci) => ({
                 key: c.theme,
                 label: c.theme,
                 content: (
                   <article className="vocab" aria-label={c.theme}>
                     <h4 className="about__big vocab__title">{c.title}</h4>
                     <div className="vocab__lines">
-                      {c.paragraphs.map((t) => <p key={t.slice(0, 32)}>{t}</p>)}
+                      {c.paragraphs.map((t, pi) => {
+                        const marks = (CONCEPT_MARKS[ci]?.[pi] ?? []).filter((m) => !(pi === 0 && t.startsWith(m.text)));
+                        return pi === 0 ? (
+                          <p key={t.slice(0, 32)}><span className="dropcap" aria-hidden="true">{t[0]}</span><span className="sr-only">{t[0]}</span>{marked(t.slice(1), marks)}</p>
+                        ) : (
+                          <p key={t.slice(0, 32)}>{marked(t, marks)}</p>
+                        );
+                      })}
                     </div>
                   </article>
                 ),
@@ -196,47 +230,36 @@ export function About() {
 
           {/* her screenshot (11/24): "还是在这个区域单开一个 The Science Section 来承载这些内容吧" — the two notes, unchanged */}
           <section id="science" className="about__part" aria-labelledby="science-h">
-            <CardDeck
-              label="The Science"
-              look="square-receipt"
-              head={<h3 id="science-h" className="about__h" tabIndex={-1}>The Science</h3>}
-              cards={[
-                {
-                  key: "families",
-                  label: HOW_IT_WORKS.families.title,
-                  content: (
-                    <article className="receipt">
-                      <h4 className="about__h4 receipt__h">{HOW_IT_WORKS.families.title}</h4>
-                      <p className="receipt__p">{HOW_IT_WORKS.families.body}</p>
-                      <div className="about__links receipt__foot">
-                        <Link href="/scentpedia" className="btn btn--primary">Explore Scentpedia</Link>
-                        <a href="https://fragrancesoftheworld.com/" target="_blank" rel="noopener noreferrer" className="btn btn--ghost">
-                          Fragrances of the World<Icon name="external" size={18} />
-                        </a>
-                      </div>
-                    </article>
-                  ),
-                },
-                {
-                  key: "ideas",
-                  label: HOW_IT_WORKS.ideasTitle,
-                  content: (
-                    <article className="receipt">
-                      <h4 className="about__h4 receipt__h">{HOW_IT_WORKS.ideasTitle}</h4>
-                      <div className="receipt__items">
-                        {HOW_IT_WORKS.ideas.map((t) => (
-                          <Link key={t.name} href={t.name === "The Olfia Edit" ? "/edit" : "/gifts"} className="receipt__item">
-                            <Icon name={t.name === "The Olfia Edit" ? "newspaper" : "gift"} size={24} />
-                            <span className="receipt__item-name">{t.name}</span>
-                            <span className="receipt__item-line">{t.line}</span>
-                          </Link>
-                        ))}
-                      </div>
-                    </article>
-                  ),
-                },
-              ]}
-            />
+            {/* her note (11/24): "直接把两个卡片并排展示吧" — the two receipts side by side, same height */}
+            <h3 id="science-h" className="about__h" tabIndex={-1}>The Science</h3>
+            <div className="receipts">
+              <div className="receipt-wrap">
+              <article className="receipt" aria-labelledby="science-families">
+                <h4 id="science-families" className="about__h4 receipt__h">{HOW_IT_WORKS.families.title}</h4>
+                <p className="receipt__p">{HOW_IT_WORKS.families.body}</p>
+                <div className="about__links receipt__foot">
+                  <Link href="/scentpedia" className="btn btn--primary">Explore Scentpedia</Link>
+                  <a href="https://fragrancesoftheworld.com/" target="_blank" rel="noopener noreferrer" className="btn btn--ghost">
+                    Fragrances of the World<Icon name="external" size={18} />
+                  </a>
+                </div>
+              </article>
+              </div>
+              <div className="receipt-wrap receipt-wrap--b">
+              <article className="receipt" aria-labelledby="science-ideas">
+                <h4 id="science-ideas" className="about__h4 receipt__h">{HOW_IT_WORKS.ideasTitle}</h4>
+                <div className="receipt__items">
+                  {HOW_IT_WORKS.ideas.map((t) => (
+                    <Link key={t.name} href={t.name === "The Olfia Edit" ? "/edit" : "/gifts"} className="receipt__item">
+                      <Icon name={t.name === "The Olfia Edit" ? "newspaper" : "gift"} size={24} />
+                      <span className="receipt__item-name">{t.name}</span>
+                      <span className="receipt__item-line">{t.line}</span>
+                    </Link>
+                  ))}
+                </div>
+              </article>
+              </div>
+            </div>
           </section>
 
           <section id="creator" className="about__part" aria-labelledby="creator-h">

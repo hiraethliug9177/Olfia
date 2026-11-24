@@ -6,26 +6,24 @@ import { FAMILY_FILL, FAMILY_WASH } from "@/lib/colors";
 import { FAMILY_GUIDE, GUIDE_INTRO, WHEEL_HINT } from "@/lib/copy/familyGuide";
 import { Story } from "@/components/library/Story";
 import { GuideText } from "@/components/library/GuideText";
-import { QuizInvite } from "@/components/home/QuizInvite";
 
 export const metadata: Metadata = { title: "Scentpedia" };
 
 /**
- * Scentpedia (v2, 11/23; the Scent Library until then, /library forwards here): the quiz module on top (an invitation,
- * or your result), then the seven families, each with Tiffany's little story (her Notion: "quiz在上family在下").
+ * Scentpedia (v2, 11/23; the Scent Library until then, /library forwards here): the seven families, each with Tiffany's
+ * little story. The quiz module that sat on top until 11/24 was removed at her request (the quiz lives at /quiz).
  * Copy v1 (11/24, §7): each family has her long guide (first paragraph shown, the rest behind "Continue reading"),
  * signature notes, its place on the fragrance wheel, at home, and the same scent recipe as the home dial (research links removed 11/24).
  */
 export default function LibraryPage() {
   return (
     <div className="wrap page">
-      <div className="split-head">
+      {/* Tiffany 11/24: the line beside the title spans the title's height; the personality module is gone from this page
+          (the quiz stays in its floating window and at /quiz); the intro paragraph runs the full width */}
+      <div className="split-head split-head--match">
         <h1 className="h-page">Scentpedia</h1>
         <p className="lead">Get to know seven fragrance families through their ingredients, their character, and the stories behind them.</p>
       </div>
-      <section id="quiz" aria-label="Scent personality quiz" style={{ marginBottom: 48 }}>
-        <QuizInvite />
-      </section>
       <p className="lib-guide-intro">{GUIDE_INTRO}</p>
       <nav aria-label="Families" className="lib-jump">
         {FAMILIES.map((f) => (

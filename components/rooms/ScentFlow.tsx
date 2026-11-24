@@ -131,6 +131,31 @@ function dot(g2: CanvasRenderingContext2D, x: number, y: number, r: number, c: R
   g2.fill();
 }
 
+/**
+ * Tiffany's Scent View sketch (11/24): dashed rings around each product's field, drifting slowly outward and fading as
+ * they widen, so the reach of each scent reads like a map. Drawn on the back layer, under the products.
+ */
+function dashedRings(p: Paint, count: number, lift: number) {
+  const g2 = p.ctx;
+  const col = mix(p.core, [41, 42, 49], 0.3);
+  const cy = p.y - p.R * lift * p.rise;
+  g2.save();
+  g2.setLineDash([5, 6]);
+  g2.lineWidth = 1.2;
+  g2.lineDashOffset = -p.t * 5;
+  for (let i = 0; i < count; i += 1) {
+    const f = (i / count + p.t * 0.04 + p.seed * 0.1) % 1;
+    const r = p.R * p.spread * (0.3 + 0.95 * f);
+    const a = Math.min(0.45, p.a * 0.62) * Math.sin(Math.PI * f) ** 0.7;
+    if (a < 0.01) continue;
+    g2.strokeStyle = rgba(col, a);
+    g2.beginPath();
+    g2.ellipse(p.x + p.wind * r * 0.25, cy, r * 1.1, r * 0.88, 0, 0, TAU);
+    g2.stroke();
+  }
+  g2.restore();
+}
+
 /** The scent filling the room: one wide, faint wash per product. */
 function ambient(p: Paint, lift = 0.5) {
   blob(p.ctx, p.x + p.wind * p.R * 0.6, p.y - p.R * lift * p.rise, p.R * 2.5 * p.spread, p.c, p.a * 0.16, p.edge * 0.6);
@@ -379,7 +404,7 @@ export function ScentFlow({ sources, settings }: { sources: FlowSource[]; settin
         const tempo = TEMPO[s.family] ?? 1;
         const focusFade = st.focus && st.focus !== s.uid ? 0.3 : 1;
         const lit = st.time === "night" && (s.type === "candle" || s.type === "wax") ? 1.2 : 1;
-        DRAW[s.type]({
+        const paint: Paint = {
           ctx,
           fx,
           x: s.x * W,
@@ -398,7 +423,9 @@ export function ScentFlow({ sources, settings }: { sources: FlowSource[]; settin
           edge: 0.32 + e * 0.36,
           wind: st.windowOpen ? 0.35 : 0,
           night: st.time === "night",
-        });
+        };
+        DRAW[s.type](paint);
+        dashedRings(paint, s.w > 0.1 ? 3 : 2, s.type === "stones" || s.type === "flora" ? 0.05 : 0.2);
       }
     };
 

@@ -3,7 +3,8 @@
 import { Fragment } from "react";
 import type { CSSProperties, PointerEvent as ReactPointerEvent, ReactNode, Ref } from "react";
 import { familyById, findMaterial, itemById } from "@/lib/catalog";
-import { SCENT_MID, boxOf, type ItemNote } from "@/lib/roomScent";
+import { SCENT_MID, boxOf, emitPoint, tagLines, type ItemNote } from "@/lib/roomScent";
+import { FAMILY_INK } from "@/lib/colors";
 import type { FamilyId, PlacedItem, TimeOfDay } from "@/lib/types";
 import { dayName, dotDate } from "@/lib/dates";
 import { ItemArt } from "@/components/scene/Cutout";
@@ -50,26 +51,61 @@ export interface ScenePageProps {
   onItemHover?: (uid: string | null) => void;
 }
 
-/** Notes tags sit above their product; a tag that would cover another one moves up a row. */
-function layoutTags(list: Array<{ uid: string; x: number; top: number; text: string }>, stagePx: number) {
-  // the tag's type is max(15px, 3.3cqw) of the sheet; Caveat runs about a third of an em per character
-  const font = Math.max(15, (0.033 * stagePx) / 0.94);
-  const perChar = (0.36 * font) / stagePx;
-  const rowH = (font * 1.25 + 10) / (stagePx / 0.83);
-  const placed: Array<{ x0: number; x1: number; y: number }> = [];
-  const out = new Map<string, { x: number; y: number }>();
+interface TagAnchor { uid: string; x: number; top: number; mark: { x: number; y: number }; title: string; notes: string }
+
+/**
+ * Notes tags (Tiffany's tag sketch, 11/24): a small card above and to the side of its product, leaning toward the
+ * middle of the room, with a leader line down to a ring on the spot the scent comes from. A tag that would cover
+ * another one tries the other side, a place beside it, below the ring, then a row higher.
+ */
+function layoutTags(list: TagAnchor[], stagePx: number) {
+  // the tag's type is max(14px, 2.6cqw) and max(13px, 2cqw) of the sheet, which is the stage's width / 0.94
+  const sheet = stagePx / 0.94;
+  const titleFont = Math.max(14, 0.026 * sheet);
+  const notesFont = Math.max(13, 0.02 * sheet);
+  const stageH = stagePx / STAGE_ASPECT;
+  const tagH = (titleFont * 1.2 + notesFont * 1.35 + 14) / stageH;
+  const rowH = tagH + 6 / stageH;
+  const gapX = 8 / stagePx;
+  const placed: Array<{ x0: number; x1: number; y0: number; y1: number }> = [];
+  const out = new Map<string, { x: number; y: number; ax: number; ay: number }>();
+  const lean = 0.03;
   for (const t of [...list].sort((a, b) => a.top - b.top)) {
-    const w = Math.min(0.62, t.text.length * perChar + 40 / stagePx);
-    const x = Math.min(1 - w / 2 - 0.01, Math.max(w / 2 + 0.01, t.x));
-    let y = t.top - 0.012;
-    for (let guard = 0; guard < 8; guard += 1) {
-      const hit = placed.find((p) => x + w / 2 > p.x0 && x - w / 2 < p.x1 && Math.abs(p.y - y) < rowH);
-      if (!hit) break;
-      y = hit.y - rowH;
+    // Plex Mono is 0.6 em a character, less the narrowed word spaces; Newsreader averages about half an em
+    const px = Math.max(t.title.length * 0.5 * titleFont, t.notes.length * 0.6 * notesFont - (t.notes.split(" ").length - 1) * 0.2 * notesFont) + 22;
+    // on a phone-sized sheet a tag may take more of the width (the CSS matches: 82% under 560px of window)
+    const w = Math.min(stagePx < 420 ? 0.82 : 0.64, px / stagePx);
+    const toward = t.mark.x < 0.5 ? 1 : -1;
+    const clampX = (x: number) => Math.min(1 - w / 2 - 0.005, Math.max(w / 2 + 0.005, x));
+    const free = (x: number, y: number) => !placed.some((p) => x + w / 2 > p.x0 && x - w / 2 < p.x1 && y > p.y0 && y - tagH < p.y1);
+    // where the tag may sit: leaning toward the middle, leaning out, or just beside a tag already placed
+    const xs = [toward, -toward].map((d) => t.mark.x + d * (lean + 0.3 * w));
+    for (const p of placed) xs.push(p.x0 - gapX - w / 2, p.x1 + gapX + w / 2);
+    const above = Math.min(t.top, t.mark.y) - 0.035;
+    const below = t.mark.y + 0.035 + tagH;
+    // rows: just above the product, then just below its ring, then higher and higher above
+    const ys = [above, below, ...Array.from({ length: 7 }, (_, k) => above - (k + 1) * rowH)].filter((y) => y - tagH > 0.004 && y < 0.995);
+    let pick: { x: number; y: number; ax: number; ay: number } | null = null;
+    for (const y of ys) {
+      let bestD = Infinity;
+      for (const raw of xs) {
+        const x = clampX(raw);
+        if (!free(x, y)) continue;
+        const side = x >= t.mark.x ? 1 : -1;
+        const ax = Math.min(x + w / 2 - 0.12 * w, Math.max(x - w / 2 + 0.12 * w, t.mark.x + side * lean));
+        const ay = y <= t.mark.y ? y : y - tagH;
+        const d = Math.hypot((ax - t.mark.x) * stagePx, (ay - t.mark.y) * stageH);
+        if (d < bestD) {
+          bestD = d;
+          pick = { x, y, ax, ay };
+        }
+      }
+      if (pick) break;
     }
-    y = Math.max(rowH + 0.005, y);
-    placed.push({ x0: x - w / 2, x1: x + w / 2, y });
-    out.set(t.uid, { x, y });
+    const fallback = Math.max(tagH + 0.005, above);
+    const done = pick ?? { x: clampX(t.mark.x), y: fallback, ax: t.mark.x, ay: fallback };
+    placed.push({ x0: done.x - w / 2, x1: done.x + w / 2, y0: done.y - tagH - 0.004, y1: done.y + 0.004 });
+    out.set(t.uid, done);
   }
   return out;
 }
@@ -138,10 +174,18 @@ export function ScenePage({
         const anchors = shown.flatMap((n) => {
           const it = items.find((i) => i.uid === n.uid);
           const def = it ? itemById(it.kind) : undefined;
-          return it && def ? [{ uid: n.uid, x: it.x, top: boxOf(it, def).top, text: n.text, note: n }] : [];
+          return it && def ? [{ uid: n.uid, x: it.x, top: boxOf(it, def).top, mark: emitPoint(it, def), note: n, ...tagLines(n, it.kind) }] : [];
         });
         const pos = layoutTags(anchors, stagePx);
-        return anchors.map((a) => ({ ...a, px: a.x, ...(pos.get(a.uid) ?? { x: a.x, y: a.top }) }));
+        const stageH = stagePx / STAGE_ASPECT;
+        return anchors.map((a) => {
+          const p = pos.get(a.uid) ?? { x: a.x, y: a.top, ax: a.x, ay: a.top };
+          // the leader stops at the ring's edge (8px from its centre)
+          const dx = (p.ax - a.mark.x) * stagePx;
+          const dy = (p.ay - a.mark.y) * stageH;
+          const len = Math.hypot(dx, dy) || 1;
+          return { ...a, ...p, ex: a.mark.x + (dx / len) * (8 / stagePx), ey: a.mark.y + (dy / len) * (8 / stageH) };
+        });
       })()
     : [];
 
@@ -235,30 +279,32 @@ export function ScenePage({
 
           {overlay}
 
+          {tags.length ? (
+            <svg className="note-leaders" viewBox="0 0 1000 1000" preserveAspectRatio="none" aria-hidden="true">
+              {tags.map((t) => (
+                <line key={t.uid} x1={t.ax * 1000} y1={t.ay * 1000} x2={t.ex * 1000} y2={t.ey * 1000} vectorEffect="non-scaling-stroke" />
+              ))}
+            </svg>
+          ) : null}
           {tags.map((t) => {
-            const fam = familyById(t.note.family);
-            const lift = t.top - t.y;
+            const fam = t.note.family;
+            const cls = `note-tag${t.note.suggested ? " note-tag--suggested" : ""}${onNoteClick && (focusUid === t.uid || selected === t.uid) ? " is-on" : ""}`;
+            const pos: CSSProperties = { left: `${t.x * 100}%`, top: `${t.y * 100}%` };
             const body = (
               <>
-                <span className="note-tag__dot" style={{ background: fam.hex }} aria-hidden="true" />
-                <span className="note-tag__text">{t.text}</span>
+                <span className="note-tag__title" style={{ color: FAMILY_INK[fam] }}>{t.title}</span>
+                <span className="note-tag__notes">{t.notes}</span>
               </>
             );
             return (
               <Fragment key={`tag-${t.uid}`}>
-                {lift > 0.03 ? <span className="note-tag__string" aria-hidden="true" style={{ left: `${t.px * 100}%`, top: `${t.y * 100}%`, height: `${lift * 100}%` }} /> : null}
+                <span className="note-marker" aria-hidden="true" style={{ left: `${t.mark.x * 100}%`, top: `${t.mark.y * 100}%`, ["--ring" as string]: familyById(fam).hex }} />
                 {onNoteClick ? (
-                  <button
-                    type="button"
-                    className={`note-tag${t.note.suggested ? " note-tag--suggested" : ""}${focusUid === t.uid || selected === t.uid ? " is-on" : ""}`}
-                    style={{ left: `${t.x * 100}%`, top: `${t.y * 100}%` }}
-                    aria-label={`Notes: ${t.text}`}
-                    onClick={() => onNoteClick(t.uid)}
-                  >
+                  <button type="button" className={cls} style={pos} aria-label={`Notes for ${t.title}: ${t.notes}`} onClick={() => onNoteClick(t.uid)}>
                     {body}
                   </button>
                 ) : (
-                  <span className={`note-tag${t.note.suggested ? " note-tag--suggested" : ""}`} style={{ left: `${t.x * 100}%`, top: `${t.y * 100}%` }}>
+                  <span className={cls} style={pos}>
                     {body}
                   </span>
                 )}

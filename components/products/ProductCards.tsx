@@ -1,10 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { familyById, sourceLabel } from "@/lib/catalog";
 import { matchProducts, type Product } from "@/lib/products";
 import { SCENT_MID, artFor, sameNote, splitNotes } from "@/lib/roomScent";
 import type { Daypart, FamilyId, Season, SourceKind } from "@/lib/types";
+import { loadShelf, saveShelf, shelfItemFor } from "@/lib/shelf";
+import { useToast } from "@/lib/toast";
 import { Icon } from "@/components/ui/Icon";
 import { ProductLink } from "@/components/products/ProductLink";
 
@@ -115,60 +117,114 @@ export function seasonText(s: Season[]): string {
   return list.length === 4 ? "All year" : cap(joinAnd(list));
 }
 
+/** One word for the air of a room by family, used when no feeling has been chosen in Scent View (Claude's words). */
+const FAMILY_MOOD: Record<FamilyId, string> = {
+  floral: "soft",
+  gourmand: "cozy",
+  spicy: "warm",
+  woody: "grounded",
+  green: "green",
+  citrus: "bright",
+  fresh: "clean",
+};
+
 /**
- * The detailed card of Rooms' Fragrance Matches (formerly "Matches this room") (Tiffany 11/18: four products, more about each): what it is and
- * its size and price (checked on the brand's site 11/17), its notes, when it suits, and the families it shares with
- * the room. Facts only; nothing here is written as Olfia copy.
+ * "Why it fits your room", after the sentence in Tiffany's card sketch (11/24): the notes the product shares with the
+ * room's tags (or its own first notes), the room's atmosphere, and the room.
  */
-export function ProductDetailCard({ p, match, roomNotes = [], onSimilar }: { p: Product; match: FamilyId[]; roomNotes?: string[]; onSimilar?: (id: string) => void }) {
-  const f = familyById(p.families[0]);
-  const shared = match.filter((id) => p.families.includes(id));
-  const dots = shared.length ? shared : p.families;
-  const why = shared.length ? sharesLine(shared) : p.families.map((id) => familyById(id).label).join(" and ");
+function whyFits(p: Product, roomNotes: string[], moods: string[], room: string): string {
+  const own = splitNotes(p.notes);
+  const shared = own.filter((n) => roomNotes.some((r) => sameNote(n, r)));
+  const notes = (shared.length ? shared : own).slice(0, 2);
+  const mood = moods.slice(0, 2).join(", ");
+  return `${cap(joinAnd(notes))} ${notes.length > 1 ? "echo" : "echoes"} the ${mood} atmosphere you have created for your ${room}.`;
+}
+
+/**
+ * Rooms' Fragrance Matches, second design (Tiffany's card sketch, 11/24): a wide card with the product's cut-out, its
+ * name, families, why it fits the room and when it suits, then three actions: add it to the room, save it to the
+ * Scent Atlas (the Fragrance Shelf), or open the brand's page.
+ */
+export function ProductMatchCard({ p, roomNotes = [], moods, room, onAdd, onSimilar }: { p: Product; roomNotes?: string[]; moods: string[]; room: string; onAdd?: (p: Product) => void; onSimilar?: (id: string) => void }) {
+  const show = useToast((st) => st.show);
+  const [onShelf, setOnShelf] = useState(false);
+  useEffect(() => {
+    setOnShelf(loadShelf().some((x) => x.productId === p.id));
+  }, [p.id]);
   const price = p.price ? [p.price, p.size].filter(Boolean).join(" · ") : p.url ? null : "Available in stores only";
-  const body = (
-    <>
-      <NameTile brand={p.brand} kind={sourceLabel(p.type)} type={p.type} seed={p.id} family={f.id} />
-      <span className="pcard__body pdetail">
-        <span className="pcard__brand">{p.brand} · {sourceLabel(p.type)}</span>
-        <span className="pcard__name">{p.name}</span>
-        {price ? <span className="pdetail__price">{price}</span> : null}
-        <span className="pdetail__notes">
-          {/* Rooms v2: notes this product shares with the notes tags in the room are filled with its family's colour */}
-          {p.notes.split(" · ").map((n) => {
-            const shared = roomNotes.some((r) => splitNotes(n).some((x) => sameNote(x, r)));
-            return (
-              <span key={n} className={`pdetail__note${shared ? " is-shared" : ""}`} style={shared ? { background: SCENT_MID[p.families[0]] } : undefined}>
-                {n}
-              </span>
-            );
-          })}
-        </span>
-        <span className="pdetail__row"><Icon name="clock" size={18} />{dayText(p.dayparts)}</span>
-        <span className="pdetail__row"><Icon name="calendar" size={18} />{seasonText(p.seasons)}</span>
-        <span className="pcard__why">
-          <span className="pdetail__dots" aria-hidden="true">{dots.map((id) => <span key={id} className="chip__dot" style={{ background: familyById(id).hex }} />)}</span>
-          {why}
-        </span>
-      </span>
-    </>
-  );
+  const save = () => {
+    if (onShelf) return;
+    if (!saveShelf([shelfItemFor(p), ...loadShelf()])) {
+      show("Couldn’t save this entry in your browser. Try freeing up storage and saving again.");
+      return;
+    }
+    setOnShelf(true);
+    show("Added to your Fragrance Shelf", "/atlas?tab=shelf", "Open");
+  };
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 10, minWidth: 0 }}>
-      {p.url ? (
-        <ProductLink className="pcard" href={p.url} product={{ id: p.id, brand: p.brand, family: p.families[0], tier: p.tier }} ariaLabel={`${p.brand} ${p.name}, opens the brand’s website`}>
-          {body}
-          <span className="pcard__out"><Icon name="external" size={18} /></span>
-        </ProductLink>
-      ) : (
-        <div className="pcard">{body}</div>
-      )}
+    <div className="pmatch-wrap">
+      <article className="pmatch" aria-label={`${p.brand} ${p.name}`}>
+        <div className="pmatch__top">
+          <div className="pmatch__pic">
+            <NameTile brand={p.brand} kind={sourceLabel(p.type)} type={p.type} seed={p.id} family={p.families[0]} />
+          </div>
+          <div className="pmatch__body">
+            <h3 className="pmatch__name">{p.name}</h3>
+            <span className="pmatch__meta">{p.brand} · {sourceLabel(p.type)}{price ? ` · ${price}` : ""}</span>
+            <span className="pmatch__fams">
+              {p.families.map((id) => (
+                <span key={id} className="pmatch__fam"><span className="chip__dot" style={{ background: familyById(id).hex }} aria-hidden="true" />{familyById(id).label}</span>
+              ))}
+            </span>
+            <span className="pmatch__h">Why it fits your room</span>
+            <p className="pmatch__why">{whyFits(p, roomNotes, moods, room)}</p>
+            <span className="pmatch__chips">
+              <span className="pmatch__chip">{dayText(p.dayparts)}</span>
+              <span className="pmatch__chip">{seasonText(p.seasons)}</span>
+            </span>
+          </div>
+        </div>
+        <div className="pmatch__actions">
+          {onAdd ? <button type="button" className="pmatch__act" onClick={() => onAdd(p)}>Add to room</button> : null}
+          <button type="button" className="pmatch__act" onClick={save} disabled={onShelf} aria-pressed={onShelf}>
+            {onShelf ? <Icon name="check" size={16} /> : null}Save to Atlas
+          </button>
+          {p.url ? (
+            <ProductLink className="pmatch__act" href={p.url} product={{ id: p.id, brand: p.brand, family: p.families[0], tier: p.tier }} ariaLabel={`Explore ${p.brand} ${p.name} on the brand’s website`}>
+              Explore fragrance<Icon name="external" size={15} />
+            </ProductLink>
+          ) : null}
+        </div>
+      </article>
       {onSimilar ? <button type="button" className="hero__link" onClick={() => onSimilar(p.id)} style={{ alignSelf: "flex-start", border: 0, background: "transparent", padding: 0, fontSize: 15 }}>Explore similar fragrances</button> : null}
     </div>
   );
 }
 
-export function ProductCards({ families, roomNotes = [], title = "Recreate this at home", lead, limit = 4, compact = false }: { families: FamilyId[]; roomNotes?: string[]; title?: string; lead?: string; limit?: number; compact?: boolean }) {
+export function ProductCards({
+  families,
+  roomNotes = [],
+  feelings = [],
+  room = "room",
+  onAdd,
+  title = "Recreate this at home",
+  lead,
+  limit = 4,
+  compact = false,
+}: {
+  families: FamilyId[];
+  roomNotes?: string[];
+  /** the feelings chosen in Scent View, as words ("calm"); without any, the room's families give the atmosphere */
+  feelings?: string[];
+  /** what the room is ("reading corner", "bedroom") */
+  room?: string;
+  onAdd?: (p: Product) => void;
+  title?: string;
+  lead?: string;
+  limit?: number;
+  compact?: boolean;
+}) {
+  const moods = feelings.length ? feelings : families.length ? families.map((f) => FAMILY_MOOD[f]) : ["quiet"];
   const [when, setWhen] = useState<When>("any");
   const [similar, setSimilar] = useState<string | null>(null);
 
@@ -201,8 +257,8 @@ export function ProductCards({ families, roomNotes = [], title = "Recreate this 
         </div>
       ) : null}
       {list.length ? (
-        <div className="pcard-grid pcard-grid--four">
-          {list.map((p) => <ProductDetailCard key={p.id} p={p} match={families} roomNotes={roomNotes} onSimilar={compact ? undefined : setSimilar} />)}
+        <div className="pmatch-grid">
+          {list.map((p) => <ProductMatchCard key={p.id} p={p} roomNotes={roomNotes} moods={moods} room={room} onAdd={onAdd} onSimilar={compact ? undefined : setSimilar} />)}
         </div>
       ) : (
         <p className="muted">No fragrances match these selections yet. Try another time filter or scent family.</p>

@@ -35,6 +35,24 @@ export interface ShelfItem {
 
 export const SHELF_KEY = "olfia.shelf.v1";
 
+/** When a recommended product is usually used, from the parts of the day it suits. */
+export function routineFor(p: Product): Routine {
+  const eve = p.dayparts.includes("evening") || p.dayparts.includes("night");
+  const day = p.dayparts.includes("morning") || p.dayparts.includes("afternoon");
+  return eve && day ? "daily" : eve ? "evenings" : "mornings";
+}
+
+const makeId = (): string =>
+  typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `id-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+
+/** A recommended product as a new Fragrance Shelf entry (Gifts and Rooms' Fragrance Matches). */
+export function shelfItemFor(p: Product): ShelfItem {
+  return {
+    id: makeId(), createdAt: new Date().toISOString(), name: p.name, brand: p.brand, kind: p.type, families: p.families,
+    routine: routineFor(p), note: "", url: p.url, productId: p.id,
+  };
+}
+
 export function loadShelf(): ShelfItem[] {
   try {
     const raw = window.localStorage.getItem(SHELF_KEY);

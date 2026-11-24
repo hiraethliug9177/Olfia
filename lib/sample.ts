@@ -1,4 +1,4 @@
-import { autoTags, baseLayout, seasonOf, stickersFor } from "@/lib/catalog";
+import { autoTags, baseLayout, itemById, seasonOf, stickersFor } from "@/lib/catalog";
 import { ROOM_PRESETS } from "@/lib/presets";
 import { newId } from "@/lib/store";
 import type { CaptureEntry, Daypart, EmotionId, Entry, FamilyId, MethodId, Occasion, PlacedItem, RoomKind, RoomsEntry, SourceKind, TimeOfDay } from "@/lib/types";
@@ -20,10 +20,17 @@ export function sampleEntries(now: Date = new Date()): Entry[] {
 
   const room = (
     daysAgo: number, hour: number, families: FamilyId[], nickname: string, time: TimeOfDay,
-    o: { source?: string; scene?: string; preset?: string; starred?: boolean; strength?: number; windowOpen?: boolean } = {},
+    o: { source?: string; scene?: string; preset?: string; starred?: boolean; strength?: number; windowOpen?: boolean; notes?: string } = {},
   ): RoomsEntry => {
     const scene = o.scene ?? "reading-corner";
-    const items = (o.preset && presetItems(o.preset)) || [...baseLayout(o.source ?? "candle", scene), ...stickersFor(families)];
+    const base = (o.preset && presetItems(o.preset)) || [...baseLayout(o.source ?? "candle", scene), ...stickersFor(families)];
+    // the first fragrance product carries a notes tag (Rooms v2); the others keep Olfia's suggestion
+    let tagged = false;
+    const items = base.map((it) => {
+      if (tagged || !o.notes || itemById(it.kind)?.category !== "source") return it;
+      tagged = true;
+      return { ...it, notes: o.notes };
+    });
     return {
       id: newId(), schemaVersion: 2, type: "rooms", createdAt: at(daysAgo, hour), updatedAt: at(daysAgo, hour), starred: !!o.starred, families,
       sceneId: scene, nickname, items, strength: o.strength ?? 70, time, windowOpen: !!o.windowOpen,
@@ -53,19 +60,19 @@ export function sampleEntries(now: Date = new Date()): Entry[] {
 
   return [
     // this week
-    room(0, 21, ["woody", "spicy"], "rain, chapter three", "night", { preset: "reading-night", starred: true, strength: 80 }),
+    room(0, 21, ["woody", "spicy"], "rain, chapter three", "night", { preset: "reading-night", starred: true, strength: 80, notes: "sandalwood · cedar · leather" }),
     product(0, 21, ["woody", "spicy"], "Le Labo", "Santal 26", "candle", "Reading after work", { room: "reading", emotions: ["cozy", "focused"], occasion: "everyday", sentence: "The room smelled like a library with the lights low.", starred: true, tags: ["afterwork"] }),
-    room(1, 8, ["citrus", "green"], "first coffee", "morning", { scene: "kitchen", source: "diffuser", starred: true, windowOpen: true }),
+    room(1, 8, ["citrus", "green"], "first coffee", "morning", { scene: "kitchen", source: "diffuser", starred: true, windowOpen: true, notes: "lime · basil · mandarin" }),
     method(1, 18, ["spicy", "citrus"], "simmer", "First cold evening", { room: "kitchen", emotions: ["nostalgic", "cozy"], sentence: "Orange peel, two cinnamon sticks, the radio on.", tags: ["firstcold"] }),
     product(2, 7, ["citrus", "green"], "Jo Malone London", "Lime Basil & Mandarin", "diffuser", "Breakfast, window open", { room: "kitchen", emotions: ["energized"], occasion: "everyday" }),
-    room(3, 22, ["green", "fresh"], "long bath", "night", { scene: "bathroom", source: "candle" }),
-    room(4, 15, ["woody", "green"], "desk, late afternoon", "afternoon", { preset: "study-afternoon", strength: 55 }),
+    room(3, 22, ["green", "fresh"], "long bath", "night", { scene: "bathroom", source: "candle", notes: "eucalyptus · mint · sea salt" }),
+    room(4, 15, ["woody", "green"], "desk, late afternoon", "afternoon", { preset: "study-afternoon", strength: 55, notes: "cedar · vetiver · smoke" }),
     method(4, 9, ["fresh", "green"], "window", "Window open after rain", { room: "bedroom", emotions: ["fresh-start"], tags: ["rainyday"] }),
     product(5, 22, ["woody"], "Diptyque", "Feu de Bois", "candle", "Too smoky for sleep", { room: "bedroom", emotions: ["restless"], occasion: "sleep", notForMe: true, sentence: "Lovely in the living room, too much by the bed." }),
-    room(6, 9, ["citrus", "fresh"], "sunday sheets", "morning", { preset: "bedroom-morning", starred: true, windowOpen: true }),
+    room(6, 9, ["citrus", "fresh"], "sunday sheets", "morning", { preset: "bedroom-morning", starred: true, windowOpen: true, notes: "bergamot · neroli · white tea" }),
     method(6, 15, ["floral"], "flowers", "Peonies from the market", { room: "living", emotions: ["romantic", "calm"], starred: true, tags: ["sunday"] }),
     product(7, 20, ["floral", "fresh"], "Westin", "White Tea", "diffuser", "Hotel lobby at home", { room: "entryway", emotions: ["calm"], occasion: "guests", starred: true, sentence: "Guests noticed it before they took their coats off." }),
-    room(8, 22, ["gourmand", "spicy"], "record on side two", "night", { preset: "living-night" }),
+    room(8, 22, ["gourmand", "spicy"], "record on side two", "night", { preset: "living-night", notes: "vanilla · clove · tonka" }),
     product(9, 18, ["spicy", "citrus"], "NEST New York", "Holiday", "candle", "First winter dinner", { room: "living", emotions: ["cozy", "playful"], occasion: "guests", tags: ["holiday"] }),
     // last month
     method(10, 11, ["fresh"], "laundry", "Sheets just off the line", { room: "closet", emotions: ["calm", "safe"] }),
@@ -82,7 +89,7 @@ export function sampleEntries(now: Date = new Date()): Entry[] {
     room(27, 21, ["woody", "spicy"], "first fire of the year", "night", { source: "candle", strength: 85 }),
     product(30, 16, ["gourmand"], "Yankee Candle", "Vanilla Cupcake", "candle", "Too sweet for the whole house", { room: "kitchen", emotions: ["restless"], notForMe: true }),
     method(33, 8, ["green"], "window", "Pine trail, windows down", { room: "car", emotions: ["energized"], tags: ["weekendtrip"] }),
-    room(36, 15, ["woody", "citrus"], "exam week", "afternoon", { source: "diffuser", strength: 50 }),
+    room(36, 15, ["woody", "citrus"], "exam week", "afternoon", { source: "aroma-white", strength: 50, notes: "lemon · cedar · rosemary" }),
     method(40, 17, ["floral", "green"], "flowers", "Lilies on the desk", { room: "study", emotions: ["focused", "romantic"] }),
   ];
 }

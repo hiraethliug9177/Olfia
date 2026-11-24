@@ -10,7 +10,6 @@ import { ItemArt } from "@/components/scene/Cutout";
 import { Icon, type IconName } from "@/components/ui/Icon";
 import { ProductCard } from "@/components/products/ProductCards";
 import { SAMPLE_SUMMARY } from "@/lib/copy/scentprint";
-import { useAuthState } from "@/lib/mockAuth";
 
 /**
  * My Scentprint (Scent Atlas). Copy v1 (11/24): the old "Tags & profile" tab with My Preferences merged in and a map
@@ -92,7 +91,6 @@ function ScentMap({ counts }: { counts: Record<FamilyId, number> }) {
 }
 
 export function Scentprint({ entries, tag, setTag }: { entries: Entry[]; tag: string | null; setTag: (t: string | null) => void }) {
-  const { sample } = useAuthState();
   const caps = entries.filter((e): e is CaptureEntry => e.type === "capture");
   const counts = Object.fromEntries(FAMILIES.map((f) => [f.id, 0])) as Record<FamilyId, number>;
   entries.forEach((e) => e.families.forEach((f) => { counts[f] += 1; }));
@@ -173,17 +171,10 @@ export function Scentprint({ entries, tag, setTag }: { entries: Entry[]; tag: st
           />
           {quote ? <blockquote className="pref-quote"><p>“{quote}”</p></blockquote> : null}
         </figure>
-        {/* her summary text (11/24) with the sample records; for anyone else the space waits for a real reading of their records */}
-        {sample ? (
-          <aside className="scentprint__ai scentprint__ai--text" aria-label="Summary of your scent preferences">
-            <p className="scentprint__ai-text">{SAMPLE_SUMMARY}</p>
-          </aside>
-        ) : (
-          <aside className="scentprint__ai" aria-hidden="true">
-            <span className="scentprint__ai-line" /><span className="scentprint__ai-line" /><span className="scentprint__ai-line" />
-            <span className="scentprint__ai-line scentprint__ai-line--short" />
-          </aside>
-        )}
+        {/* her summary text (11/24), shown to everyone as an example of the reading to come (her answer that night) */}
+        <aside className="scentprint__ai scentprint__ai--text" aria-label="Summary of your scent preferences">
+          <p className="scentprint__ai-text">{SAMPLE_SUMMARY}</p>
+        </aside>
       </section>
 
       <section className="scentprint__tags" aria-labelledby="tags-h">

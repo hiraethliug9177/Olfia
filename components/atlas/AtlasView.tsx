@@ -169,7 +169,7 @@ export function AtlasView() {
           <>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "8px 28px", alignItems: "flex-start", paddingTop: 8 }}>
               <div className="cal-scroll" style={{ flex: "1 1 100%", minWidth: 0 }}>
-                <FitWidth width={PIECE_W * 7 + 12} height={rows * PIECE_H + 44}>
+                <FitWidth width={PIECE_W * 7 + 2} height={rows * PIECE_H + 44} max={1.3}>
                 <div style={{ display: "grid", gridTemplateColumns: `repeat(7, ${PIECE_W}px)`, marginBottom: 18, fontSize: 15, fontWeight: 600, color: "var(--slate)" }}>
                   {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => <span key={d} style={{ paddingLeft: 16 }}>{d}</span>)}
                 </div>

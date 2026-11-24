@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { familyById, sourceLabel } from "@/lib/catalog";
 import { giftEntry, type GiftScene } from "@/lib/gifts";
-import { loadShelf, saveShelf, type Routine, type ShelfItem } from "@/lib/shelf";
+import { loadShelf, saveShelf, shelfItemFor } from "@/lib/shelf";
 import { useAtlas } from "@/lib/store";
 import { useToast } from "@/lib/toast";
 import { track } from "@/lib/analytics";
@@ -14,15 +14,6 @@ import { Icon } from "@/components/ui/Icon";
 import { ProductLink } from "@/components/products/ProductLink";
 import { dayText, seasonText } from "@/components/products/ProductCards";
 import { GiftRoom } from "@/components/gifts/GiftRoom";
-
-function routineFor(p: Product): Routine {
-  const eve = p.dayparts.includes("evening") || p.dayparts.includes("night");
-  const day = p.dayparts.includes("morning") || p.dayparts.includes("afternoon");
-  return eve && day ? "daily" : eve ? "evenings" : "mornings";
-}
-
-const makeId = (): string =>
-  typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `id-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
 
 /**
  * One gift pick (Tiffany 11/18): its room, then what it is, its size and price, its notes, when it suits and its
@@ -58,11 +49,7 @@ export function GiftPick({ scene, mode, to = "" }: { scene: GiftScene; mode: "me
 
   const saveToShelf = () => {
     if (onShelf) return;
-    const item: ShelfItem = {
-      id: makeId(), createdAt: new Date().toISOString(), name: p.name, brand: p.brand, kind: p.type, families: p.families,
-      routine: routineFor(p), note: "", url: p.url, productId: p.id,
-    };
-    if (!saveShelf([item, ...loadShelf()])) {
+    if (!saveShelf([shelfItemFor(p), ...loadShelf()])) {
       show("Couldn’t save this entry in your browser. Try freeing up storage and saving again.");
       return;
     }

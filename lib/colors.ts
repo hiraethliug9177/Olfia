@@ -32,3 +32,14 @@ export const FAMILY_WASH: Record<FamilyId, string> = {
   citrus: "#F8E8C6",
   fresh: "#DCEAEB",
 };
+
+/** A family's colour dark enough to be text on white or ivory (each passes 4.8:1), for the product line of a notes tag. */
+export const FAMILY_INK: Record<FamilyId, string> = {
+  floral: "#8C6668",
+  gourmand: "#856B50",
+  spicy: "#B1542E",
+  woody: "#8A5A33",
+  green: "#697444",
+  citrus: "#8B6A36",
+  fresh: "#5E7277",
+};

@@ -96,6 +96,40 @@ export function roomNotes(items: PlacedItem[], families: FamilyId[]): ItemNote[]
   });
 }
 
+const TYPE_NOUN: Record<ScentType, string> = {
+  candle: "candle",
+  reed: "diffuser",
+  aroma: "diffuser",
+  incense: "incense",
+  spray: "room spray",
+  wax: "wax melt",
+  stones: "diffuser stones",
+  flora: "",
+};
+
+const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+
+/**
+ * A notes tag's two lines (Tiffany's tag sketch, 11/24: "Cedar candle / Cedar · Amber · Musk"): what the product is,
+ * then its notes. A product picked by name keeps its name; otherwise the first note and the kind of object
+ * make the first line, and flowers and plants use their own name.
+ */
+export function tagLines(note: ItemNote, kind: string): { title: string; notes: string } {
+  const text = note.text.trim();
+  const lower = text.toLowerCase();
+  const product = PRODUCTS.find((p) => `${p.brand} ${p.name}`.toLowerCase() === lower || p.name.toLowerCase() === lower || productNotes(p) === lower);
+  if (product) return { title: `${product.brand} ${product.name}`, notes: splitNotes(product.notes).map(cap).join(" · ") };
+  const def = itemById(kind);
+  const type = def?.scentType;
+  const noun = type ? TYPE_NOUN[type] : "";
+  const list = splitNotes(text);
+  const notes = list.length ? list.map(cap).join(" · ") : text;
+  if (type === "flora" || !noun) return { title: def?.label ?? cap(noun), notes };
+  const first = list[0];
+  const title = first && first.split(/\s+/).length <= 2 ? `${cap(first)} ${noun}` : cap(noun);
+  return { title, notes };
+}
+
 /** Every note in the room, once each. */
 export function noteWords(notes: ItemNote[]): string[] {
   return [...new Set(notes.flatMap((n) => splitNotes(n.text)))];
@@ -162,6 +196,31 @@ export const SENSORY_SLIDERS: Array<{ id: keyof SensoryValues; from: string; to:
   { id: "envelop", from: "Airy", to: "Enveloping" },
 ];
 
+/**
+ * Tiffany's sensory sketch (11/24): five sliders in this order. Subtle ↔ Intense is the room's own Scent strength
+ * (20–100) shown on 0–100, so Scent View has one control for it rather than two.
+ */
+export type SenseId = keyof SensoryValues | "intense";
+export const SENSE_ROWS: Array<{ id: SenseId; from: string; to: string }> = [
+  { id: "rich", from: "Light", to: "Rich" },
+  { id: "warm", from: "Cool", to: "Warm" },
+  { id: "creamy", from: "Dry", to: "Creamy" },
+  { id: "intense", from: "Subtle", to: "Intense" },
+  { id: "envelop", from: "Airy", to: "Enveloping" },
+];
+export const strengthToIntense = (strength: number): number => Math.round(((strength - 20) / 80) * 100);
+export const intenseToStrength = (v: number): number => Math.round(20 + v * 0.8);
+
+/** "Your sensory impression": the end each slider leans toward, in slider order, at most four (the middle says nothing). */
+export function impressionWords(values: Record<SenseId, number>): string[] {
+  return SENSE_ROWS.map((r, i) => ({ r, i, d: values[r.id] - 50 }))
+    .filter((x) => Math.abs(x.d) >= 8)
+    .sort((a, b) => Math.abs(b.d) - Math.abs(a.d) || a.i - b.i)
+    .slice(0, 4)
+    .sort((a, b) => a.i - b.i)
+    .map((x) => (x.d < 0 ? x.r.from : x.r.to));
+}
+
 /** How a feeling changes the motion: speed, sway, spread, warmth, colour strength and how high it rises. */
 export interface FeelingShape {
   speed: number;
@@ -214,7 +273,7 @@ const TYPE_ART: Partial<Record<SourceKind, string[]>> = {
   spray: ["spray-flask", "spray-tall", "spray-wood-cap", "spray-mint"],
   incense: ["incense-dish", "incense-ceramic", "incense-flower", "incense-concrete"],
   // essential oils and diffuser blends go in an aroma diffuser
-  oil: ["aroma-wood-lid"],
+  oil: ["aroma-wood-lid", "aroma-white", "aroma-clay", "aroma-pebble", "aroma-fluted"],
 };
 
 export function artFor(type: SourceKind, seed: string): ItemDef | undefined {

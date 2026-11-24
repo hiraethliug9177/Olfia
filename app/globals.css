@@ -1375,7 +1375,7 @@ body::after {
 .gifts-page__intro { display: flex; flex-direction: column; gap: 10px; max-width: 640px; }
 .gifts-page__mode { margin: -12px 0 24px; max-width: 640px; color: var(--slate); }
 .gift-card-panel__lead { margin: 0 0 4px; color: var(--slate); }
-.lib-guide-intro { max-width: 72ch; margin: 0 0 20px; }
+.lib-guide-intro { max-width: none; margin: 0 0 20px; }
 .guide-text p { margin: 0 0 12px; max-width: 72ch; }
 .guide-text__more { display: block; }
 .guide-text__more[hidden] { display: none; }
@@ -1589,16 +1589,20 @@ h1, h2, h3, h4, .h-page, .h-section { text-wrap: balance; }
 .scent-flow { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1500; pointer-events: none; }
 
 /* notes tags: a paper tag on a thread above each fragrance product */
-.note-tag { position: absolute; z-index: 3000; translate: -50% -100%; display: inline-flex; align-items: center; gap: 6px; max-width: 62%; padding: 2px 10px 3px 8px; border: 1px solid rgba(41,42,49,0.16); border-radius: 7px; background: #fff; box-shadow: 0 3px 8px rgba(41,42,49,0.12); font-family: var(--font-hand); font-weight: 700; font-size: max(15px, 3.3cqw); line-height: 1.2; color: var(--ink); white-space: nowrap; cursor: pointer; animation: tag-float 6s var(--ease) infinite; }
+/* Notes tags, second design (Tiffany's sketch, 11/24): a small white card with what the product is on the first line
+   (Newsreader, in a darkened family colour) and its notes on the second (Plex Mono, slate); a thin leader runs down
+   to a ring on the spot the scent comes from. */
+.note-tag { position: absolute; z-index: 3000; translate: -50% -100%; display: flex; flex-direction: column; align-items: flex-start; gap: 1px; max-width: 64%; padding: 5px 10px 6px; border: 1px solid rgba(41,42,49,0.1); border-radius: 8px; background: rgba(255,255,255,0.97); box-shadow: 0 6px 16px rgba(41,42,49,0.12), 0 1px 2px rgba(41,42,49,0.08); text-align: left; white-space: nowrap; cursor: pointer; }
 span.note-tag { cursor: default; }
-.note-tag--suggested { border-style: dashed; color: var(--slate); background: rgba(255,255,255,0.9); }
-.note-tag.is-on { border-color: var(--deep); box-shadow: 0 0 0 2px rgba(76,82,122,0.22), 0 3px 8px rgba(41,42,49,0.12); }
+.note-tag--suggested { border: 1px dashed rgba(41,42,49,0.3); background: rgba(255,255,255,0.9); }
+.note-tag.is-on { border-color: var(--deep); box-shadow: 0 0 0 2px rgba(76,82,122,0.22), 0 6px 16px rgba(41,42,49,0.12); }
 .note-tag:focus-visible { outline: 2px solid var(--deep); outline-offset: 2px; }
-.note-tag__dot { width: 9px; height: 9px; flex: none; border-radius: 50%; }
-.note-tag__text { overflow: hidden; text-overflow: ellipsis; padding-right: 3px; margin-right: -3px; }
-.note-tag__string { position: absolute; z-index: 2999; width: 1.5px; translate: -0.75px 0; background: rgba(41,42,49,0.42); pointer-events: none; }
-.note-tag__string::after { content: ""; position: absolute; left: 50%; bottom: -3px; width: 6px; height: 6px; translate: -50% 0; border-radius: 50%; background: rgba(41,42,49,0.5); }
-@keyframes tag-float { 0%, 100% { translate: -50% -100%; } 50% { translate: -50% calc(-100% - 3px); } }
+.note-tag__title { max-width: 100%; overflow: hidden; text-overflow: ellipsis; font-family: var(--font-display); font-weight: 500; font-size: max(14px, 2.6cqw); line-height: 1.2; }
+.note-tag__notes { max-width: 100%; overflow: hidden; text-overflow: ellipsis; font-family: var(--font-mono); font-size: max(13px, 2cqw); line-height: 1.35; word-spacing: -0.2em; color: var(--slate); }
+.note-leaders { position: absolute; inset: 0; z-index: 2998; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.note-leaders line { stroke: rgba(41,42,49,0.5); stroke-width: 1.2; stroke-linecap: round; }
+@media (max-width: 560px) { .note-tag { max-width: 82%; } }
+.note-marker { position: absolute; z-index: 2999; width: 15px; height: 15px; translate: -50% -50%; border: 2.5px solid #fff; border-radius: 50%; box-shadow: 0 0 0 1.5px var(--ring), 0 2px 6px rgba(41,42,49,0.28); pointer-events: none; }
 
 .note-editor { position: absolute; left: 16px; bottom: 76px; z-index: 6; flex-direction: column; align-items: stretch; gap: 10px; width: min(380px, calc(100% - 32px)); padding: 14px; border-radius: 20px; background: rgba(255,255,255,0.95); }
 .note-editor__field { display: flex; flex-direction: column; gap: 6px; }
@@ -1611,9 +1615,28 @@ span.note-tag { cursor: default; }
 .note-editor__row { display: flex; justify-content: space-between; gap: 8px; }
 
 /* the sensory sliders of Scent View */
-.senses { display: flex; flex-direction: column; gap: 4px; }
-.sense { display: grid; grid-template-columns: 4.6em minmax(0, 1fr) 6.6em; align-items: center; gap: 10px; font-size: 14px; font-weight: 500; color: var(--slate); }
-.sense span:last-child { text-align: right; }
+/* Scent View sliders (Tiffany's sensory sketch, 11/24): the two words over each track, then the impression they make */
+.senses { display: flex; flex-direction: column; gap: 12px; }
+.sense { display: flex; flex-direction: column; gap: 2px; font-size: 14px; font-weight: 500; color: var(--slate); }
+.sense__ends { display: flex; justify-content: space-between; gap: 12px; }
+.impression { display: flex; align-items: center; gap: 18px; padding-top: 16px; border-top: 1px solid var(--line); }
+.impression__text { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.impression__h { font-size: 16px; font-weight: 600; color: var(--ink); }
+.impression__words { font-size: 14px; color: var(--slate); }
+.swatch { flex: none; width: 76px; height: 76px; border-radius: 50%; }
+
+/* Rooms start (Tiffany's flow, 11/24): feeling, then space, then fragrance, above a new room */
+.room-start { display: flex; flex-wrap: wrap; align-items: stretch; gap: 14px 0; padding: 18px 22px; }
+.room-start__step { display: flex; align-items: center; min-width: 0; }
+.room-start__arrow { flex: none; margin: 22px 18px 0; color: var(--slate); }
+.room-start__group { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.room-start__h { font-size: 15px; font-weight: 600; color: var(--ink); }
+.room-start__opts { display: flex; flex-wrap: wrap; gap: 6px; }
+.room-start__opts .chip { min-height: 38px; padding: 0 12px; font-size: 14px; }
+@media (max-width: 860px) {
+  .room-start { flex-direction: column; padding: 16px; }
+  .room-start__arrow { display: none; }
+}
 
 /* Photo View: the room's photo beside its collage, split by a line you can drag */
 .photo-layer { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1500; }
@@ -1634,7 +1657,7 @@ span.note-tag { cursor: default; }
 .pdetail__note.is-shared { font-weight: 600; }
 
 @media (prefers-reduced-motion: reduce) {
-  .scene-item__halo, .note-tag { animation: none; }
+  .scene-item__halo { animation: none; }
 }
 .scent-flow--front { z-index: 2900; }
 
@@ -1678,8 +1701,13 @@ span.note-tag { cursor: default; }
 .deck__slot.is-gone { transition: transform var(--deck-dur) var(--deck-ease), opacity var(--deck-dur) cubic-bezier(0.55, 0, 0.8, 0.45), filter var(--deck-dur) ease; }
 .deck--vocabulary-card .deck__stage { max-width: 870px; padding: 0 36px 32px 0; }
 .deck--file-folder .deck__stage { padding-top: 32px; }
-.deck--square-receipt { max-width: 600px; }
-.deck--square-receipt .deck__stage { padding: 0 0 36px 32px; }
+/* The Science (her note 11/24): the two receipts side by side, the same height, each turned a touch like paper on a desk */
+.receipts { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: clamp(22px, 3vw, 40px); align-items: stretch; margin-top: 22px; max-width: 980px; }
+.receipt-wrap { display: flex; filter: drop-shadow(0 14px 22px rgba(41, 42, 49, 0.12)) drop-shadow(0 2px 3px rgba(41, 42, 49, 0.08)); rotate: -0.8deg; }
+.receipt-wrap--b { rotate: 0.9deg; }
+.receipt-wrap > .receipt { flex: 1; min-width: 0; aspect-ratio: auto; }
+.receipt-wrap .receipt__foot { flex-wrap: wrap; }
+@media (max-width: 760px) { .receipts { grid-template-columns: minmax(0, 1fr); } .receipt-wrap, .receipt-wrap--b { rotate: 0deg; } }
 .deck--existing-creator-card .deck__stage { max-width: 592px; padding: 0 32px 32px 0; }
 
 /* The Concept: a landscape index card — white stock, an apricot header rule, faint periwinkle ruled lines */
@@ -1694,6 +1722,8 @@ span.note-tag { cursor: default; }
 .vocab__lines { position: relative; z-index: 1; flex: 1; margin-top: 20px; background-image: repeating-linear-gradient(to bottom, transparent 0 calc(var(--lh) - 1px), rgba(160, 166, 200, 0.4) calc(var(--lh) - 1px) var(--lh)); }
 .vocab__lines p { margin: 0 0 var(--lh); font-size: 15px; line-height: var(--lh); }
 .vocab__lines p:last-child { margin-bottom: 0; }
+/* her note (11/24): like the letter, a large first letter and marked words; the capital spans two ruled lines */
+.vocab .dropcap { float: left; height: calc(var(--lh) * 2 - 2px); margin: 1px 10px 0 -2px; padding: 0 6px; background: radial-gradient(ellipse at 52% 58%, rgba(231, 180, 159, 0.6) 0 46%, rgba(231, 180, 159, 0) 64%); font-family: var(--font-display); font-size: 50px; font-weight: 600; line-height: calc(var(--lh) * 2); color: var(--ink); }
 
 /* How it Works: a folder in Mist with its tab cut into the top edge; each folder's tab sits a third further along */
 .folder { --tab-h: 34px; --folder: var(--mist); position: relative; display: flex; flex-direction: column; padding-top: var(--tab-h); }
@@ -1749,4 +1779,52 @@ span.note-tag { cursor: default; }
   .ways-card .way__pic { justify-content: flex-start; }
   .ways-card .way__pic img { width: auto; max-width: 120px; max-height: 88px; }
   .about__part--white { padding: 20px 16px; }
+}
+
+/* Scentpedia head (Tiffany 11/24, "match the title's height"): beside the title the line sets on two lines whose top meets
+   the title's cap line and whose last line sits on the title's baseline. Newsreader's capitals are 0.70 em tall and
+   IBM Plex Mono's 0.71 em, so with the line at 0.28 of the title size, a line gap of half the title size closes the
+   difference (0.70t = 0.5t + 0.71 x 0.28t). Below 861px the two stack and the line is an ordinary lead again. */
+@media (min-width: 861px) {
+  .split-head--match { --t: clamp(44px, 5.4vw, 76px); align-items: flex-end; align-items: last baseline; flex-wrap: nowrap; }
+  .split-head--match > .h-page { font-size: var(--t); }
+  .split-head--match > .lead { flex: 0 1 auto; max-width: 60ch; margin: 0 0 0 auto; font-size: max(13px, calc(var(--t) * 0.28)); line-height: calc(var(--t) * 0.5); text-wrap: balance; }
+}
+
+/* Fragrance Matches, second design (Tiffany's card sketch, 11/24): wide cards, two to a row on a computer — the
+   product's cut-out on the left; name, what it is, families, why it fits the room and when it suits on the right;
+   a rule, then three actions in a line */
+.pmatch-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+@media (max-width: 960px) { .pmatch-grid { grid-template-columns: minmax(0, 1fr); } }
+.pmatch-wrap { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.pmatch { display: flex; flex-direction: column; flex: 1; border-radius: 22px; background: #fff; box-shadow: var(--shadow-card); overflow: hidden; }
+.pmatch__top { display: grid; grid-template-columns: 168px minmax(0, 1fr); gap: 20px; padding: 18px 20px 16px 18px; flex: 1; }
+.pmatch__pic { align-self: start; border-radius: 16px; overflow: hidden; }
+.pmatch__pic .ptile { height: 208px; }
+.pmatch__pic .ptile__art { height: 70%; max-width: 74%; }
+.pmatch__pic .ptile__label--corner { left: 10px; top: 10px; padding: 6px 10px 5px; }
+.pmatch__pic .ptile__brand { font-size: 16px; }
+.pmatch__body { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; min-width: 0; }
+.pmatch__name { margin: 0; font-family: var(--font-display); font-size: 24px; font-weight: 500; line-height: 1.15; }
+.pmatch__meta { font-size: 14px; color: var(--slate); }
+.pmatch__fams { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 14px; color: var(--slate); }
+.pmatch__fam { display: inline-flex; align-items: center; gap: 6px; }
+.pmatch__h { margin-top: 8px; font-size: 16px; font-weight: 600; color: var(--ink); }
+.pmatch__why { margin: 0; font-size: 15px; line-height: 1.55; color: var(--ink); }
+.pmatch__chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.pmatch__chip { padding: 3px 11px; border: 1px solid var(--line); border-radius: 999px; font-size: 13px; line-height: 1.5; color: var(--ink); }
+.pmatch__actions { display: flex; flex-wrap: wrap; align-items: center; padding: 4px 12px 6px; border-top: 1px solid var(--line); }
+.pmatch__act { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 10px; border: 0; background: transparent; font-family: var(--font-ui); font-size: 15px; font-weight: 500; color: var(--deep); text-decoration: none; cursor: pointer; }
+.pmatch__act + .pmatch__act::before { content: "·"; margin: 0 10px 0 -10px; color: var(--slate); }
+.pmatch__act:hover { text-decoration: underline; text-underline-offset: 4px; }
+.pmatch__act:disabled { color: var(--slate); cursor: default; text-decoration: none; }
+.pmatch__act:focus-visible { outline: 2px solid var(--deep); outline-offset: -2px; border-radius: 8px; }
+@media (max-width: 560px) {
+  .pmatch__top { display: flex; flex-direction: column; gap: 14px; padding: 14px; }
+  .pmatch__pic { align-self: stretch; }
+  .pmatch__pic .ptile { height: 150px; }
+  .pmatch__pic .ptile__art { max-width: 40%; }
+  .pmatch__name { font-size: 22px; }
+  .pmatch__actions { flex-direction: column; align-items: flex-start; padding: 4px 6px 6px; }
+  .pmatch__act + .pmatch__act::before { content: none; }
 }
