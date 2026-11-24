@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  ArrowLeft, ArrowRight, BookOpen, Bookmark, BookmarkCheck, CalendarDays, Check, ChevronDown, ChevronLeft, ChevronRight, CircleUserRound, Clock, Compass, Copy, Download,
+  ArrowDown, ArrowLeft, ArrowRight, BookOpen, Bookmark, BookmarkCheck, CalendarDays, Check, ChevronDown, ChevronLeft, ChevronRight, CircleUserRound, Clock, Compass, Copy, Download,
   DoorOpen, Drama, ExternalLink, Flame, FlaskConical, FlipHorizontal2, Gift, House, Image, ImagePlus, Instagram, Layers, Link2, Mail, Map as MapIcon, MapPin,
   Menu, Minus, Newspaper, Pause, Tag, PenLine, PencilRuler, Pin, Play, Plus, Redo2, RotateCcw, RotateCw, Scroll, SendToBack, Share2, Trash2, Undo2, X,
   Bath, Heart, Laptop, Leaf, Moon, PartyPopper, Sparkles, Sun, Users,
@@ -23,6 +23,8 @@ const ICONS = {
   pause: Pause,
   tag: Tag,
   arrowRight: ArrowRight,
+  // 11/24 handoff: the Rooms action bar points down to Fragrance Matches
+  arrowDown: ArrowDown,
   arrowLeft: ArrowLeft,
   chevronLeft: ChevronLeft,
   chevronRight: ChevronRight,

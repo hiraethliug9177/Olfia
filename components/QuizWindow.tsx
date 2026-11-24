@@ -15,8 +15,10 @@ const SAMPLE = "istj";
 /**
  * 05 Find your scent personality (v2, Tiffany's Notion 11/23): a small window at the bottom right of every page,
  * in place of the quiz section that used to sit on Home. It fades in once the first screen has scrolled by, folds
- * into a circle (on phones from the start; by itself in Capture and Rooms, from About Olfia down, and over the footer,
- * where it would cover things), and × closes it. It stays off the quiz page. After the quiz it shows your own character.
+ * into a circle (on phones from the start; by itself in Capture, Rooms and Scent Card, from About Olfia down, and over
+ * the footer, where it would cover things), and × closes it. It stays off the quiz page. After the quiz it shows your
+ * own character. In Rooms and Scent Card it rises above the studio's bar when the bar is at the foot of the screen, so
+ * it never sits on Save (11/24 handoff).
  */
 export function QuizWindow() {
   const path = usePathname() ?? "/";
@@ -28,6 +30,7 @@ export function QuizWindow() {
   const [aside, setAside] = useState(false);
   // what the person chose: "open" lasts until the next page (so Capture and Rooms can fold it again), "mini" lasts the visit
   const [choice, setChoice] = useState<"open" | "mini" | null>(null);
+  const [lift, setLift] = useState(0);
   const moved = useRef(false);
   const box = useRef<HTMLElement>(null);
 
@@ -70,6 +73,14 @@ export function QuizWindow() {
       const pastAbout = about ? about.getBoundingClientRect().top < h * 0.7 : false;
       const footOn = foot ? foot.getBoundingClientRect().top < h : false;
       setAside(pastAbout || footOn);
+      // a studio's bar (Rooms, Scent Card) or the Rooms drawer pinned to the foot of the screen: sit just above it
+      const low = [".ws__bar", ".desk__bar", ".ws__tray"].flatMap((sel) => {
+        const el = document.querySelector<HTMLElement>(sel);
+        if (!el || (sel === ".ws__tray" && getComputedStyle(el).position !== "sticky")) return [];
+        const r = el.getBoundingClientRect();
+        return r.bottom > h - 110 && r.top < h ? [r.top] : [];
+      });
+      setLift(low.length ? Math.max(0, Math.round(h - Math.min(...low) - 8)) : 0);
     };
     const ask = () => { if (!raf) raf = requestAnimationFrame(read); };
     read();
@@ -82,7 +93,7 @@ export function QuizWindow() {
     };
   }, [path]);
 
-  const busy = path.startsWith("/capture") || path.startsWith("/rooms");
+  const busy = path.startsWith("/capture") || path.startsWith("/rooms") || path === "/card";
   const mini = choice ? choice === "mini" : phone || busy || aside;
 
   // after a fold or an unfold the person asked for, focus follows to the control that replaced the one they pressed
@@ -103,7 +114,7 @@ export function QuizWindow() {
   };
 
   return (
-    <aside ref={box} className="qw" aria-label="Scent personality quiz">
+    <aside ref={box} className="qw" aria-label="Scent personality quiz" style={lift ? { bottom: 20 + lift } : undefined}>
       {mini ? (
         <button type="button" className="qw__mini" aria-label={result ? `${result.archetype.name}: open` : "Find your scent personality"} onClick={() => pick("open")}>
           {/* eslint-disable-next-line @next/next/no-img-element */}

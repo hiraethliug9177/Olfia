@@ -1,20 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
-import { FAMILIES, SEASON_OPTIONS, familyById, roomLabel, sceneName, texture, uid } from "@/lib/catalog";
+import { FAMILIES, SEASON_OPTIONS, familyById, methodLabel, roomLabel, sceneName, sourceLabel, texture, uid } from "@/lib/catalog";
 import { FAMILY_FILL, FAMILY_WASH } from "@/lib/colors";
 import { useAtlas, useMounted } from "@/lib/store";
 import { useToast } from "@/lib/toast";
 import { track } from "@/lib/analytics";
-import { hourStamp } from "@/lib/dates";
+import { hourStamp, shortDate } from "@/lib/dates";
 import { CutDefs } from "@/components/scene/Cutout";
 import { ScenePage } from "@/components/scene/ScenePage";
 import { Atmosphere } from "@/components/scene/Atmosphere";
 import { Stamp } from "@/components/scene/Stamp";
 import { CaptureScene } from "@/components/capture/CaptureScene";
 import { Icon } from "@/components/ui/Icon";
+import { onTabKeys } from "@/components/ui/tabKeys";
 import type { Entry, FamilyId } from "@/lib/types";
 
 type Shape = "circle" | "star" | "drop" | "spiral";
@@ -43,10 +44,25 @@ const TEMPLATES: Array<{ id: Template; label: string }> = [
   { id: "instant", label: "Instant" },
   { id: "postcard", label: "Postcard" },
 ];
+const RATIOS: Ratio[] = ["9:16", "3:4"];
+
+/**
+ * The desk's settings in three tabs (11/24 handoff, §2.5): Style is the card's look, Decorate its families and
+ * stickers, Details the words on it. Every control is the one that was there before, regrouped.
+ */
+type Tab = "style" | "decorate" | "details";
+const TABS: Array<{ id: Tab; label: string }> = [
+  { id: "style", label: "Style" },
+  { id: "decorate", label: "Decorate" },
+  { id: "details", label: "Details" },
+];
 
 const STAR = "polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)";
 const SHAPES: Shape[] = ["circle", "star", "drop", "spiral"];
+const DEFAULT_FAMS: FamilyId[] = ["woody", "spicy"];
 const CARD_W = 360;
+/** height of the template thumbnails; each template is drawn at the card's own 360px width and scaled down to it */
+const THUMB_H = 120;
 /** width / height of the stage inside a scene page (.scene-stage: 94% × 78% of a 360 × 520 sheet) */
 const STAGE = 338.4 / 405.6;
 /** width / height of the Capture picture */
@@ -96,6 +112,15 @@ function fromEntry(e: Entry | undefined) {
   return { families: e.families, notes: product || notes, line: e.sentence || e.situation || "", place: roomLabel(e.room) };
 }
 
+/** An entry's name in the source list, as Scent Atlas writes it, with the day it was made. */
+function entryLabel(e: Entry): string {
+  let title: string;
+  if (e.type === "rooms") title = e.nickname ? `${sceneName(e.sceneId)} · ${e.nickname}` : sceneName(e.sceneId);
+  else if (e.what.mode === "product") title = e.what.productName || e.what.scentName || sourceLabel(e.source);
+  else title = e.what.text || methodLabel(e.what.method);
+  return `${title} · ${shortDate(new Date(e.createdAt))}`;
+}
+
 /** Holds a picture of a fixed shape and crops it to fill whatever frame it is in. */
 function Crop({ aspect, children }: { aspect: number; children: ReactNode }) {
   return (
@@ -143,11 +168,11 @@ function Picture({ entry, show, base, families, atmosphere }: { entry: Entry | u
   );
 }
 
-function Toggle({ label, on, onChange }: { label: string; on: boolean; onChange: (v: boolean) => void }) {
+function Toggle({ label, on, onChange, row = false }: { label: string; on: boolean; onChange: (v: boolean) => void; row?: boolean }) {
   return (
-    <button type="button" role="switch" aria-checked={on} className="switch" onClick={() => onChange(!on)}>
+    <button type="button" role="switch" aria-checked={on} className={`switch switch--sm${row ? " switch--row" : ""}`} onClick={() => onChange(!on)}>
       {label}
-      <span className="switch__track"><span className="switch__knob" /></span>
+      <span className="switch__track" aria-hidden="true"><span className="switch__knob" /></span>
     </button>
   );
 }
@@ -155,6 +180,7 @@ function Toggle({ label, on, onChange }: { label: string; on: boolean; onChange:
 const pad = (n: number) => String(n).padStart(2, "0");
 
 export function CardStudio() {
+  const router = useRouter();
   const params = useSearchParams();
   const fromId = params.get("from");
   const mounted = useMounted();
@@ -163,7 +189,7 @@ export function CardStudio() {
   const show = useToast((s) => s.show);
   const source = entries.find((e) => e.id === fromId);
 
-  const [families, setFamilies] = useState<FamilyId[]>(["woody", "spicy"]);
+  const [families, setFamilies] = useState<FamilyId[]>(DEFAULT_FAMS);
   const [base, setBase] = useState<FamilyId>("woody");
   const [template, setTemplate] = useState<Template>("film");
   const [ratio, setRatio] = useState<Ratio>("9:16");
@@ -175,23 +201,47 @@ export function CardStudio() {
   const [showName, setShowName] = useState(true);
   const [showPhoto, setShowPhoto] = useState(false);
   const [showCity, setShowCity] = useState(false);
-  const [stickers, setStickers] = useState<Sticker[]>(() => defaultStickers(["woody", "spicy"]));
+  const [stickers, setStickers] = useState<Sticker[]>(() => defaultStickers(DEFAULT_FAMS));
   const [selected, setSelected] = useState<string | null>(null);
   const [when, setWhen] = useState<Date | null>(null);
   const [showStamp, setShowStamp] = useState(true);
   const [showAtmosphere, setShowAtmosphere] = useState(true);
   const [busy, setBusy] = useState(false);
-  const loaded = useRef(false);
+  /** while saving: the off-screen card the image is drawn from */
+  const [exporting, setExporting] = useState(false);
+  const [tab, setTab] = useState<Tab>("style");
+  /** phones: the settings are a sheet under the card, closed to its tabs until one is chosen */
+  const [sheet, setSheet] = useState(false);
+  /** the entry the card's words and picture came from (undefined until the first load; null for a blank card) */
+  const imported = useRef<string | null | undefined>(undefined);
   const photoRef = useRef<HTMLDivElement>(null);
-  const cardRef = useRef<HTMLDivElement>(null);
+  const exportRef = useRef<HTMLDivElement>(null);
+  /** the card is always laid out at the templates' own 360 px width and scaled to the space on the desk, so the preview
+   *  looks exactly like the saved image at any size (the type's 13 px minimum never reshapes a small preview) */
+  const frameRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(1);
   const drag = useRef<{ uid: string; dx: number; dy: number } | null>(null);
 
+  // The card starts from the entry in ?from= (a saved room or a captured moment), or blank. Choosing another entry or
+  // "Start from scratch" in the source row changes ?from= and the card takes that entry's words and picture; its
+  // template, ratio, stamp, atmosphere, name and city stay as they were.
   useEffect(() => {
-    if (!mounted || !hydrated || loaded.current) return;
-    loaded.current = true;
-    const d = fromEntry(source);
+    if (!mounted || !hydrated) return;
+    const key = source?.id ?? null;
+    if (imported.current === key) return;
+    const first = imported.current === undefined;
+    imported.current = key;
+    setSelected(null);
     setWhen(source ? new Date(source.createdAt) : new Date());
-    if (!d) return;
+    const d = fromEntry(source);
+    if (!d) {
+      if (!first) {
+        // back to a blank card: the same start as opening /card on its own
+        setFamilies(DEFAULT_FAMS); setBase("woody"); setNotes("Cedar · Clove · Vanilla"); setLine(""); setPlace("Reading Corner");
+        setShowPhoto(false); setStickers(defaultStickers(DEFAULT_FAMS));
+      }
+      return;
+    }
     const fams = d.families.length ? d.families : (["woody"] as FamilyId[]);
     setFamilies(fams);
     setBase(fams[0]);
@@ -202,6 +252,14 @@ export function CardStudio() {
     setShowPhoto(true);
     setStickers([]);
   }, [mounted, hydrated, source]);
+
+  useEffect(() => {
+    const el = frameRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => setScale(el.getBoundingClientRect().width / CARD_W));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   const toggleFamily = (f: FamilyId) => {
     setFamilies((cur) => {
@@ -236,11 +294,15 @@ export function CardStudio() {
   const onUp = () => { drag.current = null; };
 
   const render = async (): Promise<Blob | null> => {
-    const node = cardRef.current;
+    const node = exportRef.current;
     if (!node) return null;
     const { toBlob } = await import("html-to-image");
-    const pixelRatio = 1080 / node.offsetWidth;
-    const opts = { pixelRatio, cacheBust: true, backgroundColor: "#ffffff" };
+    // the off-screen card's pictures are the preview's, already loaded; make sure they are decoded before drawing
+    await Promise.all(Array.from(node.querySelectorAll("img")).map((img) => img.decode().catch(() => undefined)));
+    // the image is always 1080 × 1920 (9:16) or 1080 × 1440 (3:4): the 360 px card drawn three times larger.
+    // No backgroundColor: html-to-image paints it over the card's own background, which turned the Film template's
+    // charcoal strip and the Instant template's colour white in saved images.
+    const opts = { pixelRatio: 1, canvasWidth: 1080, canvasHeight: ratio === "9:16" ? 1920 : 1440, cacheBust: true };
     try {
       return await toBlob(node, opts);
     } catch {
@@ -252,7 +314,10 @@ export function CardStudio() {
     if (busy) return;
     setBusy(true);
     setSelected(null);
+    setExporting(true);
+    // let the off-screen card render and settle for two frames
     await new Promise((r) => setTimeout(r, 60));
+    await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
     try {
       const blob = await render();
       if (!blob) throw new Error("no image");
@@ -282,13 +347,13 @@ export function CardStudio() {
       show("Couldn’t create the image. Please try again.");
     } finally {
       setBusy(false);
+      setExporting(false);
     }
   };
 
   const fam = familyById(base);
   const sel = stickers.find((s) => s.uid === selected);
   const mats = families.flatMap((f) => familyById(f).materials);
-  const tIndex = TEMPLATES.findIndex((t) => t.id === template);
   const stamp = when ? hourStamp(when) : "";
   const monthDay = when ? `${pad(when.getMonth() + 1)} · ${pad(when.getDate())}` : undefined;
   const imprint = when ? `’${String(when.getFullYear()).slice(2)} ${pad(when.getMonth() + 1)} ${pad(when.getDate())}` : "";
@@ -298,98 +363,113 @@ export function CardStudio() {
   const cardStyle: CSSProperties = { aspectRatio: ratio === "9:16" ? "9 / 16" : "3 / 4" };
   const holes = Array.from({ length: ratio === "9:16" ? 21 : 16 }, (_, i) => i);
 
-  /** The picture frame every template shares: the room or moment, then the stickers on top. */
-  const frame = (cls: string, extra?: ReactNode) => (
-    <div
-      ref={photoRef}
-      className={`sc__frame ${cls}`}
-      onPointerMove={onMove}
-      onPointerUp={onUp}
-      onPointerCancel={onUp}
-      onPointerDown={(e) => { if (!(e.target as HTMLElement).closest(".sticker")) setSelected(null); }}
-    >
-      <Picture entry={source} show={showPhoto && !!source} base={base} families={families} atmosphere={showAtmosphere} />
-      <div className="polaroid__film" />
-      {stickers.map((s) => (
-        <button
-          key={s.uid}
-          type="button"
-          className="sticker"
-          aria-label={`${s.shape} sticker`}
-          aria-pressed={s.uid === selected}
-          onPointerDown={(e) => onDown(s.uid, e)}
-          onKeyDown={(e) => {
-            const k = e.key;
-            const step = 0.02;
-            if (k === "Delete" || k === "Backspace") { setStickers((cur) => cur.filter((x) => x.uid !== s.uid)); setSelected(null); return; }
-            const dx = k === "ArrowLeft" ? -step : k === "ArrowRight" ? step : 0;
-            const dy = k === "ArrowUp" ? -step : k === "ArrowDown" ? step : 0;
-            if (dx || dy) { e.preventDefault(); setStickers((cur) => cur.map((x) => (x.uid === s.uid ? { ...x, x: x.x + dx, y: x.y + dy } : x))); }
-          }}
-          style={{ left: `${s.x * 100}%`, top: `${s.y * 100}%`, rotate: `${s.rot}deg`, outline: s.uid === selected ? "2px dashed #4C527A" : undefined, outlineOffset: 6 }}
-        >
-          <StickerArt shape={s.shape} colors={s.colors} size={s.size} />
-        </button>
-      ))}
-      <div className="polaroid__grain" />
-      {extra}
-    </div>
-  );
+  /**
+   * One card in one template. "live" is the card in the middle of the desk, which stickers are dragged on; "export" is
+   * the same card at 360 px, off screen, that the saved image is drawn from; "thumb" is a still copy for the template
+   * thumbnails (no atmosphere layer, no SVG definitions of its own).
+   */
+  const face = (t: Template, mode: "live" | "export" | "thumb"): ReactNode => {
+    const live = mode === "live";
+    /** The picture frame every template shares: the room or moment, then the stickers on top. */
+    const frame = (cls: string, extra?: ReactNode) => (
+      <div
+        ref={live ? photoRef : undefined}
+        className={`sc__frame ${cls}`}
+        onPointerMove={live ? onMove : undefined}
+        onPointerUp={live ? onUp : undefined}
+        onPointerCancel={live ? onUp : undefined}
+        onPointerDown={live ? (e) => { if (!(e.target as HTMLElement).closest(".sticker")) setSelected(null); } : undefined}
+      >
+        <Picture entry={source} show={showPhoto && !!source} base={base} families={families} atmosphere={mode !== "thumb" && showAtmosphere} />
+        <div className="polaroid__film" />
+        {stickers.map((s) =>
+          live ? (
+            <button
+              key={s.uid}
+              type="button"
+              className="sticker"
+              aria-label={`${s.shape} sticker`}
+              aria-pressed={s.uid === selected}
+              onPointerDown={(e) => onDown(s.uid, e)}
+              onKeyDown={(e) => {
+                const k = e.key;
+                const step = 0.02;
+                if (k === "Delete" || k === "Backspace") { setStickers((cur) => cur.filter((x) => x.uid !== s.uid)); setSelected(null); return; }
+                const dx = k === "ArrowLeft" ? -step : k === "ArrowRight" ? step : 0;
+                const dy = k === "ArrowUp" ? -step : k === "ArrowDown" ? step : 0;
+                if (dx || dy) { e.preventDefault(); setStickers((cur) => cur.map((x) => (x.uid === s.uid ? { ...x, x: x.x + dx, y: x.y + dy } : x))); }
+              }}
+              style={{ left: `${s.x * 100}%`, top: `${s.y * 100}%`, rotate: `${s.rot}deg`, outline: s.uid === selected ? "2px dashed #4C527A" : undefined, outlineOffset: 6 }}
+            >
+              <StickerArt shape={s.shape} colors={s.colors} size={s.size} />
+            </button>
+          ) : (
+            <span key={s.uid} className="sticker" style={{ left: `${s.x * 100}%`, top: `${s.y * 100}%`, rotate: `${s.rot}deg` }}>
+              <StickerArt shape={s.shape} colors={s.colors} size={s.size} />
+            </span>
+          ),
+        )}
+        <div className="polaroid__grain" />
+        {extra}
+      </div>
+    );
 
-  const meta = (
-    <span className="sc__meta">
-      {where ? <span>{where}</span> : null}
-      <span>{stamp}</span>
-      {signedBy ? <span>— {signedBy}</span> : null}
-    </span>
-  );
+    const meta = (
+      <span className="sc__meta">
+        {where ? <span>{where}</span> : null}
+        <span>{stamp}</span>
+        {signedBy ? <span>— {signedBy}</span> : null}
+      </span>
+    );
+    const ref = mode === "export" ? exportRef : undefined;
+    const defs = mode === "thumb" ? null : <CutDefs prefix="card" />;
 
-  let card: ReactNode;
-  if (template === "film") {
-    card = (
-      <div ref={cardRef} className="sc sc-film" style={cardStyle}>
-        <CutDefs prefix="card" />
-        {(["l", "r"] as const).map((side) => (
-          <div key={side} className={`sc-film__holes sc-film__holes--${side}`} aria-hidden="true">
-            {holes.map((i) => <span key={i} style={{ top: `${i * 8.6 + 1.6}cqw` }} />)}
+    if (t === "film") {
+      return (
+        <div ref={ref} className="sc sc-film" style={cardStyle}>
+          {defs}
+          {(["l", "r"] as const).map((side) => (
+            <div key={side} className={`sc-film__holes sc-film__holes--${side}`} aria-hidden="true">
+              {holes.map((i) => <span key={i} style={{ top: `${i * 8.6 + 1.6}cqw` }} />)}
+            </div>
+          ))}
+          <span className="sc-film__edge sc-film__edge--l" style={{ top: "24cqw" }} aria-hidden="true">olfia 400</span>
+          <span className="sc-film__edge sc-film__edge--l" style={{ bottom: "20cqw" }} aria-hidden="true">olfia 400</span>
+          <span className="sc-film__edge sc-film__edge--r" style={{ top: "16cqw" }} aria-hidden="true">{frameNo} ▸</span>
+          <span className="sc-film__edge sc-film__edge--r" style={{ bottom: "24cqw" }} aria-hidden="true">{frameNo}A</span>
+          <div className="sc-film__strip">
+            <div className="sc-film__prev" style={{ backgroundImage: `url(${fam.texture})`, backgroundColor: fam.hex }} aria-hidden="true" />
+            {frame("sc-film__frame", showStamp ? <span className="sc__date">{imprint}</span> : null)}
+            <div className="sc-film__note" style={{ background: FAMILY_WASH[base] }}>
+              <span className="sc__notes">{notes}</span>
+              {line ? <span className="sc__line">{line}</span> : null}
+              <div className="sc__foot">{meta}<span className="sc__sig">Olfia</span></div>
+            </div>
           </div>
-        ))}
-        <span className="sc-film__edge sc-film__edge--l" style={{ top: "24cqw" }} aria-hidden="true">olfia 400</span>
-        <span className="sc-film__edge sc-film__edge--l" style={{ bottom: "20cqw" }} aria-hidden="true">olfia 400</span>
-        <span className="sc-film__edge sc-film__edge--r" style={{ top: "16cqw" }} aria-hidden="true">{frameNo} ▸</span>
-        <span className="sc-film__edge sc-film__edge--r" style={{ bottom: "24cqw" }} aria-hidden="true">{frameNo}A</span>
-        <div className="sc-film__strip">
-          <div className="sc-film__prev" style={{ backgroundImage: `url(${fam.texture})`, backgroundColor: fam.hex }} aria-hidden="true" />
-          {frame("sc-film__frame", showStamp ? <span className="sc__date">{imprint}</span> : null)}
-          <div className="sc-film__note" style={{ background: FAMILY_WASH[base] }}>
-            <span className="sc__notes">{notes}</span>
+        </div>
+      );
+    }
+    if (t === "instant") {
+      return (
+        <div ref={ref} className="sc sc-instant" style={{ ...cardStyle, background: FAMILY_WASH[base] }}>
+          {defs}
+          {frame("sc-instant__frame")}
+          <div className="sc-instant__foot">
             {line ? <span className="sc__line">{line}</span> : null}
+            <span className="sc__notes">{notes}</span>
             <div className="sc__foot">{meta}<span className="sc__sig">Olfia</span></div>
           </div>
+          {showStamp ? (
+            <div className="sc__postmark sc-instant__stamp" aria-hidden="true">
+              <Stamp family={base} size={96} rot={10} date={monthDay} />
+            </div>
+          ) : null}
         </div>
-      </div>
-    );
-  } else if (template === "instant") {
-    card = (
-      <div ref={cardRef} className="sc sc-instant" style={{ ...cardStyle, background: FAMILY_WASH[base] }}>
-        <CutDefs prefix="card" />
-        {frame("sc-instant__frame")}
-        <div className="sc-instant__foot">
-          {line ? <span className="sc__line">{line}</span> : null}
-          <span className="sc__notes">{notes}</span>
-          <div className="sc__foot">{meta}<span className="sc__sig">Olfia</span></div>
-        </div>
-        {showStamp ? (
-          <div className="sc__postmark sc-instant__stamp" aria-hidden="true">
-            <Stamp family={base} size={96} rot={10} date={monthDay} />
-          </div>
-        ) : null}
-      </div>
-    );
-  } else {
-    card = (
-      <div ref={cardRef} className="sc sc-post" style={{ ...cardStyle, "--stripe-a": fam.hex } as CSSProperties}>
-        <CutDefs prefix="card" />
+      );
+    }
+    return (
+      <div ref={ref} className="sc sc-post" style={{ ...cardStyle, "--stripe-a": fam.hex } as CSSProperties}>
+        {defs}
         <div className="sc-post__inner">
           <div className="sc-post__photo">
             <span className="tape tape--a" aria-hidden="true" />
@@ -422,110 +502,192 @@ export function CardStudio() {
         </div>
       </div>
     );
-  }
+  };
+
+  /* ---------- the source row: what this card is made from (11/24 handoff, §2.3) ---------- */
+
+  const saved = [...entries].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  const savedRooms = saved.filter((e) => e.type === "rooms");
+  const savedMoments = saved.filter((e) => e.type === "capture");
+  const sourceRow = (
+    <div className="desk__source">
+      <span className="ws-label" id="desk-source">Start with</span>
+      {!hydrated || saved.length ? (
+        <span className="ws-pick__box">
+          <select
+            className="ws-pick__select"
+            aria-labelledby="desk-source"
+            value={source?.id ?? ""}
+            disabled={!hydrated}
+            onChange={(e) => { if (e.target.value) router.replace(`/card?from=${e.target.value}`, { scroll: false }); }}
+          >
+            <option value="" disabled hidden>Choose from Scent Atlas</option>
+            {savedRooms.length ? (
+              <optgroup label="Rooms">
+                {savedRooms.map((e) => <option key={e.id} value={e.id}>{entryLabel(e)}</option>)}
+              </optgroup>
+            ) : null}
+            {savedMoments.length ? (
+              <optgroup label="Capture">
+                {savedMoments.map((e) => <option key={e.id} value={e.id}>{entryLabel(e)}</option>)}
+              </optgroup>
+            ) : null}
+          </select>
+          <Icon name="chevronDown" size={18} className="ws-pick__chev" />
+        </span>
+      ) : (
+        <Link href="/atlas" className="desk__atlas">Choose from Scent Atlas<Icon name="arrowRight" size={18} /></Link>
+      )}
+      {source ? (
+        <button type="button" className="desk__scratch" onClick={() => router.replace("/card", { scroll: false })}>Start from scratch</button>
+      ) : (
+        <p className="desk__or">or start from scratch</p>
+      )}
+    </div>
+  );
+
+  /* ---------- the three tabs ---------- */
+
+  const styleTab = (
+    <>
+      <div className="ws-group">
+        <span className="ws-label" id="desk-template">Template</span>
+        <div role="radiogroup" aria-labelledby="desk-template" className="tpl-row">
+          {TEMPLATES.map((t) => {
+            const h0 = ratio === "9:16" ? (CARD_W * 16) / 9 : (CARD_W * 4) / 3;
+            const s = THUMB_H / h0;
+            return (
+              <button key={t.id} type="button" role="radio" aria-checked={template === t.id} className="tpl" onClick={() => setTemplate(t.id)}>
+                <span className="tpl__thumb" aria-hidden="true">
+                  <span className="tpl__mini" style={{ width: Math.round(CARD_W * s), height: THUMB_H }}>
+                    <span className="tpl__scale" style={{ transform: `scale(${s})` }}>{face(t.id, "thumb")}</span>
+                  </span>
+                </span>
+                {t.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+      <div className="ws-group">
+        <span className="ws-label" id="desk-ratio">Aspect ratio</span>
+        <div role="radiogroup" aria-labelledby="desk-ratio" className="seg seg--soft">
+          {RATIOS.map((r) => (
+            <button key={r} type="button" role="radio" aria-checked={ratio === r} className="seg__opt" onClick={() => setRatio(r)}>{r}</button>
+          ))}
+        </div>
+      </div>
+      <div className="ws-group">
+        <span className="ws-label" id="desk-color">Color</span>
+        <div role="radiogroup" aria-labelledby="desk-color" className="desk-swatches">
+          {FAMILIES.map((f) => (
+            <button key={f.id} type="button" role="radio" aria-checked={base === f.id} aria-label={f.label} title={f.label} className="desk-swatch" style={{ background: f.hex }} onClick={() => setBase(f.id)} />
+          ))}
+        </div>
+      </div>
+      <div className="desk__switches">
+        <Toggle label="Stamp" on={showStamp} onChange={setShowStamp} />
+        <Toggle label="Atmosphere" on={showAtmosphere} onChange={setShowAtmosphere} />
+      </div>
+    </>
+  );
+
+  const decorateTab = (
+    <>
+      <div className="ws-group">
+        <span className="ws-label">Families</span>
+        <div className="chips">
+          {FAMILIES.map((f) => (
+            <button key={f.id} type="button" className="chip" aria-pressed={families.includes(f.id)} onClick={() => toggleFamily(f.id)}>
+              <span className="chip__dot" style={{ background: f.hex }} />{f.label}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="ws-group">
+        <span className="ws-label">Stickers</span>
+        <p className="ws-note">Drag a sticker to place it. Select it to resize or rotate.</p>
+        <div className="desk-stickers">
+          {mats.slice(0, 6).flatMap((m) => SHAPES.map((sh) => (
+            <button key={`${m.id}-${sh}`} type="button" className="desk-sticker" aria-label={`Add ${m.label} ${sh}`} title={`${m.label}`} onClick={() => addSticker(sh, m.colors)}>
+              <StickerArt shape={sh} colors={m.colors} size={0.075} unit="px" />
+            </button>
+          )))}
+        </div>
+      </div>
+    </>
+  );
+
+  const detailsTab = (
+    <div className="desk__fields">
+      <label className="ws-field">Notes<input className="input" value={notes} maxLength={48} onChange={(e) => setNotes(e.target.value)} /></label>
+      <label className="ws-field">One line<input className="input" value={line} maxLength={60} placeholder="What do you remember about this moment?" onChange={(e) => setLine(e.target.value)} /></label>
+      <label className="ws-field">Room<input className="input" value={place} maxLength={32} onChange={(e) => setPlace(e.target.value)} /></label>
+      <Toggle label="Show name" on={showName} onChange={setShowName} row />
+      {showName ? <label className="ws-field">Name<input className="input" value={name} maxLength={24} onChange={(e) => setName(e.target.value)} /></label> : null}
+      {source ? <Toggle label={source.type === "rooms" ? "Show room" : "Show moment"} on={showPhoto} onChange={setShowPhoto} row /> : null}
+      <Toggle label="Show city" on={showCity} onChange={setShowCity} row />
+      {showCity ? <label className="ws-field">City<input className="input" value={city} maxLength={24} onChange={(e) => setCity(e.target.value)} /></label> : null}
+    </div>
+  );
+
+  const tabIndex = TABS.findIndex((t) => t.id === tab);
+  const openTab = (t: Tab) => { setTab(t); setSheet(true); };
 
   return (
-    <div className="editor" style={{ alignItems: "flex-start" }}>
-      <div className="editor__tray" style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-        <div className="fieldset" style={{ padding: 20 }}>
-          <span className="legend" style={{ marginBottom: 0 }}>Template</span>
-          <div role="radiogroup" aria-label="Template" className="seg">
-            <span className="seg__thumb" aria-hidden="true" style={{ left: `calc(5px + (100% - 10px) * ${tIndex / 3})`, width: "calc((100% - 10px) / 3)" }} />
-            {TEMPLATES.map((t) => (
-              <button key={t.id} type="button" role="radio" aria-checked={template === t.id} className="seg__opt" style={{ padding: 0 }} onClick={() => setTemplate(t.id)}>{t.label}</button>
-            ))}
-          </div>
-          <span className="legend" style={{ marginBottom: 0, marginTop: 6 }}>Aspect ratio</span>
-          <div role="radiogroup" aria-label="Aspect ratio" className="seg">
-            <span className="seg__thumb" aria-hidden="true" style={{ left: ratio === "9:16" ? 5 : "50%", width: "calc(50% - 5px)" }} />
-            <button type="button" role="radio" aria-checked={ratio === "9:16"} className="seg__opt" onClick={() => setRatio("9:16")}>9:16</button>
-            <button type="button" role="radio" aria-checked={ratio === "3:4"} className="seg__opt" onClick={() => setRatio("3:4")}>3:4</button>
-          </div>
-        </div>
-        <div className="fieldset" style={{ padding: 20 }}>
-          <span className="legend" style={{ marginBottom: 0 }}>Color</span>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-            {FAMILIES.map((f) => (
-              <button key={f.id} type="button" aria-label={f.label} aria-pressed={base === f.id} onClick={() => setBase(f.id)}
-                style={{ width: 36, height: 36, borderRadius: "50%", border: 0, background: f.hex, boxShadow: base === f.id ? "0 0 0 3px #fff, 0 0 0 5px #4C527A" : "0 0 0 1px rgba(41,42,49,0.1)" }} />
-            ))}
-          </div>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 14, marginTop: 6 }}>
-            <Toggle label="Stamp" on={showStamp} onChange={setShowStamp} />
-            <Toggle label="Atmosphere" on={showAtmosphere} onChange={setShowAtmosphere} />
-          </div>
-          <span className="legend" style={{ marginBottom: 0, marginTop: 6 }}>Families</span>
-          <div className="chips">
-            {FAMILIES.map((f) => (
-              <button key={f.id} type="button" className="chip" aria-pressed={families.includes(f.id)} onClick={() => toggleFamily(f.id)} style={{ minHeight: 40, padding: "0 14px", fontSize: 15 }}>
-                <span className="chip__dot" style={{ background: f.hex }} />{f.label}
-              </button>
-            ))}
-          </div>
-        </div>
-        <div className="fieldset" style={{ padding: 20 }}>
-          <span className="legend" style={{ marginBottom: 0 }}>Stickers</span>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8 }}>
-            {mats.slice(0, 6).flatMap((m) => SHAPES.map((sh) => (
-              <button key={`${m.id}-${sh}`} type="button" className="tray-item" aria-label={`Add ${m.label} ${sh}`} onClick={() => addSticker(sh, m.colors)} style={{ padding: 8, minHeight: 56, justifyContent: "center" }}>
-                <StickerArt shape={sh} colors={m.colors} size={0.075} unit="px" />
-              </button>
-            )))}
+    <section className="desk" aria-label="Scent Card studio">
+      {sourceRow}
+
+      <div
+        className="desk__canvas"
+        onPointerDown={(e) => { const t = e.target as HTMLElement; if (!t.closest(".sc") && !t.closest(".ws-rail")) setSelected(null); }}
+      >
+        <div className="desk__stage" style={{ "--ar": ratio === "9:16" ? 0.5625 : 0.75 } as CSSProperties}>
+          <div ref={frameRef} className="desk__frame">
+            {/* a new template settles in (about 0.4 s); words, families, source and stickers stay as they are */}
+            <div key={template} className="desk__swap" style={{ transform: `scale(${scale})` }}>{face(template, "live")}</div>
+            {sel ? (
+              <div role="toolbar" aria-label="Selected sticker" aria-orientation="vertical" className="ws-rail ws-rail--r">
+                <button type="button" className="ws-tool" aria-label="Rotate" title="Rotate" onClick={() => patch((s) => ({ ...s, rot: (s.rot + 15) % 360 }))}><Icon name="rotateCw" /></button>
+                <button type="button" className="ws-tool" aria-label="Bigger" title="Bigger" onClick={() => patch((s) => ({ ...s, size: Math.min(0.5, s.size * 1.15) }))}><Icon name="plus" /></button>
+                <button type="button" className="ws-tool" aria-label="Smaller" title="Smaller" onClick={() => patch((s) => ({ ...s, size: Math.max(0.06, s.size / 1.15) }))}><Icon name="minus" /></button>
+                <span className="ws-rail__sep" aria-hidden="true" />
+                <button type="button" className="ws-tool" aria-label="Delete sticker" title="Delete sticker" onClick={() => { setStickers((cur) => cur.filter((x) => x.uid !== selected)); setSelected(null); }}><Icon name="trash" /></button>
+              </div>
+            ) : null}
           </div>
         </div>
       </div>
 
-      <div className="editor__stage" style={{ alignItems: "center" }}>
-        <div className="stage-box" style={{ width: "100%", padding: "32px 16px" }} onPointerDown={(e) => { if (e.target === e.currentTarget) setSelected(null); }}>
-          {card}
-        </div>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "center", minHeight: 44 }}>
-          {sel ? (
-            <>
-              <button type="button" className="tool" aria-label="Rotate" onClick={() => patch((s) => ({ ...s, rot: (s.rot + 15) % 360 }))}><Icon name="rotateCw" /></button>
-              <button type="button" className="tool" aria-label="Bigger" onClick={() => patch((s) => ({ ...s, size: Math.min(0.5, s.size * 1.15) }))}><Icon name="plus" /></button>
-              <button type="button" className="tool" aria-label="Smaller" onClick={() => patch((s) => ({ ...s, size: Math.max(0.06, s.size / 1.15) }))}><Icon name="minus" /></button>
-              <button type="button" className="tool" aria-label="Delete sticker" onClick={() => { setStickers((cur) => cur.filter((x) => x.uid !== selected)); setSelected(null); }}><Icon name="trash" /></button>
-            </>
-          ) : <span className="muted" style={{ fontSize: 15, alignSelf: "center" }}>Drag a sticker to place it. Select it to resize or rotate.</span>}
+      <div className={`desk__insp${sheet ? " is-open" : ""}`}>
+        <div className="desk__insp-in">
+          <button type="button" className="ws__handle" aria-expanded={sheet} aria-controls="desk-panel" aria-label={sheet ? "Close the settings" : "Open the settings"} onClick={() => setSheet((v) => !v)}>
+            <span aria-hidden="true" />
+          </button>
+          <div role="tablist" aria-label="Customize your card" className="ws-tabs" onKeyDown={(e) => onTabKeys(e, TABS.length, tabIndex, (i) => openTab(TABS[i].id))}>
+            {TABS.map((t) => (
+              <button key={t.id} type="button" role="tab" id={`desk-tab-${t.id}`} aria-controls="desk-panel" aria-selected={tab === t.id} tabIndex={tab === t.id ? 0 : -1} className="ws-tab" onClick={() => openTab(t.id)}>{t.label}</button>
+            ))}
+          </div>
+          <div id="desk-panel" role="tabpanel" aria-labelledby={`desk-tab-${tab}`} className="desk__panel">
+            {tab === "style" ? styleTab : tab === "decorate" ? decorateTab : detailsTab}
+          </div>
         </div>
       </div>
 
-      <div className="editor__panel">
-        <div className="fieldset" style={{ padding: 20 }}>
-          <label className="field">Notes<input className="input" value={notes} maxLength={48} onChange={(e) => setNotes(e.target.value)} /></label>
-          <label className="field">One line<input className="input" value={line} maxLength={60} placeholder="What do you remember about this moment?" onChange={(e) => setLine(e.target.value)} /></label>
-          <label className="field">Room<input className="input" value={place} maxLength={32} onChange={(e) => setPlace(e.target.value)} /></label>
-          <Toggle label="Show name" on={showName} onChange={setShowName} />
-          {showName ? <label className="field">Name<input className="input" value={name} maxLength={24} onChange={(e) => setName(e.target.value)} /></label> : null}
-          {source ? <Toggle label={source.type === "rooms" ? "Show room" : "Show moment"} on={showPhoto} onChange={setShowPhoto} /> : null}
-          <Toggle label="Show city" on={showCity} onChange={setShowCity} />
-          {showCity ? <label className="field">City<input className="input" value={city} maxLength={24} onChange={(e) => setCity(e.target.value)} /></label> : null}
+      {exporting ? <div className="desk__export" aria-hidden="true">{face(template, "export")}</div> : null}
+
+      {/* 11/24 handoff (§2.7): one Share (the phone's share sheet, else a download) and Save image */}
+      <div className="desk__bar">
+        <div className="ws__status">
+          <span className="ws__status-name">Your card</span>
+          <span className="ws__status-line">PNG · 1080 px wide</span>
         </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          <button type="button" className="btn btn--primary" disabled={busy} onClick={() => exportCard("download")}>{busy ? "Creating image…" : `Save image · ${ratio}`}</button>
-          <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
-            <button type="button" className="tool" aria-label="Share to Instagram" title="Instagram" disabled={busy} onClick={() => exportCard("share")} style={{ borderRadius: "50%", width: 48, height: 48 }}>
-              <Icon name="instagram" />
-            </button>
-            {[
-              { id: "xhs", label: "小红书", d: "M5 4h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V5a1 1 0 011-1zm3 5h8M8 12h8M8 15h5" },
-              { id: "pin", label: "Pinterest", d: "M12 3a8 8 0 00-2.9 15.4c-.1-.7-.1-1.7 0-2.4l1-4.2s-.3-.5-.3-1.3c0-1.2.7-2.1 1.6-2.1.7 0 1.1.6 1.1 1.2 0 .8-.5 1.9-.7 2.9-.2.9.4 1.6 1.3 1.6 1.5 0 2.7-1.6 2.7-4 0-2.1-1.5-3.5-3.6-3.5-2.5 0-3.9 1.8-3.9 3.7 0 .7.3 1.5.6 2" },
-              { id: "x", label: "X", d: "M4 4l16 16M20 4L4 20" },
-            ].map((s) => (
-              <button key={s.id} type="button" className="tool" aria-label={`Share to ${s.label}`} title={s.label} disabled={busy} onClick={() => exportCard("share")} style={{ borderRadius: "50%", width: 48, height: 48 }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={s.d} /></svg>
-              </button>
-            ))}
-          </div>
-          <span className="muted" style={{ fontSize: 14, textAlign: "center" }}>PNG · 1080 px wide</span>
-          {!source && mounted ? (
-            <span style={{ fontSize: 15, textAlign: "center" }}>
-              Start with a saved entry: <Link href="/atlas">Scent Atlas</Link>
-            </span>
-          ) : null}
+        <div className="ws__actions">
+          <button type="button" className="btn btn--ghost" disabled={busy} onClick={() => exportCard("share")}><Icon name="share" size={18} />Share</button>
+          <button type="button" className="btn btn--primary" disabled={busy} onClick={() => exportCard("download")}><Icon name="download" size={18} />{busy ? "Creating image…" : <>Save image<span className="desk__ratio"> · {ratio}</span></>}</button>
         </div>
       </div>
-    </div>
+    </section>
   );
 }

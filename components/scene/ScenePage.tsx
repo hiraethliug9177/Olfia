@@ -49,6 +49,8 @@ export interface ScenePageProps {
   /** Scent View: the product brought forward */
   focusUid?: string | null;
   onItemHover?: (uid: string | null) => void;
+  /** the item being dragged right now: it lifts a little off the page and settles when it is let go (11/24 handoff) */
+  lifted?: string | null;
 }
 
 interface TagAnchor { uid: string; x: number; top: number; mark: { x: number; y: number }; title: string; notes: string }
@@ -150,6 +152,7 @@ export function ScenePage({
   overlay,
   focusUid,
   onItemHover,
+  lifted,
 }: ScenePageProps) {
   const fams = families.slice(0, 3).map(familyById);
   const source = [...items].reverse().find((i) => itemById(i.kind)?.category === "source");
@@ -245,6 +248,7 @@ export function ScenePage({
               isScent && (emphasizeScent || view === "scent") ? " scene-item--scent" : "",
               view === "scent" && !isScent ? (isMat ? " scene-item--soft" : " scene-item--dim") : "",
               view === "scent" && focusUid && isScent && focusUid !== it.uid ? " scene-item--back" : "",
+              lifted === it.uid ? " is-lifted" : "",
             ].join("");
             const inner = (
               <>

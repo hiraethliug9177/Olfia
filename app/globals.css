@@ -631,38 +631,10 @@ section[id] { scroll-margin-top: 24px; }
 .polaroid__foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 64px; }
 .sticker { position: absolute; padding: 0; border: 0; background: transparent; translate: -50% -50%; cursor: grab; touch-action: none; }
 
-/* ---------- rooms editor ---------- */
+/* ---------- rooms: the saved-rooms strip; .tool is also used by Scent Atlas ---------- */
 .strip { display: flex; gap: 16px; overflow-x: auto; padding: 4px 2px 16px; }
-.editor { display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start; }
-.editor__tray { flex: 1 1 230px; max-width: 280px; min-width: 220px; padding: 18px; display: flex; flex-direction: column; gap: 14px; }
-.editor__tray-body { display: flex; flex-direction: column; gap: 14px; }
-.editor__handle { display: none; }
-/* Phones (11/17): the room comes first; furniture, scent and materials sit in a drawer pinned to the bottom of
-   the screen while the editor is in view. Closed it shows only its tabs; a tab or the handle opens it. */
-@media (max-width: 700px) {
-  .editor__stage { order: -1; }
-  .editor__tray { order: 2; flex-basis: 100%; max-width: none; min-width: 0; position: sticky; bottom: 0; z-index: 30;
-    padding: 4px 14px calc(12px + env(safe-area-inset-bottom)); gap: 10px; border-radius: 22px 22px 0 0;
-    box-shadow: 0 -12px 30px rgba(41,42,49,0.16); }
-  .editor__handle { display: flex; align-self: center; justify-content: center; align-items: center; width: 64px; height: 24px; padding: 0; border: 0; background: none; }
-  .editor__handle span { width: 40px; height: 4px; border-radius: 999px; background: rgba(41,42,49,0.28); }
-  .editor__tray:not(.is-open) .editor__tray-body { display: none; }
-  .editor__tray-body { max-height: 52vh; overflow-y: auto; overscroll-behavior: contain; }
-  .editor__tray .tray-groups { max-height: none; overflow: visible; }
-}
-.editor__stage { flex: 3 1 480px; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
-.editor__panel { flex: 1 1 280px; max-width: 340px; min-width: 260px; display: flex; flex-direction: column; gap: 22px; }
 .tool { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border: 0; border-radius: 12px; background: #fff; color: var(--ink); box-shadow: 0 2px 6px rgba(41,42,49,0.12); }
 .tool:disabled { opacity: 0.4; cursor: not-allowed; }
-.tray-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-.tray-item { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 12px 6px; border: 1px solid rgba(41,42,49,0.08); border-radius: 16px; background: var(--ivory); font-size: 14px; font-weight: 600; }
-.tray-item:hover { border-color: var(--deep); }
-.tray-item__art { width: 64px; height: 64px; display: flex; align-items: flex-end; justify-content: center; }
-.stage-box { position: relative; border-radius: 26px; background: var(--mist); padding: 24px; display: flex; justify-content: center; }
-.stage-box .scene-sheet { max-width: 560px; }
-@media (max-width: 1100px) {
-  .editor__tray, .editor__panel { max-width: none; }
-}
 
 /* ---------- atlas ---------- */
 .folder-tabs { display: flex; gap: 6px; padding-left: 24px; }
@@ -1012,8 +984,6 @@ a.pcard:hover { color: var(--ink); transform: translateY(-3px); }
   .dial-panel { padding: 22px; }
 }
 
-.tray-groups { display: flex; flex-direction: column; gap: 18px; max-height: min(70vh, 720px); overflow-y: auto; padding-right: 4px; }
-.tray-group__h { font-size: 14px; font-weight: 600; color: var(--slate); }
 
 /* ---------- analog finish (2026-11-10): film grain, soft focus, glass ---------- */
 body::after {
@@ -1268,7 +1238,9 @@ body::after {
 .sc__line { font-family: var(--font-hand); font-weight: 700; font-size: 7.4cqw; line-height: 1.02; color: var(--ink); overflow-wrap: anywhere; }
 .sc__meta { display: flex; flex-direction: column; gap: 0.3cqw; min-width: 0; font-family: var(--font-ui); font-size: max(13px, 3.6cqw); line-height: 1.35; color: var(--slate); }
 .sc__meta span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.sc__foot > .sc__meta { flex: 1 1 auto; max-width: 100%; }
+/* basis 0, not auto (11/24): the saved image copies each element's laid-out width, and a meta block copied at its
+   grown width filled the row exactly, so the "Olfia" signature wrapped below it and was cut off in saved Film cards */
+.sc__foot > .sc__meta { flex: 1 1 0; max-width: 100%; }
 .sc__foot { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 1cqw 3cqw; margin-top: auto; }
 .sc__foot > .sc__sig { margin-left: auto; }
 .sc__sig { flex: none; font-family: var(--font-hand); font-weight: 700; font-size: 9cqw; line-height: 0.9; color: var(--deep); rotate: -7deg; }
@@ -1320,12 +1292,6 @@ body::after {
 .sc-post__line--notes { font-weight: 600; color: var(--ink); }
 .sc-post__sig { position: absolute; right: 0; bottom: 1.6cqw; }
 
-/* Rooms: the three rooms as one more setting in the panel (11/18, Tiffany: same style as Time of day, below the name).
-   Same control as Time of day; in a narrow panel "Reading Corner" takes two lines rather than shrinking. */
-.seg--wrap .seg__opt { min-height: 42px; padding: 4px 6px; line-height: 1.15; white-space: normal; }
-/* in the narrow panel beside the stage (laptops), both choices step down to 13px so "Afternoon" and "Bathroom" fit */
-.editor__panel { container-type: inline-size; }
-@container (max-width: 300px) { .editor__panel .seg__opt { font-size: 13px; } }
 
 /* ---------- Copy v1 (Tiffany 11/24): plain styles for the new copy blocks; the design pass comes later ---------- */
 .signup__body { margin: 0; font-size: 15px; color: var(--slate); }
@@ -1438,8 +1404,10 @@ h1, h2, h3, h4, .h-page, .h-section { text-wrap: balance; }
 .about__photo .tape { width: 92px; height: 24px; }
 .about__photo .tape--a { left: -26px; top: -6px; rotate: -28deg; }
 .about__photo .tape--b { right: -26px; top: -6px; rotate: 26deg; }
-.sticker { position: absolute; z-index: 4; pointer-events: none; filter: drop-shadow(0 3px 4px rgba(41, 42, 49, 0.22)); }
-.sticker img { display: block; width: 100%; height: auto; }
+/* (scoped to the photo frame on 11/24: as a bare .sticker this rule also reached the Scent Card's stickers and switched
+   off their pointer events, so they could no longer be selected or dragged) */
+.about__photo .sticker { position: absolute; z-index: 4; pointer-events: none; filter: drop-shadow(0 3px 4px rgba(41, 42, 49, 0.22)); }
+.about__photo .sticker img { display: block; width: 100%; height: auto; }
 .sticker--rose { left: -30px; bottom: 70px; width: 72px; rotate: -16deg; }
 .sticker--lavender { right: -24px; top: 34%; width: 44px; rotate: 14deg; }
 .sticker--orange { right: -20px; bottom: -14px; width: 62px; rotate: 20deg; }
@@ -1568,14 +1536,7 @@ h1, h2, h3, h4, .h-page, .h-section { text-wrap: balance; }
 .plans__faq-h { margin: 22px 0 6px; }
 
 /* ---------- Rooms v2 (design round 11/24, Tiffany's Notion 11/23): views, notes tags, Scent View, Photo View ---------- */
-.editor__views { width: 100%; }
-.editor__views .seg__opt { min-height: 46px; font-size: 15px; }
-.editor__tools { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; min-height: 44px; }
-.editor__toolbar { position: absolute; left: 16px; bottom: 16px; flex-wrap: wrap; max-width: calc(100% - 32px); z-index: 5; }
-.switch--pill { width: auto; justify-content: flex-start; gap: 10px; min-height: 44px; padding: 0 16px; border-radius: 999px; background: #fff; font-size: 15px; }
-.tray-item--scent .tray-item__art { width: 72px; height: 72px; }
 .field__error { font-size: 14px; line-height: 1.5; color: #9A4B3F; }
-@media (max-width: 480px) { .editor__views .seg__opt { font-size: 13px; padding: 0 4px; } }
 
 /* Room View: fragrance products are larger and sit on a soft, breathing halo of their family's mid tone */
 .scene-item { transition: opacity 0.6s var(--ease), filter 0.6s var(--ease); }
@@ -1616,27 +1577,11 @@ span.note-tag { cursor: default; }
 
 /* the sensory sliders of Scent View */
 /* Scent View sliders (Tiffany's sensory sketch, 11/24): the two words over each track, then the impression they make */
-.senses { display: flex; flex-direction: column; gap: 12px; }
-.sense { display: flex; flex-direction: column; gap: 2px; font-size: 14px; font-weight: 500; color: var(--slate); }
-.sense__ends { display: flex; justify-content: space-between; gap: 12px; }
 .impression { display: flex; align-items: center; gap: 18px; padding-top: 16px; border-top: 1px solid var(--line); }
 .impression__text { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .impression__h { font-size: 16px; font-weight: 600; color: var(--ink); }
 .impression__words { font-size: 14px; color: var(--slate); }
 .swatch { flex: none; width: 76px; height: 76px; border-radius: 50%; }
-
-/* Rooms start (Tiffany's flow, 11/24): feeling, then space, then fragrance, above a new room */
-.room-start { display: flex; flex-wrap: wrap; align-items: stretch; gap: 14px 0; padding: 18px 22px; }
-.room-start__step { display: flex; align-items: center; min-width: 0; }
-.room-start__arrow { flex: none; margin: 22px 18px 0; color: var(--slate); }
-.room-start__group { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
-.room-start__h { font-size: 15px; font-weight: 600; color: var(--ink); }
-.room-start__opts { display: flex; flex-wrap: wrap; gap: 6px; }
-.room-start__opts .chip { min-height: 38px; padding: 0 12px; font-size: 14px; }
-@media (max-width: 860px) {
-  .room-start { flex-direction: column; padding: 16px; }
-  .room-start__arrow { display: none; }
-}
 
 /* Photo View: the room's photo beside its collage, split by a line you can drag */
 .photo-layer { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1500; }
@@ -1827,4 +1772,339 @@ span.note-tag { cursor: default; }
   .pmatch__name { font-size: 22px; }
   .pmatch__actions { flex-direction: column; align-items: flex-start; padding: 4px 6px 6px; }
   .pmatch__act + .pmatch__act::before { content: none; }
+}
+
+/* ---------- Studios (Tiffany's UI/UX handoff, 11/24): Rooms, the atmosphere workshop; Scent Card, the memory-making desk ----------
+   Canvas first. Each page has its own grid instead of the shared flex row that wrapped; the room sheet and the card are
+   sized from the space the screen leaves them, so the whole picture, its tools and the save buttons are in view
+   together, while the side panels scroll on their own. Both studios share the compact head, the desk surface, the soft
+   segmented controls, text tabs, small switches, tool rails and the action bar. Colours stay inside the brand guide:
+   the desk is a mix of Ivory and Mist, lines are Charcoal at low strength. */
+
+/* the head: on a computer the title (one line) and its lead share a row, the lead's last line on the title's baseline */
+.studio-head { display: flex; flex-direction: column; gap: 10px; margin: 0 0 22px; }
+.studio-head > .h-page { font-size: clamp(34px, 2.1vw + 12px, 42px); line-height: 1.04; letter-spacing: -0.02em; }
+.studio-head > .lead { margin: 0; font-size: 14px; line-height: 1.6; max-width: 62ch; text-wrap: balance; }
+@media (min-width: 1100px) {
+  .studio-head { flex-direction: row; align-items: flex-end; align-items: last baseline; justify-content: space-between; gap: 48px; }
+  .studio-head > .h-page { flex: none; white-space: nowrap; }
+  .studio-head > .lead { flex: 0 1 auto; max-width: 68ch; }
+}
+
+/* shared parts */
+.ws, .desk {
+  --mat: color-mix(in srgb, var(--ivory) 58%, var(--mist));
+  --rail: 48px;
+  position: relative; display: grid; border: 1px solid var(--line); border-radius: 24px; background: #fff;
+  box-shadow: var(--shadow-card); overflow: clip;
+}
+.ws__canvas, .desk__canvas {
+  background-color: var(--mat);
+  background-image: radial-gradient(rgba(41,42,49,0.1) 0.9px, transparent 1.15px);
+  background-size: 16px 16px; background-position: 8px 8px;
+}
+.ws-label { margin: 0; font-size: 14px; font-weight: 600; line-height: 1.4; color: var(--ink); }
+.ws-label .field__hint { font-size: 13px; font-weight: 400; }
+.ws-group { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.ws-note { margin: 0; font-size: 13px; line-height: 1.6; color: var(--slate); }
+.ws-field { display: flex; flex-direction: column; gap: 8px; font-size: 14px; font-weight: 600; color: var(--ink); }
+.ws-field .input { min-height: 44px; padding: 0 14px; border-radius: 12px; font-size: 15px; }
+.ws-field .input.hand { font-size: 21px; }
+
+/* segmented control, soft: the chosen option is a white pill with Periwinkle deep text on a light track */
+.seg--soft { gap: 2px; padding: 3px; background: rgba(41,42,49,0.06); }
+.seg--soft .seg__opt { flex: 1 1 0; min-height: 34px; padding: 0 12px; border-radius: 999px; font-size: 14px; font-weight: 600; color: var(--slate); white-space: nowrap; transition: background-color 0.2s, color 0.2s, box-shadow 0.2s; }
+.seg--soft .seg__opt:hover { color: var(--ink); }
+.seg--soft .seg__opt[aria-selected="true"], .seg--soft .seg__opt[aria-checked="true"] { background: #fff; color: var(--deep); box-shadow: 0 1px 2px rgba(41,42,49,0.14), 0 0 0 1px rgba(41,42,49,0.05); }
+/* options as wide as their words ("Reading Corner" next to "Kitchen") */
+.seg--fit .seg__opt { flex: 1 1 auto; padding: 0 7px; font-size: 13px; }
+
+/* text tabs with a Periwinkle deep line under the open one */
+.ws-tabs { display: flex; gap: 22px; border-bottom: 1px solid var(--line); }
+.ws-tab { position: relative; min-height: 44px; padding: 0; border: 0; background: none; font-size: 14px; font-weight: 600; color: var(--slate); transition: color 0.2s; }
+.ws-tab:hover { color: var(--ink); }
+.ws-tab[aria-selected="true"] { color: var(--deep); }
+.ws-tab[aria-selected="true"]::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; border-radius: 1px; background: var(--deep); }
+.ws-tab:focus-visible { outline-offset: -2px; }
+
+/* small switch: label first, then the track */
+.switch--sm { width: auto; min-height: 36px; justify-content: flex-start; gap: 10px; font-size: 14px; font-weight: 500; }
+.switch--sm .switch__track { width: 36px; height: 22px; }
+.switch--sm .switch__knob { width: 16px; height: 16px; }
+.switch--sm[aria-checked="true"] .switch__knob { left: 17px; }
+.switch--row { width: 100%; justify-content: space-between; font-weight: 600; }
+
+/* a compact choice (native select) with its label above */
+.ws-pick { display: flex; flex-direction: column; gap: 6px; min-width: 0; font-size: 13px; font-weight: 600; color: var(--slate); }
+.ws-pick__box { position: relative; display: block; min-width: 0; }
+.ws-pick__select { display: block; width: 100%; height: 44px; padding: 0 40px 0 14px; border: 1px solid var(--line); border-radius: 12px; background: #fff; font-size: 15px; font-weight: 500; color: var(--ink); text-overflow: ellipsis; appearance: none; -webkit-appearance: none; cursor: pointer; transition: border-color 0.2s; }
+.ws-pick__select:hover { border-color: rgba(76,82,122,0.55); }
+.ws-pick__chev { position: absolute; right: 13px; top: 50%; translate: 0 -50%; color: var(--slate); pointer-events: none; }
+
+/* range: a thin track filled in Periwinkle deep; the two-sided one fills from its middle toward the end it leans to */
+.rng { --track: rgba(41,42,49,0.14); display: block; width: 100%; height: 22px; margin: 0; background: transparent; cursor: pointer; appearance: none; -webkit-appearance: none; }
+.rng:focus-visible { outline: none; }
+.rng::-webkit-slider-runnable-track { height: 4px; border-radius: 999px; background: linear-gradient(90deg, var(--deep) 0 var(--v, 50%), var(--track) var(--v, 50%) 100%); }
+.rng::-moz-range-track { height: 4px; border-radius: 999px; background: linear-gradient(90deg, var(--deep) 0 var(--v, 50%), var(--track) var(--v, 50%) 100%); }
+.rng::-webkit-slider-thumb { width: 18px; height: 18px; margin-top: -7px; border: 3px solid #fff; border-radius: 50%; background: var(--deep); box-shadow: 0 1px 4px rgba(41,42,49,0.35); -webkit-appearance: none; appearance: none; }
+.rng::-moz-range-thumb { width: 12px; height: 12px; border: 3px solid #fff; border-radius: 50%; background: var(--deep); box-shadow: 0 1px 4px rgba(41,42,49,0.35); }
+.rng:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--deep); }
+.rng:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--deep); }
+.rng--bi::-webkit-slider-runnable-track { background: linear-gradient(90deg, var(--track) 0 var(--lo), var(--deep) var(--lo) var(--hi), var(--track) var(--hi) 100%); }
+.rng--bi::-moz-range-track { background: linear-gradient(90deg, var(--track) 0 var(--lo), var(--deep) var(--lo) var(--hi), var(--track) var(--hi) 100%); }
+.rng-ends { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; color: var(--slate); }
+
+/* Scent View: five two-sided sliders; the word each one leans to darkens, the middle is marked */
+.bis { display: flex; flex-direction: column; gap: 14px; }
+.bi { display: flex; flex-direction: column; gap: 4px; }
+.bi__ends { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; font-weight: 500; color: var(--slate); }
+.bi__ends > span { transition: color 0.2s; }
+.bi__ends > .is-on { color: var(--ink); font-weight: 600; }
+.bi__track { position: relative; display: block; }
+.bi__track::before { content: ""; position: absolute; left: 50%; top: 50%; width: 2px; height: 12px; translate: -50% -50%; border-radius: 1px; background: rgba(41,42,49,0.22); pointer-events: none; }
+
+/* tool rails beside the picture: outside the room or card, in a place that does not move */
+.ws-rail { position: absolute; top: 0; z-index: 4; display: flex; flex-direction: column; gap: 2px; padding: 4px; border-radius: 16px; background: rgba(255,255,255,0.88); backdrop-filter: blur(10px); box-shadow: 0 6px 18px rgba(41,42,49,0.1), 0 0 0 1px rgba(41,42,49,0.05); }
+.ws-rail--l { right: calc(100% + 18px); }
+.ws-rail--r { left: calc(100% + 18px); }
+.ws-rail__sep { flex: none; width: 24px; height: 1px; margin: 3px auto; background: var(--line); }
+.ws-tool { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; padding: 0; border: 0; border-radius: 12px; background: transparent; color: var(--ink); transition: background-color 0.15s, color 0.15s; }
+.ws-tool:hover:not(:disabled) { background: var(--mist); color: var(--deep); }
+.ws-tool[aria-pressed="true"], .ws-tool[aria-expanded="true"] { background: var(--mist); color: var(--deep); }
+.ws-tool:disabled { color: rgba(41,42,49,0.28); cursor: not-allowed; }
+@media (pointer: coarse) { .ws-tool { width: 44px; height: 44px; } }
+.ws__caption { position: absolute; left: 50%; top: calc(100% + 11px); z-index: 3; max-width: 100%; margin: 0; translate: -50% 0; font-size: 13px; line-height: 1.4; color: var(--slate); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; pointer-events: none; }
+.ws__caption b { font-weight: 600; color: var(--ink); }
+
+/* the bar under each studio: what this is on the left, the actions on the right */
+.ws__bar, .desk__bar { grid-area: bar; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; padding: 12px 20px; border-top: 1px solid var(--line); background: #fff; }
+.ws__status { display: flex; flex-direction: column; gap: 1px; min-width: 0; margin-right: auto; }
+.ws__status-name { overflow: hidden; font-family: var(--font-display); font-size: 19px; line-height: 1.25; color: var(--ink); white-space: nowrap; text-overflow: ellipsis; }
+.ws__status-name .hand { margin-left: 8px; font-size: 22px; font-weight: 700; color: var(--deep); }
+.ws__status-line { font-size: 13px; color: var(--slate); }
+.ws__jump { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-size: 14px; font-weight: 600; text-decoration: none; }
+.ws__jump:hover { text-decoration: underline; }
+.ws__actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.ws__actions .btn { height: 44px; padding: 0 22px; gap: 8px; font-size: 15px; }
+
+/* the dragged object lifts a little and settles when it is let go */
+.scene-item--btn.is-lifted { translate: 0 -3px; filter: drop-shadow(0 12px 12px rgba(41,42,49,0.22)); transition: translate 0.15s var(--ease), filter 0.15s var(--ease); cursor: grabbing; }
+
+/* ---------- Rooms: the atmosphere workshop ---------- */
+.rooms-page { display: flex; flex-direction: column; gap: 48px; }
+.ws {
+  /* what has to stay on screen with the room sheet: header, the canvas's head row and padding, the caption, the bar */
+  /* on a computer the middle row is one screen tall, less the header and the bar, so the room and the save buttons are
+     in view together once the workshop is scrolled to; on tablets and phones the room's size comes from --ws-chrome */
+  --ws-row: clamp(520px, calc(100svh - 160px), 900px);
+  --ws-chrome: 268px; --ws-tray: 248px; --ws-panel: 324px;
+  grid-template-columns: var(--ws-tray) minmax(0, 1fr) var(--ws-panel);
+  grid-template-rows: auto var(--ws-row) auto;
+  grid-template-areas: "intent intent intent" "tray canvas panel" "bar bar bar";
+}
+/* set the intention: feeling → space → fragrance (only for a room that has not been saved) */
+.ws__intent { grid-area: intent; display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr); align-items: end; gap: 10px 14px; padding: 14px 20px 16px; border-bottom: 1px solid var(--line); background: var(--ivory); }
+.ws__intent-arrow { margin-bottom: 12px; color: var(--slate); }
+
+/* the sticker book: tabs on top, the objects in a column that scrolls on its own, the hint at the foot */
+.ws__tray { grid-area: tray; position: relative; min-width: 0; border-right: 1px solid var(--line); background: #fff; }
+.ws__tray-in { position: absolute; inset: 0; display: flex; flex-direction: column; }
+.ws__tray .ws-tabs { flex: none; justify-content: space-between; gap: 8px; padding: 0 18px; }
+.ws__tray .ws-tab { font-size: 13px; }
+.ws__tray-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; gap: 20px; padding: 16px 18px 20px; scrollbar-width: thin; }
+.ws__hint { flex: none; margin: 0; padding: 11px 18px 14px; border-top: 1px solid var(--line); font-size: 13px; line-height: 1.5; color: var(--slate); }
+.ws__handle { display: none; }
+.ws-shelf { display: flex; flex-direction: column; gap: 10px; }
+.ws-shelf__h { margin: 0; font-family: var(--font-ui); font-size: 13px; font-weight: 600; line-height: 1.4; color: var(--slate); }
+.ws-tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 10px; }
+.ws-tiles--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px 8px; }
+.ws-tile { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 0; padding: 0; border: 0; background: none; color: var(--ink); cursor: pointer; }
+.ws-tile__art { display: flex; align-items: center; justify-content: center; width: 100%; min-height: 0; aspect-ratio: 1 / 0.86; overflow: hidden; border-radius: 14px; background: var(--ivory); transition: translate 0.2s var(--ease), box-shadow 0.2s var(--ease), background-color 0.2s; }
+.ws-tile__img { display: block; width: 70%; height: 74%; min-width: 0; min-height: 0; }
+.ws-tiles--3 .ws-tile__img { width: 52%; height: 60%; }
+.ws-tile:hover .ws-tile__art { translate: 0 -3px; background: #fff; box-shadow: 0 8px 18px rgba(41,42,49,0.12), 0 0 0 1px rgba(41,42,49,0.06); }
+.ws-tile:focus-visible { outline: none; }
+.ws-tile:focus-visible .ws-tile__art { outline: 2px solid var(--deep); outline-offset: 2px; }
+.ws-tile__name { display: -webkit-box; max-width: 100%; overflow: hidden; font-size: 13px; font-weight: 500; line-height: 1.3; letter-spacing: -0.01em; text-align: center; text-wrap: balance; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+
+/* the canvas: views and display switches on top, the room in the middle with its tools beside it */
+.ws__canvas { grid-area: canvas; display: flex; flex-direction: column; gap: 10px; min-width: 0; min-height: 0; padding: 14px 16px 12px; scroll-margin-top: 0; }
+.ws__head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; min-height: 40px; }
+.ws__views { flex: 0 1 auto; min-width: 0; }
+.ws__views .seg__opt { padding: 0 11px; font-size: 13px; }
+.ws__display { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 4px 16px; margin-left: auto; }
+.ws__display .switch--sm { font-size: 13px; }
+.ws__display .btn--sm { height: 36px; padding: 0 14px; font-size: 14px; gap: 8px; }
+.ws__stage { position: relative; flex: 1 1 0; min-height: 0; display: flex; align-items: center; justify-content: center; padding: 6px 0 36px; container-type: size; }
+.ws__frame { position: relative; width: min(calc(100cqw - 2 * (var(--rail) + 22px)), calc((100cqh - 42px) * 0.6923)); }
+.ws__frame > .scene-sheet { width: 100%; }
+.ws__frame .note-editor { left: 50%; bottom: 14px; translate: -50% 0; width: min(360px, calc(100% - 24px)); }
+
+/* the settings for the view that is open; the panel scrolls on its own */
+.ws__panel { grid-area: panel; position: relative; min-width: 0; border-left: 1px solid var(--line); background: #fff; }
+.ws__panel-in { position: absolute; inset: 0; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; gap: 22px; padding: 20px 22px 24px; scrollbar-width: thin; }
+.ws__panel .chips { gap: 6px; }
+.ws__panel .chip { min-height: 36px; padding: 0 12px 0 9px; font-size: 13px; }
+.ws__panel .chip__dot { width: 12px; height: 12px; }
+.ws__panel .impression { padding-top: 18px; }
+.ws__panel .swatch { width: 64px; height: 64px; }
+.ws-explore { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; font-size: 13px; color: var(--slate); }
+.ws-explore .chip { border-style: dashed; }
+.ws-photo-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.ws-photo-actions .btn { height: 44px; padding: 0 16px; font-size: 15px; gap: 8px; }
+
+/* tablets and phones: the room's height follows its width; when the stage is narrow the tools sit in a row under it */
+@media (max-width: 1099px) {
+  .ws__stage { flex: none; align-items: flex-start; container-type: inline-size; }
+  .ws__frame { width: min(calc(100cqw - 2 * (var(--rail) + 22px)), calc((100svh - var(--ws-chrome)) * 0.6923)); min-width: 240px; }
+}
+@media (max-width: 1099px) { @container (max-width: 520px) {
+  .ws__frame { width: min(calc(100cqw - 8px), calc((100svh - var(--ws-chrome) - 56px) * 0.6923)); min-width: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 8px; }
+  .ws__frame > .scene-sheet { flex: 0 0 100%; }
+  .ws-rail { position: static; flex-direction: row; }
+  .ws-rail__sep { display: none; }
+  .ws-rail .ws-tool { width: 40px; height: 40px; }
+  /* undo and redo with the caption beside them, then the object's tools spread across the width */
+  .ws-rail--l { order: 1; }
+  .ws__caption { position: static; order: 2; flex: 1 1 0; align-self: center; translate: none; text-align: left; padding-left: 4px; }
+  .ws-rail--r { order: 3; flex: 0 0 100%; justify-content: space-between; padding: 2px; }
+} }
+
+/* tablets: the room and one panel side by side; the sticker book becomes a drawer at the bottom of the screen */
+/* (a flex row here, not the grid: a sticky grid item could only move inside its own grid cell) */
+@media (max-width: 1099px) {
+  .ws { --ws-chrome: 286px; display: flex; flex-wrap: wrap; align-items: stretch; }
+  .ws__intent { flex: 0 0 100%; order: 0; }
+  .ws__canvas { flex: 1 1 0; order: 1; }
+  .ws__panel { flex: 0 0 320px; order: 2; }
+  .ws__tray { flex: 0 0 100%; order: 3; }
+  .ws__bar { flex: 0 0 100%; order: 4; }
+  .ws__tray { position: sticky; bottom: 0; z-index: 30; border-right: 0; border-top: 1px solid var(--line); border-radius: 20px 20px 0 0; box-shadow: 0 -12px 30px rgba(41,42,49,0.14); }
+  .ws__tray-in { position: static; }
+  .ws__tray .ws__handle { display: flex; align-self: center; justify-content: center; align-items: center; width: 64px; height: 22px; padding: 0; border: 0; background: none; }
+  .ws__tray .ws__handle span { width: 40px; height: 4px; border-radius: 999px; background: rgba(41,42,49,0.28); }
+  .ws__tray:not(.is-open) .ws__tray-body, .ws__tray:not(.is-open) .ws__hint { display: none; }
+  .ws__tray-body { max-height: 46svh; }
+  .ws-tiles, .ws-tiles--3 { grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); }
+}
+@media (max-width: 700px) {
+  .rooms-page { gap: 36px; }
+  .ws { --ws-chrome: 250px; border-radius: 20px; }
+  .ws__canvas, .ws__panel { flex: 0 0 100%; }
+  .ws__intent { grid-template-columns: minmax(0, 1fr); gap: 10px; padding: 14px 14px 16px; }
+  .ws__intent-arrow { display: none; }
+  .ws__intent .ws-pick { flex-direction: row; align-items: center; gap: 12px; }
+  .ws__intent .ws-pick > :first-child { flex: 0 0 10.5em; }
+  .ws__intent .ws-pick__box { flex: 1 1 auto; }
+  .ws__canvas { padding: 12px 12px 14px; }
+  .ws__head { justify-content: center; }
+  .ws__views { width: 100%; }
+  .ws__display { margin: 0; justify-content: center; }
+  .ws__panel { border-left: 0; border-top: 1px solid var(--line); }
+  .ws__panel-in { position: static; padding: 18px 16px 22px; }
+  .ws__frame .note-editor { position: fixed; left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); width: auto; translate: none; z-index: 60; }
+  .ws__bar { padding: 12px 14px calc(12px + env(safe-area-inset-bottom)); }
+  .ws__actions { width: 100%; }
+  .ws__actions .btn { flex: 1 1 0; padding: 0 12px; }
+  .ws__jump { display: none; }
+}
+
+/* ---------- Scent Card: the memory-making desk ---------- */
+.desk {
+  /* what has to stay on screen with the card: header, the canvas's padding and the bar */
+  --desk-chrome: 188px; --ar: 0.5625;
+  grid-template-columns: minmax(0, 3fr) minmax(380px, 2fr);
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  grid-template-areas: "canvas source" "canvas insp" "bar bar";
+}
+.desk__source { grid-area: source; display: flex; flex-direction: column; gap: 8px; min-width: 0; padding: 20px 24px 8px; border-left: 1px solid var(--line); }
+.desk__or { margin: 0; font-size: 13px; color: var(--slate); }
+.desk__scratch { align-self: flex-start; min-height: 32px; padding: 0; border: 0; background: none; font-size: 14px; font-weight: 600; color: var(--deep); text-decoration: underline; text-underline-offset: 4px; cursor: pointer; }
+.desk__atlas { display: flex; align-items: center; justify-content: space-between; height: 44px; padding: 0 14px; border: 1px solid var(--line); border-radius: 12px; font-size: 15px; font-weight: 500; color: var(--ink); text-decoration: none; }
+.desk__atlas:hover { border-color: rgba(76,82,122,0.55); color: var(--deep); }
+.desk__canvas { grid-area: canvas; min-width: 0; padding: 18px; }
+.desk__stage { position: relative; display: grid; place-items: center; height: clamp(440px, calc(100svh - var(--desk-chrome)), 880px); container-type: size; }
+.desk__frame { position: relative; width: min(calc(100cqw - 2 * (var(--rail) + 22px)), calc((100cqh - 68px) * var(--ar))); aspect-ratio: var(--ar); }
+/* the card at its own 360 px, scaled to the frame (the scale is set from the frame's width) */
+.desk__swap { position: absolute; left: 0; top: 0; width: 360px; transform-origin: 0 0; animation: card-swap 0.4s var(--ease); }
+@keyframes card-swap { from { opacity: 0; translate: 0 10px; scale: 0.985; } }
+.desk__insp { grid-area: insp; position: relative; min-width: 0; border-left: 1px solid var(--line); }
+.desk__insp-in { position: absolute; inset: 0; display: flex; flex-direction: column; }
+.desk__insp .ws-tabs { flex: none; margin: 0 24px; }
+.desk__panel { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; gap: 24px; padding: 20px 24px 26px; scrollbar-width: thin; }
+.desk__switches { display: flex; flex-wrap: wrap; gap: 6px 28px; }
+
+/* template thumbnails: the three real templates, drawn small with what is on the card now */
+.tpl-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.tpl { display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 0; padding: 12px 6px 10px; border: 1px solid var(--line); border-radius: 14px; background: #fff; font-size: 14px; font-weight: 600; color: var(--ink); transition: border-color 0.2s, background-color 0.2s, box-shadow 0.2s; }
+.tpl:hover { border-color: rgba(76,82,122,0.5); }
+.tpl[aria-checked="true"] { border-color: var(--deep); background: var(--mist); color: var(--deep); box-shadow: inset 0 0 0 0.5px var(--deep); }
+.tpl__thumb { display: flex; align-items: center; justify-content: center; width: 100%; height: 120px; }
+.tpl__mini { position: relative; flex: none; overflow: hidden; border-radius: 2px; }
+.tpl__scale { position: absolute; left: 0; top: 0; width: 360px; transform-origin: 0 0; pointer-events: none; }
+.tpl__scale .sc { box-shadow: none; }
+
+.desk-swatches { display: flex; flex-wrap: wrap; gap: 10px; }
+.desk-swatch { width: 32px; height: 32px; padding: 0; border: 0; border-radius: 50%; box-shadow: 0 0 0 1px rgba(41,42,49,0.1); transition: box-shadow 0.2s; }
+.desk-swatch[aria-checked="true"] { box-shadow: 0 0 0 3px #fff, 0 0 0 5px var(--deep); }
+.desk__panel .chips { gap: 6px; }
+.desk__panel .chip { min-height: 36px; padding: 0 12px 0 9px; font-size: 13px; }
+.desk__panel .chip__dot { width: 12px; height: 12px; }
+.desk-stickers { display: grid; grid-template-columns: repeat(auto-fill, minmax(46px, 1fr)); gap: 8px; }
+.desk-sticker { display: flex; align-items: center; justify-content: center; aspect-ratio: 1; padding: 0; border: 0; border-radius: 12px; background: var(--ivory); transition: translate 0.2s var(--ease), box-shadow 0.2s var(--ease), background-color 0.2s; }
+.desk-sticker:hover { translate: 0 -2px; background: #fff; box-shadow: 0 6px 14px rgba(41,42,49,0.12), 0 0 0 1px rgba(41,42,49,0.06); }
+.desk__fields { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
+/* "Save image · 9:16" and "· 3:4" differ by a character; a fixed width keeps Share from shifting */
+.desk__bar .btn--primary { min-width: 15.5em; }
+
+/* a narrow canvas: the sticker tools go under the card */
+@container (max-width: 480px) {
+  .desk__frame { width: min(calc(100cqw - 16px), calc((100cqh - 72px) * var(--ar))); }
+  .desk__frame .ws-rail--r { left: 50%; top: calc(100% + 10px); flex-direction: row; translate: -50% 0; }
+}
+@media (max-width: 1099px) {
+  .desk { grid-template-columns: minmax(0, 1.25fr) minmax(320px, 1fr); }
+  .desk__source, .desk__insp .ws-tabs { padding-left: 0; padding-right: 0; }
+  .desk__source { padding: 18px 20px 8px; }
+  .desk__insp .ws-tabs { margin: 0 20px; }
+  .desk__panel { padding: 18px 20px 24px; }
+}
+/* phones: one screen tall, the card on top, the settings as a sheet that opens under it and the actions at the foot */
+@media (max-width: 700px) {
+  .desk { height: calc(100svh - 72px); min-height: 560px; border-radius: 20px; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto auto; grid-template-areas: "source" "canvas" "insp" "bar"; }
+  .desk__source { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 6px 12px; padding: 12px 14px 10px; border-left: 0; border-bottom: 1px solid var(--line); }
+  .desk__source > .ws-label { display: none; }
+  .desk__source > .ws-pick__box, .desk__source > .desk__atlas { flex: 1 1 100%; }
+  .desk__canvas { padding: 8px; min-height: 0; }
+  .desk__stage { height: 100%; }
+  .desk__insp { border-left: 0; border-top: 1px solid var(--line); box-shadow: 0 -10px 24px rgba(41,42,49,0.08); }
+  .desk__insp-in { position: static; }
+  .desk__insp .ws__handle { display: flex; align-self: center; justify-content: center; align-items: center; width: 64px; height: 20px; padding: 0; border: 0; background: none; }
+  .desk__insp .ws__handle span { width: 40px; height: 4px; border-radius: 999px; background: rgba(41,42,49,0.28); }
+  .desk__insp .ws-tabs { margin: 0 14px; justify-content: space-around; }
+  .desk__insp:not(.is-open) .desk__panel { display: none; }
+  .desk__panel { max-height: 36svh; padding: 16px 14px 18px; }
+  /* while the sheet is open the card gets the source row's room */
+  .desk:has(.desk__insp.is-open) .desk__source { display: none; }
+  .desk__ratio { display: none; }
+  .desk__bar { padding: 10px 14px calc(10px + env(safe-area-inset-bottom)); }
+  .desk__bar .ws__status { display: none; }
+  .desk__bar .ws__actions { width: 100%; }
+  .desk__bar .ws__actions .btn { flex: 1 1 0; padding: 0 12px; min-width: 0; }
+  .tpl__thumb { height: 104px; }
+}
+
+/* the card the image is made from: drawn at the templates' own 360 px width, off screen and only while saving, so the
+   saved image is laid out the same on a phone as on a computer whatever size the preview is (11/24 handoff, §2.6) */
+.desk__export { position: fixed; left: -10000px; top: 0; width: 360px; pointer-events: none; }
+.desk__export *, .desk__export *::before, .desk__export *::after { animation: none !important; transition: none !important; }
+
+/* before the page has loaded: the same frame, so nothing jumps when it fills in */
+.skel { display: block; border-radius: 10px; background: rgba(41,42,49,0.06); }
+.skel-sheet { display: block; width: 100%; aspect-ratio: 360 / 520; background: var(--paper); opacity: 0.7; }
+.skel-card { display: block; width: 100%; aspect-ratio: 9 / 16; background: var(--ivory); box-shadow: 0 16px 34px rgba(41,42,49,0.12); }
+
+@media (prefers-reduced-motion: reduce) {
+  .desk__swap { animation: none; }
+  .ws-tile:hover .ws-tile__art, .desk-sticker:hover, .scene-item--btn.is-lifted { translate: none; }
 }
