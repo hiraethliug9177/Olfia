@@ -39,17 +39,20 @@ function Particles({ family, count, kind }: { family: FamilyId; count: number; k
   return (
     <>
       {Array.from({ length: count }, (_, i) => {
-        const left = seeded(i, 1) * 100;
-        const top = seeded(i, 2) * 100;
-        const dur = 9 + seeded(i, 3) * 12;
-        const delay = -seeded(i, 4) * dur;
-        const size = kind === "spot" ? 60 + seeded(i, 5) * 120 : kind === "steam" ? 40 + seeded(i, 5) * 60 : kind === "leaf" ? 50 + seeded(i, 5) * 70 : 5 + seeded(i, 5) * 9;
+        // rounded to two places so the page built on the server and the one in the browser write the same numbers
+        // (long decimals were printed differently on each side, a hydration warning seen on 11/24)
+        const r2 = (n: number) => Math.round(n * 100) / 100;
+        const left = r2(seeded(i, 1) * 100);
+        const top = r2(seeded(i, 2) * 100);
+        const dur = r2(9 + seeded(i, 3) * 12);
+        const delay = r2(-seeded(i, 4) * dur);
+        const size = r2(kind === "spot" ? 60 + seeded(i, 5) * 120 : kind === "steam" ? 40 + seeded(i, 5) * 60 : kind === "leaf" ? 50 + seeded(i, 5) * 70 : 5 + seeded(i, 5) * 9);
         const style: CSSProperties = {
           left: `${left}%`,
-          top: kind === "petal" ? `${-10 - seeded(i, 6) * 20}%` : kind === "steam" ? "auto" : `${top}%`,
-          bottom: kind === "steam" ? `${seeded(i, 6) * 20}%` : undefined,
+          top: kind === "petal" ? `${r2(-10 - seeded(i, 6) * 20)}%` : kind === "steam" ? "auto" : `${top}%`,
+          bottom: kind === "steam" ? `${r2(seeded(i, 6) * 20)}%` : undefined,
           width: size,
-          height: kind === "petal" ? size * 0.7 : kind === "steam" ? size * 2.6 : size,
+          height: kind === "petal" ? r2(size * 0.7) : kind === "steam" ? r2(size * 2.6) : size,
           animationDuration: `${dur}s`,
           animationDelay: `${delay}s`,
           background:

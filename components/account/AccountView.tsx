@@ -6,7 +6,6 @@ import { familyById } from "@/lib/catalog";
 import { useAtlas, useMounted } from "@/lib/store";
 import { useToast } from "@/lib/toast";
 import { sampleEntries } from "@/lib/sample";
-import { ScentSummary } from "@/components/account/ScentSummary";
 import { Character } from "@/components/quiz/Character";
 import { blendsWith, loadQuiz, type QuizResult } from "@/lib/quiz";
 import { Plans } from "@/components/plans/Plans";
@@ -24,10 +23,14 @@ function AccountQuiz() {
   if (!mounted) return <section id="quiz" className="card anchor" style={{ minHeight: 200 }} />;
   if (!r) {
     return (
-      <section id="quiz" className="card anchor" style={{ display: "flex", flexDirection: "column", gap: 14, alignItems: "flex-start" }}>
-        <h2 className="h-section" style={{ fontSize: 40 }}>Which scent feels like you?</h2>
-        <p className="lead">Twenty questions about your habits and sensory preferences. Meet one of sixteen scent characters, discover fragrance families to explore, and find a room to start with.</p>
-        <Link href="/quiz" className="btn btn--primary">Take the quiz</Link>
+      // Tiffany 11/24: her picture (quiz_cover.png) on the right of the invitation
+      <section id="quiz" className="card anchor quiz-cover">
+        <div className="quiz-cover__text">
+          <h2 className="h-section" style={{ fontSize: 40 }}>Which scent feels like you?</h2>
+          <p className="lead">Twenty questions about your habits and sensory preferences. Meet one of sixteen scent characters, discover fragrance families to explore, and find a room to start with.</p>
+          <Link href="/quiz" className="btn btn--primary">Take the quiz</Link>
+        </div>
+        <img className="quiz-cover__img" src="/assets/quiz/quiz-cover.webp" width={1100} height={825} alt="Illustration: a woman with her eyes closed breathing in a scent, surrounded by perfume bottles, lavender, a lily, a rose, a lemon and scent cards" />
       </section>
     );
   }
@@ -49,6 +52,7 @@ function AccountQuiz() {
           {second ? <>, with <span className="account-quiz__fam"><span className="chip__dot" style={{ background: second.hex }} aria-hidden="true" />{second.label}</span> as a secondary family</> : null}.
           {explore ? ` For another scent direction, explore ${explore.label}.` : null}
         </p>
+        <p className="quiz-notes">{r.archetype.association.split(/,\s*/).join(" · ")}</p>
         <Link href={`/rooms?family=${[r.family, r.second].filter(Boolean).join(",")}`} className="btn btn--primary" style={{ alignSelf: "flex-start" }}>Design a room in this style</Link>
       </div>
     </section>
@@ -82,7 +86,8 @@ export function AccountView() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
-      <section className="card" style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 24, background: "var(--peri-soft)" }}>
+      {/* #profile (the My Page menu's "Account") is this card since "Your Scents at a Glance" left My Page (Tiffany 11/24) */}
+      <section id="profile" className="card anchor" style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 24, background: "var(--peri-soft)" }}>
         <span aria-hidden="true" style={{ width: 88, height: 88, borderRadius: "50%", background: "radial-gradient(circle at 35% 30%, #DADDF0, #A0A6C8)", boxShadow: "0 0 0 5px #fff" }} />
         <div style={{ flex: "1 1 240px", display: "flex", flexDirection: "column", gap: 4 }}>
           <h1 className="h-page" style={{ fontSize: "clamp(36px, 4.4vw, 56px)" }}>My Page</h1>
@@ -100,8 +105,6 @@ export function AccountView() {
           <span className="callout" style={{ background: "var(--apricot)", color: "var(--ink)" }}>{mounted ? captures : "–"} captures</span>
         </div>
       </section>
-
-      <div id="profile" className="anchor"><ScentSummary /></div>
 
       <section id="info" className="card anchor" style={{ display: "flex", flexDirection: "column", gap: 16 }}>
         <h2 className="h-section" style={{ fontSize: 34 }}>Personal Info</h2>

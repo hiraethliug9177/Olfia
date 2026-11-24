@@ -6,7 +6,6 @@ import { FAMILIES } from "@/lib/catalog";
 import { ItemArt } from "@/components/scene/Cutout";
 import { Atmosphere } from "@/components/scene/Atmosphere";
 import { FAMILY_GUIDE, WHEEL_HINT } from "@/lib/copy/familyGuide";
-import { ResearchNotes } from "@/components/ui/Sources";
 
 /**
  * Seven families as an old rotary telephone dial (Tiffany's reference, 11/10).
@@ -18,7 +17,7 @@ import { ResearchNotes } from "@/components/ui/Sources";
  * button. It only turns while it is on screen; a turn by hand starts the 5 seconds again; it waits while someone
  * is moving through it with the keyboard; and it stays still for people whose device asks for reduced motion.
  * Copy v1 (Tiffany 11/24, §1.2): the card is a knowledge card from the shared family guide (lib/copy/familyGuide.ts,
- * also used by Scentpedia): a short description, signature notes, at home, a pairing and a starter recipe that
+ * also used by Scentpedia): a short description, signature notes, at home and a starter recipe (pairing and research links removed 11/24) that
  * folds open. The old "neighbours layer well" line is gone (the guide removes automatic layering claims).
  */
 
@@ -139,7 +138,6 @@ export function FamilyWheel() {
           <dl className="fam-facts">
             <div><dt>Signature notes</dt><dd>{g.signatureNotes}</dd></div>
             <div><dt>At home</dt><dd>{g.atHome}</dd></div>
-            <div><dt>Scent pairing</dt><dd>{g.pairing}</dd></div>
           </dl>
           <details className="recipe" key={`recipe-${sel.id}`}>
             <summary>Your first scent recipe</summary>
@@ -152,7 +150,6 @@ export function FamilyWheel() {
             <Link href={`/rooms?family=${sel.id}`} className="btn btn--primary"><span className="chip__dot" style={{ background: sel.hex, boxShadow: "0 0 0 2px #fff" }} aria-hidden="true" />Try {sel.label} in a room</Link>
             <Link href={`/scentpedia#${sel.id}`} className="hero__link">Explore in Scentpedia</Link>
           </div>
-          <ResearchNotes key={`src-${sel.id}`} ids={g.cardSources} label="Research sources" />
         </div>
       </div>
     </div>

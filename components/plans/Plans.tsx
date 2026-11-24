@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Icon } from "@/components/ui/Icon";
 import { joinPlus } from "@/lib/mockAuth";
 import { PLAN_CARDS, PLAN_FAQ, PLAN_ROWS, hasPrices, plusPrice, type Billing, type PlanId } from "@/lib/plans";
+import { Dialog } from "@/components/ui/Dialog";
 
 /** Monthly / Yearly, in the same sliding control as Time of day in Rooms (the 11/21 design). Shown once prices exist. */
 function BillingSwitch({ value, onChange }: { value: Billing; onChange: (b: Billing) => void }) {
@@ -55,9 +56,14 @@ function Cell({ v }: { v: boolean | string }) {
     : <><span aria-hidden="true">–</span><span className="sr-only">Not included</span></>;
 }
 
-/** My Page → Plans (/account#plans): the 11/21 design Tiffany kept, now inside My Page (her Notion 11/23). */
+/**
+ * My Page → Plans (/account#plans): the 11/21 design Tiffany kept, now inside My Page (her Notion 11/23).
+ * Design round (Tiffany 11/24): the comparison table opens in a window from "Compare plans"; the questions sit under
+ * an FAQ heading; the second Join button at the end is gone (the Plus card has it).
+ */
 export function Plans() {
   const [billing, setBilling] = useState<Billing>("monthly");
+  const [compare, setCompare] = useState(false);
   const join = () => joinPlus("account", hasPrices ? billing : "none");
   return (
     <section id="plans" className="card anchor plans" aria-labelledby="plans-h">
@@ -68,6 +74,11 @@ export function Plans() {
       <p className="lead plans__lead">Explore Olfia for free today. Olfia Plus is planned for people who want to keep more room designs and personalize their visual collection.</p>
       <p className="muted plans__hint">Olfia Plus is not available yet. The features below describe the planned offering.</p>
       <PlanCards billing={billing} onJoin={join} />
+      <button type="button" className="btn btn--ghost plans__compare" onClick={() => setCompare(true)}>Compare plans</button>
+      <Dialog open={compare} onClose={() => setCompare(false)} label="Compare plans" className="dlg--wide dlg--compare">
+        <div className="dlg__body">
+          <button type="button" className="dlg__x" aria-label="Close" onClick={() => setCompare(false)}><Icon name="x" /></button>
+          <h2 className="dlg__title">Compare plans</h2>
       {/* on a phone the table scrolls sideways and its first column stays put */}
       <div className="plans__scroll" role="region" aria-label="Compare the plans" tabIndex={0}>
         <table className="plans__table">
@@ -89,16 +100,16 @@ export function Plans() {
           </tbody>
         </table>
       </div>
-      <div className="plans__faq">
+        </div>
+      </Dialog>
+      <div className="plans__faq" aria-labelledby="faq-h">
+        <h3 id="faq-h" className="plans__faq-h">FAQ</h3>
         {PLAN_FAQ.map((f) => (
           <details key={f.q} className="plans__q">
             <summary>{f.q}<Icon name="chevronDown" /></summary>
             <p>{f.a}</p>
           </details>
         ))}
-      </div>
-      <div className="plans__end">
-        <button type="button" className="btn btn--primary" onClick={join}>Join the waitlist</button>
       </div>
     </section>
   );

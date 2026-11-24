@@ -6,7 +6,6 @@ import { FAMILY_FILL, FAMILY_WASH } from "@/lib/colors";
 import { FAMILY_GUIDE, GUIDE_INTRO, WHEEL_HINT } from "@/lib/copy/familyGuide";
 import { Story } from "@/components/library/Story";
 import { GuideText } from "@/components/library/GuideText";
-import { ResearchNotes } from "@/components/ui/Sources";
 import { QuizInvite } from "@/components/home/QuizInvite";
 
 export const metadata: Metadata = { title: "Scentpedia" };
@@ -15,7 +14,7 @@ export const metadata: Metadata = { title: "Scentpedia" };
  * Scentpedia (v2, 11/23; the Scent Library until then, /library forwards here): the quiz module on top (an invitation,
  * or your result), then the seven families, each with Tiffany's little story (her Notion: "quiz在上family在下").
  * Copy v1 (11/24, §7): each family has her long guide (first paragraph shown, the rest behind "Continue reading"),
- * signature notes, its place on the fragrance wheel, at home, the same scent recipe as the home dial, and research links.
+ * signature notes, its place on the fragrance wheel, at home, and the same scent recipe as the home dial (research links removed 11/24).
  */
 export default function LibraryPage() {
   return (
@@ -78,7 +77,6 @@ export default function LibraryPage() {
                 </div>
                 {story ? <Story story={story} fill={FAMILY_FILL[f.id]} /> : null}
                 <Link href={`/rooms?family=${f.id}`} className="hero__link" style={{ alignSelf: "flex-start" }}>Try {f.label} in a room</Link>
-                <ResearchNotes ids={g.guideSources} label="Research sources" />
               </div>
             </section>
           );

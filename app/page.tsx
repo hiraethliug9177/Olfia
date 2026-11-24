@@ -6,12 +6,9 @@ import { ScenePage } from "@/components/scene/ScenePage";
 import { ArticleCard } from "@/components/edit/ArticleCard";
 import { byDate } from "@/lib/edit";
 import { ROOM_PRESETS } from "@/lib/presets";
-import { familyById, sourceLabel } from "@/lib/catalog";
-import { giftScenes, giftsFor, seasonFamily } from "@/lib/gifts";
-import { GiftRoom } from "@/components/gifts/GiftRoom";
 import { strings } from "@/lib/strings";
 
-// The Gifts row follows the season, so Home is rebuilt once a day instead of only at deploy time.
+// The Edit row shows the latest dated stories, so Home is rebuilt once a day instead of only at deploy time.
 export const revalidate = 86400;
 
 /**
@@ -19,8 +16,8 @@ export const revalidate = 86400;
  * presets, deep periwinkle for the closing invite — and each opens with a large title on the left and a short line
  * on the right. v2 (11/23, Tiffany's Notion): the hero's left text is new, the quiz moved to a window at the bottom
  * right, and About Olfia lives here in full. Copy v1 (Tiffany 11/24, docs/copy/olfia-site-copy-v1.md §1): the order
- * stays as it is (hero, families, The Olfia Edit, Gifts, room presets, About, invite); 03 "The same room, a different
- * feeling" is outside this round.
+ * stays as it is; 03 "The same room, a different feeling" is outside this round.
+ * Design round (Tiffany 11/24): the Gifts section and the closing invite are gone from Home (Gifts stays under Discover).
  */
 // 11/18 (Tiffany): Home shows three of the six presets, in this order; Rooms keeps all six
 const HOME_PRESET_IDS = ["living-night", "bedroom-morning", "study-afternoon"];
@@ -28,9 +25,6 @@ const HOME_PRESETS = HOME_PRESET_IDS.map((id) => ROOM_PRESETS.find((r) => r.id =
 
 export default function HomePage() {
   const latest = byDate().slice(0, 3);
-  // 11/18 (Tiffany): Gifts on Home, the season's family drawn into three rooms
-  const giftFamily = seasonFamily();
-  const gifts = giftScenes(giftsFor(giftFamily));
   return (
     <div style={{ overflowX: "clip" }}>
       <Hero />
@@ -64,40 +58,13 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="gifts" className="wrap section">
-        <div className="row-head">
-          <h2 className="h-section">Gifts</h2>
-          <p className="lead">Find a fragrance for yourself or someone you have in mind.</p>
-          <div className="row-head__cta home-gifts__ctas">
-            <Link href="/gifts?for=me" className="btn btn--ghost btn--sm">For myself</Link>
-            <Link href="/gifts?for=someone" className="btn btn--primary btn--sm">For someone else</Link>
-          </div>
-        </div>
-        <div className="home-gifts">
-          {gifts.map((g) => (
-            <Link key={g.p.id} href={`/gifts?for=someone&family=${giftFamily}`} className="home-gift">
-              <GiftRoom scene={g} />
-              <span className="home-gift__body">
-                <span className="gift-pick__brand">{g.p.brand} · {sourceLabel(g.p.type)}</span>
-                <span className="home-gift__name">{g.p.name}</span>
-                <span className="home-gift__row">
-                  <span className="gift-pick__price">{g.p.price ? [g.p.price, g.p.size].filter(Boolean).join(" · ") : "Available in stores only"}</span>
-                  <span className="home-gift__fams">
-                    {g.p.families.map((id) => <span key={id} className="chip__dot" style={{ background: familyById(id).hex }} aria-hidden="true" />)}
-                    {g.p.families.map((id) => familyById(id).label.split(" ")[0].toLowerCase()).join(" · ")}
-                  </span>
-                </span>
-              </span>
-            </Link>
-          ))}
-        </div>
-      </section>
-
       <section id="presets" className="wrap section">
         <div className="panel panel--apricot">
           {/* 11/18 (Tiffany): the same head as The Olfia Edit: the line beside the title, the button at the right edge */}
-          <div className="row-head">
+          {/* design round 11/24: the title takes its full line; the line and the button share the row below */}
+          <div className="row-head row-head--stack">
             <h2 className="h-section">{strings.brand.explore}.</h2>
+            <span className="row-head__break" aria-hidden="true" />
             <p className="lead">Begin with a room we’ve put together. Change its objects and fragrance to suit the way you want to live.</p>
             <Link href="/rooms" className="btn btn--primary btn--sm row-head__cta">Explore Rooms</Link>
           </div>
@@ -115,12 +82,6 @@ export default function HomePage() {
 
       <About />
 
-      <section id="capture" className="wrap section" style={{ paddingBottom: 120 }}>
-        <div className="invite panel--deep">
-          <h2 className="invite__line">{strings.brand.capture}.</h2>
-          <Link href="/capture" className="btn btn--apricot">Capture a scent</Link>
-        </div>
-      </section>
     </div>
   );
 }

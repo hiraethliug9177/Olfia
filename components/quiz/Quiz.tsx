@@ -132,12 +132,14 @@ export function Quiz() {
           <ResultCard r={result} cardRef={cardRef} />
         </div>
         <div style={{ flex: "1 1 360px", minWidth: 0, display: "flex", flexDirection: "column", gap: 20 }}>
-          <h1 className="h-page">You are {result.archetype.name}.</h1>
+          <h1 className="h-page h-page--fit">You are {result.archetype.name}.</h1>
           <p className="lead">{result.archetype.voice}</p>
           <p>
             Your result suggests {familyById(result.family).label}{result.second ? `, with ${familyById(result.second).label} as a secondary family` : ""}.
             {explore ? ` For another scent direction, explore ${familyById(explore).label}.` : null}
           </p>
+          {/* Tiffany 11/24 (answer 6): the character's notes, one line, no heading */}
+          <p className="quiz-notes">{result.archetype.association.split(/,\s*/).join(" · ")}</p>
           {profile ? (
             <section className="quiz-profile" aria-labelledby="quiz-profile-h">
               <h2 id="quiz-profile-h" className="quiz-profile__h">Your scent personality</h2>

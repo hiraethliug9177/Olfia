@@ -7,8 +7,8 @@ export const metadata: Metadata = { title: "Privacy" };
  * and kept in the browser), preferences, quiz result and small settings are all in this browser under "olfia." keys;
  * GA4 events carry ids and categories, never typed text, and no typed text goes in a page address; EEA/UK/CH and
  * GPC/DNT start cookieless; ads are off; Kit receives only the email; the found-us answer is a fixed menu sent to GA4.
- * Two sentences in "Your saved entries" are Claude's additions for her to approve: the full storage list and the
- * product-link reading (/api/link-preview), which her draft did not mention.
+ * Three sentences in "Your saved entries" were added by Claude and approved by Tiffany on 11/24 (answers 3 and 4): the
+ * full storage list, the product-link reading (/api/link-preview), and fonts and pictures loaded from other websites.
  */
 export default function PrivacyPage() {
   return (
@@ -19,6 +19,7 @@ export default function PrivacyPage() {
         <h2>Your saved entries</h2>
         <p>Olfia does not currently offer personal accounts. Your Capture entries, room designs, and starred entries are saved in this browser, on this device. They are not uploaded as personal records to an Olfia server.</p>
         <p>Your Fragrance Shelf, including any photos you add, your preferences, your quiz result, and a few display settings are stored in this browser in the same way. When you paste a product link, the link is sent to Olfia’s server, which reads that page to fill in the product’s details.</p>
+        <p>Some pages also load fonts and pictures from other websites, such as Google Fonts. Those sites receive the basic information your browser sends with any request.</p>
 
         <h2>Website analytics</h2>
         <p>Olfia uses Google Analytics to understand visits and selected actions, such as completing the quiz, saving a Scent Card, or opening a product link. Analytics may use cookies to distinguish visits. Events include categories such as a fragrance family rather than the text you enter.</p>

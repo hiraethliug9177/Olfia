@@ -233,11 +233,6 @@ export function Footer() {
         <div className="ft__col ft__brand">
           <Link href="/" className="ft__mark">Olfia</Link>
           <span className="muted" style={{ maxWidth: "24em" }}>{strings.brand.invitation}</span>
-          <a href="mailto:tliu3694@usc.edu" className="ft__contact">tliu3694@usc.edu</a>
-          <div className="ft__icons">
-            <a href="#" className="ft__icon" aria-label="Instagram (coming soon)"><Icon name="instagram" /></a>
-            <a href="#" className="ft__icon" aria-label="小红书 (coming soon)"><Icon name="bookOpen" /></a>
-          </div>
         </div>
         {[...NAV, ABOUT].map((n) => (
           <nav key={n.href} aria-label={n.label} className="ft__col">
@@ -246,7 +241,17 @@ export function Footer() {
           </nav>
         ))}
       </div>
-      <div className="ft__signup"><SignupForm place="footer" /></div>
+      {/* Tiffany 11/24: the email address is no longer shown; the social icons sit on the sign-up row under "Contact us @" */}
+      <div className="ft__signup">
+        <SignupForm place="footer" />
+        <div className="ft__contact">
+          <span className="ft__contact-label">Contact us @</span>
+          <div className="ft__icons">
+            <a href="#" className="ft__icon" aria-label="Instagram (coming soon)"><Icon name="instagram" /></a>
+            <a href="#" className="ft__icon" aria-label="小红书 (coming soon)"><Icon name="bookOpen" /></a>
+          </div>
+        </div>
+      </div>
       <div className="ft__base">
         <span className="ft__legal"><span>© 2026 Olfia</span><Link href="/privacy">Privacy</Link></span>
         <span>A USC DSM596 capstone project</span>
