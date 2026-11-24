@@ -44,7 +44,7 @@ function ShelfPicture({ item, height = 180 }: { item: Pick<ShelfItem, "image" | 
       </span>
     );
   }
-  return <NameTile brand={item.brand || "Your scent"} kind={sourceLabel(item.kind)} family={item.families[0] ?? "fresh"} height={height} />;
+  return <NameTile brand={item.brand || "Your scent"} kind={sourceLabel(item.kind)} type={item.kind} family={item.families[0] ?? "fresh"} height={height} />;
 }
 
 export function Shelf() {

@@ -3,20 +3,35 @@
 import { useMemo, useState } from "react";
 import { familyById, sourceLabel } from "@/lib/catalog";
 import { matchProducts, type Product } from "@/lib/products";
-import type { Daypart, FamilyId, Season } from "@/lib/types";
+import { SCENT_MID, artFor, sameNote, splitNotes } from "@/lib/roomScent";
+import type { Daypart, FamilyId, Season, SourceKind } from "@/lib/types";
 import { Icon } from "@/components/ui/Icon";
 import { ProductLink } from "@/components/products/ProductLink";
 
 /**
  * Recommended products (B tier). 11/9 feedback 10: larger cards, less text, one line saying why
  * it fits this room, one combined "when" filter.
- * 11/10: instead of product photos, every card carries the same Olfia name tile — the brand name set
- * in Newsreader on a cream label over the family colour and texture. Brand logos are the brands'
+ * 11/10: instead of product photos, every card carries the same Olfia name tile. Brand logos are the brands'
  * own trademark artwork, so they are not redrawn here.
+ * Design round (11/24), her answer 10 of 11/23: the tile shows a cut-out of the same kind of product (from her
+ * 01_objects set) and the brand name, over the family's mid tone. Types without a cut-out keep the name label.
  */
 
-export function NameTile({ brand, kind, family, height }: { brand: string; kind: string; family: FamilyId; height?: number }) {
+export function NameTile({ brand, kind, type, seed, family, height }: { brand: string; kind: string; type?: SourceKind; seed?: string; family: FamilyId; height?: number }) {
   const f = familyById(family);
+  const art = type ? artFor(type, seed ?? brand) : undefined;
+  if (art?.asset) {
+    return (
+      <span className="ptile ptile--art" style={{ backgroundColor: SCENT_MID[family], height }} aria-hidden="true">
+        <span className="ptile__tex" style={{ backgroundImage: `url(${f.texture})` }} />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img className="ptile__art" src={art.asset} alt="" />
+        <span className="ptile__label ptile__label--corner">
+          <span className="ptile__brand">{brand}</span>
+        </span>
+      </span>
+    );
+  }
   return (
     <span className="ptile" style={{ backgroundColor: f.hex, height }} aria-hidden="true">
       <span className="ptile__tex" style={{ backgroundImage: `url(${f.texture})` }} />
@@ -59,7 +74,7 @@ export function ProductCard({ p, match, onSimilar, place }: { p: Product; match?
   const why = shared.length ? sharesLine(shared) : p.families.map((id) => familyById(id).label).join(" and ");
   const body = (
     <>
-      <NameTile brand={p.brand} kind={sourceLabel(p.type)} family={f.id} />
+      <NameTile brand={p.brand} kind={sourceLabel(p.type)} type={p.type} seed={p.id} family={f.id} />
       <span className="pcard__body">
         <span className="pcard__brand">{p.brand} · {sourceLabel(p.type)} · {p.tier}</span>
         <span className="pcard__name">{p.name}</span>
@@ -105,7 +120,7 @@ export function seasonText(s: Season[]): string {
  * its size and price (checked on the brand's site 11/17), its notes, when it suits, and the families it shares with
  * the room. Facts only; nothing here is written as Olfia copy.
  */
-export function ProductDetailCard({ p, match, onSimilar }: { p: Product; match: FamilyId[]; onSimilar?: (id: string) => void }) {
+export function ProductDetailCard({ p, match, roomNotes = [], onSimilar }: { p: Product; match: FamilyId[]; roomNotes?: string[]; onSimilar?: (id: string) => void }) {
   const f = familyById(p.families[0]);
   const shared = match.filter((id) => p.families.includes(id));
   const dots = shared.length ? shared : p.families;
@@ -113,13 +128,21 @@ export function ProductDetailCard({ p, match, onSimilar }: { p: Product; match: 
   const price = p.price ? [p.price, p.size].filter(Boolean).join(" · ") : p.url ? null : "Available in stores only";
   const body = (
     <>
-      <NameTile brand={p.brand} kind={sourceLabel(p.type)} family={f.id} />
+      <NameTile brand={p.brand} kind={sourceLabel(p.type)} type={p.type} seed={p.id} family={f.id} />
       <span className="pcard__body pdetail">
         <span className="pcard__brand">{p.brand} · {sourceLabel(p.type)}</span>
         <span className="pcard__name">{p.name}</span>
         {price ? <span className="pdetail__price">{price}</span> : null}
         <span className="pdetail__notes">
-          {p.notes.split(" · ").map((n) => <span key={n} className="pdetail__note">{n}</span>)}
+          {/* Rooms v2: notes this product shares with the notes tags in the room are filled with its family's colour */}
+          {p.notes.split(" · ").map((n) => {
+            const shared = roomNotes.some((r) => splitNotes(n).some((x) => sameNote(x, r)));
+            return (
+              <span key={n} className={`pdetail__note${shared ? " is-shared" : ""}`} style={shared ? { background: SCENT_MID[p.families[0]] } : undefined}>
+                {n}
+              </span>
+            );
+          })}
         </span>
         <span className="pdetail__row"><Icon name="clock" size={18} />{dayText(p.dayparts)}</span>
         <span className="pdetail__row"><Icon name="calendar" size={18} />{seasonText(p.seasons)}</span>
@@ -145,14 +168,23 @@ export function ProductDetailCard({ p, match, onSimilar }: { p: Product; match: 
   );
 }
 
-export function ProductCards({ families, title = "Recreate this at home", lead, limit = 4, compact = false }: { families: FamilyId[]; title?: string; lead?: string; limit?: number; compact?: boolean }) {
+export function ProductCards({ families, roomNotes = [], title = "Recreate this at home", lead, limit = 4, compact = false }: { families: FamilyId[]; roomNotes?: string[]; title?: string; lead?: string; limit?: number; compact?: boolean }) {
   const [when, setWhen] = useState<When>("any");
   const [similar, setSimilar] = useState<string | null>(null);
 
-  const list = useMemo(
-    () => matchProducts({ families, ...WHEN_FILTER[when], similarTo: similar ?? undefined }, limit),
-    [families, when, similar, limit],
-  );
+  // Rooms v2: among the family matches, products that share notes with the room's notes tags come first
+  const noteKey = roomNotes.join("|");
+  const list = useMemo(() => {
+    const words = noteKey ? noteKey.split("|") : [];
+    const pool = matchProducts({ families, ...WHEN_FILTER[when], similarTo: similar ?? undefined }, words.length ? limit * 3 : limit);
+    if (!words.length) return pool;
+    const shared = (p: Product) => splitNotes(p.notes).filter((n) => words.some((w) => sameNote(n, w))).length;
+    return pool
+      .map((p, i) => ({ p, i, s: shared(p) }))
+      .sort((a, b) => b.s - a.s || a.i - b.i)
+      .slice(0, limit)
+      .map((x) => x.p);
+  }, [families, when, similar, limit, noteKey]);
 
   return (
     <section aria-label={title} style={{ display: "flex", flexDirection: "column", gap: 20 }}>
@@ -170,7 +202,7 @@ export function ProductCards({ families, title = "Recreate this at home", lead, 
       ) : null}
       {list.length ? (
         <div className="pcard-grid pcard-grid--four">
-          {list.map((p) => <ProductDetailCard key={p.id} p={p} match={families} onSimilar={compact ? undefined : setSimilar} />)}
+          {list.map((p) => <ProductDetailCard key={p.id} p={p} match={families} roomNotes={roomNotes} onSimilar={compact ? undefined : setSimilar} />)}
         </div>
       ) : (
         <p className="muted">No fragrances match these selections yet. Try another time filter or scent family.</p>

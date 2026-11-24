@@ -162,7 +162,19 @@ export interface ItemDef {
   asset?: string;
   /** tray heading inside the Furniture tab */
   group?: FurnitureGroup;
+  /** tray heading inside the Scent tab (Rooms v2, Tiffany's Notion 11/23) */
+  scentGroup?: ScentGroup;
+  /** how the product shows in Scent View */
+  scentType?: ScentType;
+  /** where its scent leaves the object, as fractions of its box from the left and from the top (default by type) */
+  emit?: [number, number];
 }
+
+/** Rooms v2 (Tiffany's Notion 11/23): fragrance products, including her new Flowers & plants category. */
+export const SCENT_GROUPS = ["Candles", "Reed diffusers", "Aroma diffusers", "Incense", "Room sprays", "Wax melts", "Diffuser stones", "Flowers & plants"] as const;
+export type ScentGroup = (typeof SCENT_GROUPS)[number];
+/** Scent View expressions from her Notion: candle glow, reed bloom, incense trails, spray cloud, aroma mist, wax bloom, flora mist. */
+export type ScentType = "candle" | "reed" | "aroma" | "incense" | "spray" | "wax" | "stones" | "flora";
 
 export const FURNITURE_GROUPS = ["Seating", "Tables", "Lighting", "Storage", "Beds", "Paper & books", "Objects", "Walls & floor", "Kitchen", "Bath"] as const;
 export type FurnitureGroup = (typeof FURNITURE_GROUPS)[number];
@@ -267,14 +279,73 @@ export const FURNITURE: ItemDef[] = [
   { id: "bottles", label: "Bottles", category: "furniture", group: "Bath", w: 0.12, aspect: 70 / 80 },
 ];
 
+/**
+ * Fragrance products. Design round (11/24): a quarter larger than before (her Notion: "放大香氛产品"), grouped in the
+ * tray, and joined by the 44 objects she made (design_elements/export/01_objects, cut out by her; trimmed and
+ * converted to public/assets/scent/). Their English names come from her Chinese file names.
+ */
 export const SOURCES: ItemDef[] = [
-  { id: "candle", label: "Candle", category: "source", w: 0.075, aspect: 266 / 152, asset: "/assets/sources/source-candle.webp" },
-  { id: "diffuser", label: "Diffuser", category: "source", w: 0.075, aspect: 299 / 146, asset: "/assets/sources/source-diffuser.webp" },
-  { id: "spray", label: "Room spray", category: "source", w: 0.06, aspect: 282 / 120, asset: "/assets/sources/source-spray.webp" },
-  { id: "incense", label: "Incense", category: "source", w: 0.08, aspect: 296 / 158, asset: "/assets/sources/source-incense.webp" },
-  { id: "oil", label: "Oil burner", category: "source", w: 0.1, aspect: 259 / 220, asset: "/assets/sources/source-oil-burner.webp" },
-  { id: "simmer-pot", label: "Simmer pot", category: "source", w: 0.14, aspect: 72 / 70 },
+  { id: "candle", label: "Candle", category: "source", w: 0.094, aspect: 266 / 152, asset: "/assets/sources/source-candle.webp", scentGroup: "Candles", scentType: "candle" },
+  { id: "diffuser", label: "Diffuser", category: "source", w: 0.094, aspect: 299 / 146, asset: "/assets/sources/source-diffuser.webp", scentGroup: "Reed diffusers", scentType: "reed" },
+  { id: "spray", label: "Room spray", category: "source", w: 0.075, aspect: 282 / 120, asset: "/assets/sources/source-spray.webp", scentGroup: "Room sprays", scentType: "spray" },
+  { id: "incense", label: "Incense", category: "source", w: 0.1, aspect: 296 / 158, asset: "/assets/sources/source-incense.webp", scentGroup: "Incense", scentType: "incense" },
+  { id: "oil", label: "Oil burner", category: "source", w: 0.125, aspect: 259 / 220, asset: "/assets/sources/source-oil-burner.webp", scentGroup: "Wax melts", scentType: "wax" },
+  { id: "simmer-pot", label: "Simmer pot", category: "source", w: 0.175, aspect: 72 / 70, scentGroup: "Aroma diffusers", scentType: "aroma" },
+  { id: "flower-roses", label: "Roses", category: "source", w: 0.183, aspect: 560 / 488, asset: "/assets/scent/flower-roses.webp", scentGroup: "Flowers & plants", scentType: "flora" },
+  { id: "flower-peonies", label: "Peonies", category: "source", w: 0.212, aspect: 555 / 560, asset: "/assets/scent/flower-peonies.webp", scentGroup: "Flowers & plants", scentType: "flora" },
+  { id: "flower-wildflowers", label: "Wildflowers", category: "source", w: 0.198, aspect: 560 / 529, asset: "/assets/scent/flower-wildflowers.webp", scentGroup: "Flowers & plants", scentType: "flora" },
+  { id: "flower-lilies", label: "Lilies", category: "source", w: 0.185, aspect: 560 / 492, asset: "/assets/scent/flower-lilies.webp", scentGroup: "Flowers & plants", scentType: "flora" },
+  { id: "flower-tulips", label: "Tulips", category: "source", w: 0.188, aspect: 560 / 502, asset: "/assets/scent/flower-tulips.webp", scentGroup: "Flowers & plants", scentType: "flora" },
+  { id: "plant-mint", label: "Mint", category: "source", w: 0.146, aspect: 560 / 389, asset: "/assets/scent/plant-mint.webp", scentGroup: "Flowers & plants", scentType: "flora" },
+  { id: "plant-rosemary", label: "Rosemary", category: "source", w: 0.139, aspect: 560 / 369, asset: "/assets/scent/plant-rosemary.webp", scentGroup: "Flowers & plants", scentType: "flora" },
+  { id: "plant-thyme", label: "Thyme", category: "source", w: 0.230, aspect: 460 / 560, asset: "/assets/scent/plant-thyme.webp", scentGroup: "Flowers & plants", scentType: "flora" },
+  { id: "plant-sage", label: "Sage", category: "source", w: 0.158, aspect: 560 / 421, asset: "/assets/scent/plant-sage.webp", scentGroup: "Flowers & plants", scentType: "flora" },
+  { id: "plant-peace-lily", label: "Peace lily", category: "source", w: 0.168, aspect: 560 / 448, asset: "/assets/scent/plant-peace-lily.webp", scentGroup: "Flowers & plants", scentType: "flora" },
+  { id: "spray-wood-cap", label: "Wood-cap spray", category: "source", w: 0.063, aspect: 560 / 221, asset: "/assets/scent/spray-wood-cap.webp", scentGroup: "Room sprays", scentType: "spray" },
+  { id: "spray-mint", label: "Trigger spray", category: "source", w: 0.069, aspect: 560 / 240, asset: "/assets/scent/spray-mint.webp", scentGroup: "Room sprays", scentType: "spray", emit: [0.3, 0.06] },
+  { id: "spray-tall", label: "Tall spray", category: "source", w: 0.051, aspect: 560 / 179, asset: "/assets/scent/spray-tall.webp", scentGroup: "Room sprays", scentType: "spray" },
+  { id: "spray-flask", label: "Flask spray", category: "source", w: 0.095, aspect: 560 / 331, asset: "/assets/scent/spray-flask.webp", scentGroup: "Room sprays", scentType: "spray" },
+  { id: "stones-crystal", label: "Crystal stones", category: "source", w: 0.167, aspect: 435 / 560, asset: "/assets/scent/stones-crystal.webp", scentGroup: "Diffuser stones", scentType: "stones" },
+  { id: "stones-jade", label: "Jade stones", category: "source", w: 0.178, aspect: 408 / 560, asset: "/assets/scent/stones-jade.webp", scentGroup: "Diffuser stones", scentType: "stones" },
+  { id: "stones-salt", label: "Salt rocks", category: "source", w: 0.130, aspect: 559 / 560, asset: "/assets/scent/stones-salt.webp", scentGroup: "Diffuser stones", scentType: "stones" },
+  { id: "stones-hanging", label: "Hanging stone", category: "source", w: 0.100, aspect: 560 / 430, asset: "/assets/scent/stones-hanging.webp", scentGroup: "Diffuser stones", scentType: "stones" },
+  { id: "stones-botanicals", label: "Dried botanicals", category: "source", w: 0.125, aspect: 560 / 540, asset: "/assets/scent/stones-botanicals.webp", scentGroup: "Diffuser stones", scentType: "stones" },
+  { id: "reed-hex", label: "Teal bottle", category: "source", w: 0.086, aspect: 560 / 200, asset: "/assets/scent/reed-hex.webp", scentGroup: "Reed diffusers", scentType: "reed" },
+  { id: "reed-cloche", label: "Glass cloche", category: "source", w: 0.095, aspect: 560 / 221, asset: "/assets/scent/reed-cloche.webp", scentGroup: "Reed diffusers", scentType: "reed" },
+  { id: "reed-fiber", label: "Fiber reeds", category: "source", w: 0.117, aspect: 560 / 273, asset: "/assets/scent/reed-fiber.webp", scentGroup: "Reed diffusers", scentType: "reed" },
+  { id: "reed-amber", label: "Dried flowers", category: "source", w: 0.098, aspect: 560 / 229, asset: "/assets/scent/reed-amber.webp", scentGroup: "Reed diffusers", scentType: "reed", emit: [0.5, 0.12] },
+  { id: "reed-paper-flower", label: "Paper flower", category: "source", w: 0.144, aspect: 560 / 335, asset: "/assets/scent/reed-paper-flower.webp", scentGroup: "Reed diffusers", scentType: "reed", emit: [0.5, 0.18] },
+  { id: "incense-animal", label: "Animal holder", category: "source", w: 0.160, aspect: 560 / 534, asset: "/assets/scent/incense-animal.webp", scentGroup: "Incense", scentType: "incense", emit: [0.04, 0.03] },
+  { id: "incense-ceramic", label: "Pebble stand", category: "source", w: 0.046, aspect: 560 / 123, asset: "/assets/scent/incense-ceramic.webp", scentGroup: "Incense", scentType: "incense", emit: [0.5, 0.0] },
+  { id: "incense-flower", label: "Flower holder", category: "source", w: 0.059, aspect: 560 / 158, asset: "/assets/scent/incense-flower.webp", scentGroup: "Incense", scentType: "incense", emit: [0.5, 0.0] },
+  { id: "incense-concrete", label: "Concrete tray", category: "source", w: 0.240, aspect: 344 / 560, asset: "/assets/scent/incense-concrete.webp", scentGroup: "Incense", scentType: "incense", emit: [0.77, 0.02] },
+  { id: "incense-dish", label: "Dish holder", category: "source", w: 0.174, aspect: 542 / 560, asset: "/assets/scent/incense-dish.webp", scentGroup: "Incense", scentType: "incense", emit: [0.8, 0.02] },
+  { id: "wax-black", label: "Black lamp", category: "source", w: 0.117, aspect: 560 / 272, asset: "/assets/scent/wax-black.webp", scentGroup: "Wax melts", scentType: "wax", emit: [0.45, 0.86] },
+  { id: "wax-amber", label: "Amber lamp", category: "source", w: 0.141, aspect: 560 / 328, asset: "/assets/scent/wax-amber.webp", scentGroup: "Wax melts", scentType: "wax", emit: [0.45, 0.86] },
+  { id: "wax-milk", label: "Milk-glass lamp", category: "source", w: 0.113, aspect: 560 / 263, asset: "/assets/scent/wax-milk.webp", scentGroup: "Wax melts", scentType: "wax", emit: [0.47, 0.85] },
+  { id: "wax-tulip", label: "Tulip lamp", category: "source", w: 0.136, aspect: 560 / 317, asset: "/assets/scent/wax-tulip.webp", scentGroup: "Wax melts", scentType: "wax", emit: [0.45, 0.86] },
+  { id: "wax-brass", label: "Brass lamp", category: "source", w: 0.174, aspect: 560 / 405, asset: "/assets/scent/wax-brass.webp", scentGroup: "Wax melts", scentType: "wax", emit: [0.5, 0.86] },
+  { id: "aroma-wood-lid", label: "Wood-lid diffuser", category: "source", w: 0.104, aspect: 560 / 343, asset: "/assets/scent/aroma-wood-lid.webp", scentGroup: "Aroma diffusers", scentType: "aroma", emit: [0.5, 0.04] },
+  { id: "candle-rose", label: "Rose candle", category: "source", w: 0.104, aspect: 560 / 417, asset: "/assets/scent/candle-rose.webp", scentGroup: "Candles", scentType: "candle", emit: [0.47, 0.1] },
+  { id: "candle-amber-bowl", label: "Amber bowl", category: "source", w: 0.175, aspect: 448 / 560, asset: "/assets/scent/candle-amber-bowl.webp", scentGroup: "Candles", scentType: "candle", emit: [0.5, 0.28] },
+  { id: "candle-gold-leaf", label: "Gold-leaf candle", category: "source", w: 0.122, aspect: 560 / 488, asset: "/assets/scent/candle-gold-leaf.webp", scentGroup: "Candles", scentType: "candle", emit: [0.43, 0.08] },
+  { id: "candle-apothecary", label: "Apothecary jar", category: "source", w: 0.115, aspect: 560 / 459, asset: "/assets/scent/candle-apothecary.webp", scentGroup: "Candles", scentType: "candle", emit: [0.48, 0.06] },
+  { id: "candle-pumpkin", label: "Pumpkin candle", category: "source", w: 0.179, aspect: 438 / 560, asset: "/assets/scent/candle-pumpkin.webp", scentGroup: "Candles", scentType: "candle", emit: [0.5, 0.2] },
 ];
+
+export const scentTypeOf = (kind: string): ScentType | undefined => itemById(kind)?.scentType;
+
+/** The Capture source a Rooms object counts as (Scentprint's "Most recorded format"); new kinds without one are left out. */
+export function sourceKindOf(kind: string): SourceKind | undefined {
+  if (kind === "simmer-pot") return undefined; // a simmer pot is "something I did" in Capture, not a product
+  const t = scentTypeOf(kind);
+  if (t === "candle") return "candle";
+  if (t === "reed" || t === "aroma") return "diffuser";
+  if (t === "incense") return "incense";
+  if (t === "spray") return "spray";
+  if (kind === "oil") return "oil";
+  return undefined;
+}
 
 export const MATERIAL_ITEMS: ItemDef[] = FAMILIES.flatMap((f) =>
   f.materials.map((m) => ({ id: m.id, label: m.label, category: "material" as const, w: 0.12, aspect: 1, asset: m.asset })),

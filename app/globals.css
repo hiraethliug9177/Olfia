@@ -1119,6 +1119,12 @@ body::after {
 .lib-fam-card__num { font-family: var(--font-display); font-size: 44px; font-weight: 700; line-height: 1; color: rgba(41,42,49,0.35); }
 .lib-fam-card__dot { width: 120px; height: 120px; border-radius: 50%; }
 .lib-fam-card__body { flex: 1 1 380px; min-width: 0; display: flex; flex-direction: column; gap: 14px; }
+.lib-fam-card__main, .lib-fam-card__side { min-width: 0; display: flex; flex-direction: column; gap: 14px; }
+@media (min-width: 1200px) {
+  .lib-fam-card__body { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px 40px; align-items: start; }
+  .lib-fam-card__side { padding-top: 6px; }
+  .lib-fam-card__side .story__title { font-size: clamp(22px, 1.75vw, 25px); white-space: nowrap; }
+}
 .lib-materials { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 4px; }
 .lib-material { display: inline-flex; align-items: center; gap: 8px; font-size: 15px; }
 .story { display: flex; flex-direction: column; gap: 12px; margin-top: 10px; padding: 24px 26px; border-radius: 22px; background: rgba(255,255,255,0.78); }
@@ -1601,3 +1607,74 @@ h1, h2, h3, h4, .h-page, .h-section { text-wrap: balance; }
 .scentprint__mapcol { flex: none; max-width: none; width: 100%; }
 .scentmap__label { font-size: 16px; }
 .plans__faq-h { margin: 22px 0 6px; }
+
+/* ---------- Rooms v2 (design round 11/24, Tiffany's Notion 11/23): views, notes tags, Scent View, Photo View ---------- */
+.editor__views { width: 100%; }
+.editor__views .seg__opt { min-height: 46px; font-size: 15px; }
+.editor__tools { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; min-height: 44px; }
+.editor__toolbar { position: absolute; left: 16px; bottom: 16px; flex-wrap: wrap; max-width: calc(100% - 32px); z-index: 5; }
+.switch--pill { width: auto; justify-content: flex-start; gap: 10px; min-height: 44px; padding: 0 16px; border-radius: 999px; background: #fff; font-size: 15px; }
+.tray-item--scent .tray-item__art { width: 72px; height: 72px; }
+.field__error { font-size: 14px; line-height: 1.5; color: #9A4B3F; }
+@media (max-width: 480px) { .editor__views .seg__opt { font-size: 13px; padding: 0 4px; } }
+
+/* Room View: fragrance products are larger and sit on a soft, breathing halo of their family's mid tone */
+.scene-item { transition: opacity 0.6s var(--ease), filter 0.6s var(--ease); }
+.scene-item__halo { position: absolute; left: 50%; top: 60%; width: clamp(64px, 170%, 220px); aspect-ratio: 1; translate: -50% -50%; border-radius: 50%; z-index: -1; pointer-events: none; opacity: 0.7; animation: halo-breathe 5s var(--ease) infinite; }
+@keyframes halo-breathe { 0%, 100% { scale: 0.96; opacity: 0.7; } 50% { scale: 1.04; opacity: 0.92; } }
+
+/* Scent View: the furniture steps back, the fragrance products and their air come forward */
+.scene-item--dim { opacity: 0.4; filter: saturate(0.5); }
+.scene-item--soft { opacity: 0.72; }
+.scene-item--back { opacity: 0.6; }
+.scent-flow { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1500; pointer-events: none; }
+
+/* notes tags: a paper tag on a thread above each fragrance product */
+.note-tag { position: absolute; z-index: 3000; translate: -50% -100%; display: inline-flex; align-items: center; gap: 6px; max-width: 62%; padding: 2px 10px 3px 8px; border: 1px solid rgba(41,42,49,0.16); border-radius: 7px; background: #fff; box-shadow: 0 3px 8px rgba(41,42,49,0.12); font-family: var(--font-hand); font-weight: 700; font-size: max(15px, 3.3cqw); line-height: 1.2; color: var(--ink); white-space: nowrap; cursor: pointer; animation: tag-float 6s var(--ease) infinite; }
+span.note-tag { cursor: default; }
+.note-tag--suggested { border-style: dashed; color: var(--slate); background: rgba(255,255,255,0.9); }
+.note-tag.is-on { border-color: var(--deep); box-shadow: 0 0 0 2px rgba(76,82,122,0.22), 0 3px 8px rgba(41,42,49,0.12); }
+.note-tag:focus-visible { outline: 2px solid var(--deep); outline-offset: 2px; }
+.note-tag__dot { width: 9px; height: 9px; flex: none; border-radius: 50%; }
+.note-tag__text { overflow: hidden; text-overflow: ellipsis; padding-right: 3px; margin-right: -3px; }
+.note-tag__string { position: absolute; z-index: 2999; width: 1.5px; translate: -0.75px 0; background: rgba(41,42,49,0.42); pointer-events: none; }
+.note-tag__string::after { content: ""; position: absolute; left: 50%; bottom: -3px; width: 6px; height: 6px; translate: -50% 0; border-radius: 50%; background: rgba(41,42,49,0.5); }
+@keyframes tag-float { 0%, 100% { translate: -50% -100%; } 50% { translate: -50% calc(-100% - 3px); } }
+
+.note-editor { position: absolute; left: 16px; bottom: 76px; z-index: 6; flex-direction: column; align-items: stretch; gap: 10px; width: min(380px, calc(100% - 32px)); padding: 14px; border-radius: 20px; background: rgba(255,255,255,0.95); }
+.note-editor__field { display: flex; flex-direction: column; gap: 6px; }
+.note-editor__label { font-size: 15px; font-weight: 600; }
+.note-editor__matches { display: flex; flex-direction: column; gap: 6px; }
+.note-editor__match { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 8px 12px; border: 1px solid rgba(41,42,49,0.1); border-radius: 12px; background: var(--ivory); text-align: left; }
+.note-editor__match:hover, .note-editor__match:focus-visible { border-color: var(--deep); }
+.note-editor__brand { font-size: 14px; font-weight: 600; }
+.note-editor__notes { font-family: var(--font-hand); font-size: 18px; line-height: 1.15; color: var(--slate); }
+.note-editor__row { display: flex; justify-content: space-between; gap: 8px; }
+
+/* the sensory sliders of Scent View */
+.senses { display: flex; flex-direction: column; gap: 4px; }
+.sense { display: grid; grid-template-columns: 4.6em minmax(0, 1fr) 6.6em; align-items: center; gap: 10px; font-size: 14px; font-weight: 500; color: var(--slate); }
+.sense span:last-child { text-align: right; }
+
+/* Photo View: the room's photo beside its collage, split by a line you can drag */
+.photo-layer { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1500; }
+.photo-split { position: absolute; top: 0; bottom: 0; z-index: 1501; width: 2px; translate: -1px 0; background: #fff; box-shadow: 0 0 0 1px rgba(41,42,49,0.16); pointer-events: none; }
+.photo-knob { position: absolute; top: 50%; z-index: 1502; translate: -50% -50%; display: flex; align-items: center; justify-content: center; width: 46px; height: 46px; border-radius: 50%; background: #fff; color: var(--deep); box-shadow: 0 4px 14px rgba(41,42,49,0.25); cursor: ew-resize; touch-action: none; }
+.photo-knob:focus-visible { outline: 2px solid var(--deep); outline-offset: 3px; }
+.photo-empty { position: absolute; inset: 0; z-index: 1500; display: flex; align-items: center; justify-content: center; background: rgba(236,237,245,0.5); }
+.photo-empty__btn { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 22px 26px; border: 1.5px dashed var(--deep); border-radius: 18px; background: rgba(255,255,255,0.94); color: var(--deep); font-size: 15px; font-weight: 600; }
+.photo-empty__btn:hover { background: #fff; }
+
+/* recommendation tiles (her answer 10): a cut-out of the same kind of product and the brand name */
+.ptile--art { align-items: flex-end; justify-content: center; }
+.ptile--art .ptile__tex { opacity: 0.2; }
+.ptile__art { position: relative; height: 76%; max-width: 64%; margin-bottom: 7%; object-fit: contain; object-position: bottom; filter: drop-shadow(0 6px 8px rgba(41,42,49,0.18)); }
+.ptile__label--corner { position: absolute; left: 12px; top: 12px; min-width: 0; max-width: 72%; padding: 8px 12px 7px; rotate: -2deg; }
+.pcard-grid--four .ptile--art { justify-content: center; padding-left: 0; }
+.pcard-grid--four .ptile--art .ptile__label { padding: 7px 11px 6px; }
+.pdetail__note.is-shared { font-weight: 600; }
+
+@media (prefers-reduced-motion: reduce) {
+  .scene-item__halo, .note-tag { animation: none; }
+}
+.scent-flow--front { z-index: 2900; }

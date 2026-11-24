@@ -15,7 +15,7 @@ export function GiftRoom({ scene, prefix = "olfia" }: { scene: GiftScene; prefix
   const label = `${sourceLabel(scene.p.type)} in the ${sceneName(scene.sceneId).toLowerCase()} ${LIGHT[scene.time]}`;
   return (
     <div className="gift-room" role="img" aria-label={label}>
-      <ScenePage items={scene.items} families={scene.p.families} title="" time={scene.time} strength={75} showLabels={false} prefix={prefix} />
+      <ScenePage items={scene.items} families={scene.p.families} title="" time={scene.time} strength={75} showLabels={false} prefix={prefix} emphasizeScent />
     </div>
   );
 }

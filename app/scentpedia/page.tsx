@@ -44,7 +44,9 @@ export default function LibraryPage() {
                 <span className="lib-fam-card__num">{String(i + 1).padStart(2, "0")}</span>
                 <span aria-hidden="true" className="lib-fam-card__dot" style={{ background: f.hex, boxShadow: `0 0 0 6px #fff, 0 0 48px ${f.glow}` }} />
               </div>
+              {/* design round (11/24, her rule 3): on wide screens the reading text and the at-home cards sit side by side */}
               <div className="lib-fam-card__body">
+                <div className="lib-fam-card__main">
                 <h2 className="h-section" style={{ fontSize: "clamp(32px, 3.4vw, 44px)" }}>{f.label}</h2>
                 <p className="lead" style={{ margin: 0 }}>{g.descriptors}</p>
                 <dl className="fam-facts">
@@ -52,6 +54,9 @@ export default function LibraryPage() {
                   <div><dt>On the fragrance wheel</dt><dd>{g.onWheel}</dd></div>
                 </dl>
                 <GuideText paragraphs={g.guide} />
+                <Link href={`/rooms?family=${f.id}`} className="hero__link" style={{ alignSelf: "flex-start" }}>Try {f.label} in a room</Link>
+                </div>
+                <div className="lib-fam-card__side">
                 <dl className="fam-facts">
                   <div><dt>At home</dt><dd>{g.atHome}</dd></div>
                 </dl>
@@ -76,7 +81,7 @@ export default function LibraryPage() {
                   <p className="muted recipe__hint">{WHEEL_HINT}</p>
                 </div>
                 {story ? <Story story={story} fill={FAMILY_FILL[f.id]} /> : null}
-                <Link href={`/rooms?family=${f.id}`} className="hero__link" style={{ alignSelf: "flex-start" }}>Try {f.label} in a room</Link>
+                </div>
               </div>
             </section>
           );

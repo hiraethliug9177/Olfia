@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { FAMILIES, OCCASION_OPTIONS, DAYPART_OPTIONS, areNeighbours, familyById, roomLabel, sourceLabel, methodLabel } from "@/lib/catalog";
+import { FAMILIES, OCCASION_OPTIONS, DAYPART_OPTIONS, areNeighbours, familyById, roomLabel, sourceLabel, methodLabel, sourceKindOf } from "@/lib/catalog";
 import { partOfDay, hourOnly } from "@/lib/dates";
 import { matchProducts } from "@/lib/products";
 import type { CaptureEntry, Entry, FamilyId, Occasion, SourceKind } from "@/lib/types";
@@ -24,7 +24,8 @@ import { ProductCard } from "@/components/products/ProductCards";
  *  5. Something New to Explore and its three products, moved here from My Page's "Your Scents at a Glance" (removed).
  */
 
-const SOURCE_ITEMS: Partial<Record<string, SourceKind>> = { candle: "candle", diffuser: "diffuser", spray: "spray", incense: "incense", oil: "oil" };
+/** The picture for "Most recorded format": the original cut-out of each kind. */
+const FORMAT_ART: Partial<Record<SourceKind, string>> = { candle: "candle", diffuser: "diffuser", spray: "spray", incense: "incense", oil: "oil" };
 const RITUAL_ICONS: Record<Occasion, IconName> = {
   everyday: "sun", date: "heart", party: "partyPopper", meditation: "leaf", bath: "bath",
   sleep: "moon", work: "laptop", guests: "users", cleaning: "sparkles", holiday: "gift",
@@ -97,10 +98,11 @@ export function Scentprint({ entries, tag, setTag }: { entries: Entry[]; tag: st
 
   const formats = tally([
     ...caps.map((c) => c.source).filter((s) => s !== "fragrance-free" && s !== "other"),
-    ...entries.flatMap((e) => (e.type === "rooms" ? e.items.map((i) => SOURCE_ITEMS[i.kind]).filter((s): s is SourceKind => Boolean(s)) : [])),
+    // Rooms v2: the new fragrance objects count as their kind (a tulip wax lamp is not a Capture source, so it is left out)
+    ...entries.flatMap((e) => (e.type === "rooms" ? e.items.map((i) => sourceKindOf(i.kind)).filter((s): s is SourceKind => Boolean(s)) : [])),
   ]);
   const format = formats[0]?.[0] ?? null;
-  const formatItem = format ? Object.keys(SOURCE_ITEMS).find((k) => SOURCE_ITEMS[k] === format) : undefined;
+  const formatItem = format ? FORMAT_ART[format] : undefined;
 
   const occasions = tally(caps.map((c) => c.occasion).filter((o): o is Occasion => Boolean(o)));
   const ritual = occasions[0]?.[0] ?? null;

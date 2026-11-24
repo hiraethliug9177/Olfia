@@ -1,4 +1,5 @@
-import { baseLayout, seasonOf, stickersFor } from "@/lib/catalog";
+import { baseLayout, itemById, seasonOf, stickersFor } from "@/lib/catalog";
+import { artFor } from "@/lib/roomScent";
 import { PRODUCTS, productById, type Product } from "@/lib/products";
 import type { Entry, FamilyId, PlacedItem, RoomsEntry, Season, TimeOfDay } from "@/lib/types";
 
@@ -58,10 +59,18 @@ export interface GiftScene {
   items: PlacedItem[];
 }
 
-/** The room drawn for one product: the scene's default layout with the product in it, and its families pinned up. */
+/**
+ * The room drawn for one product: the scene's default layout with the product in it, and its families pinned up.
+ * Design round (11/24): the product is drawn with the same cut-out as its recommendation tile (her 01_objects set,
+ * answer 10), at about the size the old stand-in had.
+ */
 export function sceneItems(p: Product, sceneId: string): PlacedItem[] {
   const source = ROOM_PREF[p.type] ? p.type : "candle";
-  const base = baseLayout(source, sceneId).map((it) => (it.kind === "simmer-pot" ? { ...it, kind: source } : it));
+  const art = artFor(p.type, p.id);
+  const kind = art?.id ?? source;
+  const old = itemById(source);
+  const scale = art && old ? Math.max(0.55, Math.min(1.25, (old.w * 1.15) / art.w)) : 1;
+  const base = baseLayout(source, sceneId).map((it) => (it.kind === "simmer-pot" || it.kind === source ? { ...it, kind, scale } : it));
   return [...base, ...stickersFor(p.families)];
 }
 

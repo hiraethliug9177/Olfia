@@ -66,6 +66,8 @@ export interface PlacedItem {
   rot: number;
   flip: 1 | -1;
   z: number;
+  /** Rooms v2 (Tiffany's Notion 11/23): the notes tag on a fragrance product, typed by the user or filled from a product */
+  notes?: string;
 }
 
 export interface RoomsEntry extends EntryBase {

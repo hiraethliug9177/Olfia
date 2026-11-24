@@ -4,7 +4,8 @@ export const metadata: Metadata = { title: "Privacy" };
 
 /**
  * Privacy (Tiffany's copy v1, 11/24, §11). Checked against the code on 11/24: entries, Fragrance Shelf (photos are shrunk
- * and kept in the browser), preferences, quiz result and small settings are all in this browser under "olfia." keys;
+ * and kept in the browser), Rooms' Photo View photos (olfia.roomphoto.v1, shrunk, by room; clause added in the design
+ * round 11/24), preferences, quiz result and small settings are all in this browser under "olfia." keys;
  * GA4 events carry ids and categories, never typed text, and no typed text goes in a page address; EEA/UK/CH and
  * GPC/DNT start cookieless; ads are off; Kit receives only the email; the found-us answer is a fixed menu sent to GA4.
  * Three sentences in "Your saved entries" were added by Claude and approved by Tiffany on 11/24 (answers 3 and 4): the
@@ -18,7 +19,7 @@ export default function PrivacyPage() {
       <div className="card privacy__body" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
         <h2>Your saved entries</h2>
         <p>Olfia does not currently offer personal accounts. Your Capture entries, room designs, and starred entries are saved in this browser, on this device. They are not uploaded as personal records to an Olfia server.</p>
-        <p>Your Fragrance Shelf, including any photos you add, your preferences, your quiz result, and a few display settings are stored in this browser in the same way. When you paste a product link, the link is sent to Olfia’s server, which reads that page to fill in the product’s details.</p>
+        <p>Your Fragrance Shelf, including any photos you add, the room photos you add in Photo View, your preferences, your quiz result, and a few display settings are stored in this browser in the same way. When you paste a product link, the link is sent to Olfia’s server, which reads that page to fill in the product’s details.</p>
         <p>Some pages also load fonts and pictures from other websites, such as Google Fonts. Those sites receive the basic information your browser sends with any request.</p>
 
         <h2>Website analytics</h2>

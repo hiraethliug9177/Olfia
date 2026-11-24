@@ -2,13 +2,15 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import type { KeyboardEvent as ReactKeyboardEvent, PointerEvent as ReactPointerEvent } from "react";
-import { useEffect, useRef, useState } from "react";
+import type { ChangeEvent, DragEvent as ReactDragEvent, KeyboardEvent as ReactKeyboardEvent, PointerEvent as ReactPointerEvent } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
+  EMOTION_OPTIONS,
   FAMILIES,
   FLOOR_LINE,
   FURNITURE,
   SOURCES,
+  SCENT_GROUPS,
   baseLayout,
   areNeighbours,
   FURNITURE_GROUPS,
@@ -20,17 +22,31 @@ import {
   stickersFor,
   uid,
 } from "@/lib/catalog";
+import {
+  SENSORY_DEFAULT,
+  SENSORY_SLIDERS,
+  emitPoint,
+  feelingShape,
+  findProducts,
+  isScentItem,
+  noteWords,
+  productNotes,
+  roomNotes,
+  type SensoryValues,
+} from "@/lib/roomScent";
+import { shrinkPhoto } from "@/lib/shelf";
 import { ROOM_PRESETS } from "@/lib/presets";
 import { newId, useAtlas } from "@/lib/store";
 import { useToast } from "@/lib/toast";
 import { track } from "@/lib/analytics";
 import { shortDate } from "@/lib/dates";
-import type { FamilyId, PlacedItem, RoomsEntry, TimeOfDay } from "@/lib/types";
+import type { EmotionId, FamilyId, PlacedItem, RoomsEntry, TimeOfDay } from "@/lib/types";
 import { ScenePage } from "@/components/scene/ScenePage";
 import { ItemArt } from "@/components/scene/Cutout";
 import { Icon } from "@/components/ui/Icon";
 import { ProductCards } from "@/components/products/ProductCards";
 import { ThirdRoom } from "@/components/plans/ThirdRoom";
+import { ScentFlow, type FlowSource } from "@/components/rooms/ScentFlow";
 import { FREE_ROOMS } from "@/lib/plans";
 
 const DEFAULT_FAMS: FamilyId[] = ["woody", "spicy"];
@@ -41,8 +57,36 @@ const TIMES: Array<{ id: TimeOfDay; label: string }> = [
 ];
 const TRAY = ["Furniture", "Scent", "Materials"] as const;
 
-const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
+/** Rooms v2 (Tiffany's Notion 11/23; Photo View is her answer 8): one room, three ways of looking at it. */
+type View = "room" | "scent" | "photo";
+const VIEWS: Array<{ id: View; label: string }> = [
+  { id: "room", label: "Room View" },
+  { id: "scent", label: "Scent View" },
+  { id: "photo", label: "Photo View" },
+];
 
+/** Room photos for Photo View, shrunk and kept in this browser by room (never uploaded, never in a URL). */
+const PHOTO_KEY = "olfia.roomphoto.v1";
+const DRAFT = "draft";
+function readPhotos(): Record<string, string> {
+  try {
+    const v = JSON.parse(localStorage.getItem(PHOTO_KEY) ?? "{}") as unknown;
+    return v && typeof v === "object" ? (v as Record<string, string>) : {};
+  } catch {
+    return {};
+  }
+}
+function writePhotos(map: Record<string, string>): boolean {
+  try {
+    if (Object.keys(map).length) localStorage.setItem(PHOTO_KEY, JSON.stringify(map));
+    else localStorage.removeItem(PHOTO_KEY);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
 
 export function RoomEditor() {
   const router = useRouter();
@@ -77,8 +121,28 @@ export function RoomEditor() {
   const [future, setFuture] = useState<PlacedItem[][]>([]);
   const [loadedFor, setLoadedFor] = useState<string | null>(null);
 
+  // Rooms v2
+  const [view, setView] = useState<View>("room");
+  const [showNotes, setShowNotes] = useState(true);
+  /** In Scent View the tags give way to the air: only the product you point at shows its tag, unless Notes is on. */
+  const [scentNotes, setScentNotes] = useState(false);
+  const [noteFor, setNoteFor] = useState<string | null>(null);
+  const [noteDraft, setNoteDraft] = useState("");
+  // Scent View settings live with the page (saving them is an Olfia Plus line in Tiffany's plans table)
+  const [feelings, setFeelings] = useState<EmotionId[]>([]);
+  const [sensory, setSensory] = useState<SensoryValues>(SENSORY_DEFAULT);
+  const [paused, setPaused] = useState(false);
+  const [hover, setHover] = useState<string | null>(null);
+  const [photo, setPhoto] = useState<string | null>(null);
+  const [split, setSplit] = useState(50);
+  const [photoNote, setPhotoNote] = useState<string | null>(null);
+  const [stagePx, setStagePx] = useState(560);
+
   const stageRef = useRef<HTMLDivElement>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+  const noteInputRef = useRef<HTMLInputElement>(null);
   const drag = useRef<{ uid: string; ox: number; oy: number; before: PlacedItem[]; moved: boolean } | null>(null);
+  const handleDrag = useRef(false);
 
   // Load a saved room when opened with ?id=
   useEffect(() => {
@@ -86,9 +150,11 @@ export function RoomEditor() {
     const key = editId ?? `new:${presetParam ?? ""}:${sceneParam ?? ""}`;
     if (loadedFor === key) return;
     setLoadedFor(key);
+    setNoteFor(null);
     if (!editId) {
       setEntryId(null); setCreatedAt(null); setNickname("");
       setPast([]); setFuture([]); setSelected(null);
+      setPhoto(readPhotos()[DRAFT] ?? null);
       // Opened from a Home preset: that exact room, ready to change.
       const preset = ROOM_PRESETS.find((r) => r.id === presetParam);
       if (preset) {
@@ -110,8 +176,27 @@ export function RoomEditor() {
       setEntryId(e.id); setCreatedAt(e.createdAt); setNickname(e.nickname); setSceneId(e.sceneId);
       setItems(e.items); setFamilies(e.families); setStrength(e.strength); setTime(e.time); setWindowOpen(e.windowOpen);
       setPast([]); setFuture([]); setSelected(null);
+      setPhoto(readPhotos()[e.id] ?? null);
     }
   }, [hydrated, editId, famParam, sceneParam, presetParam, entries, loadedFor]);
+
+  // Photos of rooms that were deleted are let go.
+  useEffect(() => {
+    if (!hydrated) return;
+    const map = readPhotos();
+    const ids = new Set(entries.map((e) => e.id));
+    const keep = Object.fromEntries(Object.entries(map).filter(([k]) => k === DRAFT || ids.has(k)));
+    if (Object.keys(keep).length !== Object.keys(map).length) writePhotos(keep);
+  }, [hydrated, entries]);
+
+  // The notes tags keep out of each other's way at the stage's real width.
+  useEffect(() => {
+    const el = stageRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => setStagePx(Math.max(240, el.getBoundingClientRect().width)));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   /** A room tab starts a new page of that room, keeping the families already chosen. */
   const openScene = (id: string) => {
@@ -146,7 +231,7 @@ export function RoomEditor() {
       if (r) next.push(r);
     }
     commit(next);
-    if (!next.some((i) => i.uid === selected)) setSelected(null);
+    if (!next.some((i) => i.uid === selected)) { setSelected(null); setNoteFor(null); }
   };
 
   const topZ = () => Math.max(0, ...items.map((i) => i.z));
@@ -160,6 +245,7 @@ export function RoomEditor() {
     const it: PlacedItem = { uid: uid(), kind, x: pos.x, y: pos.y, scale: 1, rot: def.category === "material" ? Math.round(jitter * 60) : 0, flip: 1, z: topZ() + 1 };
     commit([...items, it]);
     setSelected(it.uid);
+    setNoteFor(null);
     // on a phone, close the drawer so the new piece can be dragged into place
     if (typeof window !== "undefined" && window.matchMedia("(max-width: 700px)").matches) setDrawer(false);
   };
@@ -187,13 +273,19 @@ export function RoomEditor() {
     const r = stage.getBoundingClientRect();
     drag.current = { uid: id, ox: (e.clientX - r.left) / r.width - it.x, oy: (e.clientY - r.top) / r.height - it.y, before: items, moved: false };
     setSelected(id);
+    if (noteFor && noteFor !== id) setNoteFor(null);
   };
 
   const onMove = (e: ReactPointerEvent<HTMLDivElement>) => {
-    const d = drag.current;
     const stage = stageRef.current;
-    if (!d || !stage) return;
+    if (!stage) return;
     const r = stage.getBoundingClientRect();
+    if (handleDrag.current) {
+      setSplit(clamp(((e.clientX - r.left) / r.width) * 100, 0, 100));
+      return;
+    }
+    const d = drag.current;
+    if (!d) return;
     const x = clamp((e.clientX - r.left) / r.width - d.ox, 0.02, 0.98);
     const y = clamp((e.clientY - r.top) / r.height - d.oy, 0.06, 1.02);
     d.moved = true;
@@ -201,6 +293,7 @@ export function RoomEditor() {
   };
 
   const onUp = () => {
+    handleDrag.current = false;
     const d = drag.current;
     drag.current = null;
     if (!d || !d.moved) return;
@@ -217,7 +310,8 @@ export function RoomEditor() {
   };
 
   const onKey = (e: ReactKeyboardEvent<HTMLDivElement>) => {
-    if (!selected) return;
+    if (!selected || noteFor) return;
+    if ((e.target as HTMLElement).closest("input, textarea, [role='slider']")) return;
     const step = e.shiftKey ? 0.05 : 0.015;
     const map: Record<string, [number, number]> = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step] };
     if (map[e.key]) {
@@ -229,6 +323,90 @@ export function RoomEditor() {
       patchSel(() => null);
     }
   };
+
+  /* ---------- notes tags ---------- */
+
+  const openNotes = (id: string) => {
+    const it = items.find((i) => i.uid === id);
+    if (!it) return;
+    setSelected(id);
+    setNoteFor(id);
+    setNoteDraft(it.notes ?? "");
+    if (view === "room") setShowNotes(true);
+    window.setTimeout(() => noteInputRef.current?.focus(), 30);
+  };
+  const saveNotes = (text: string) => {
+    const id = noteFor;
+    if (!id) return;
+    const clean = text.replace(/\s+/g, " ").trim().slice(0, 80);
+    const it = items.find((i) => i.uid === id);
+    if (it && (it.notes ?? "") !== clean) commit(items.map((i) => (i.uid === id ? { ...i, notes: clean || undefined } : i)));
+    setNoteFor(null);
+  };
+
+  const notes = useMemo(() => {
+    const base = roomNotes(items, families);
+    if (!noteFor) return base;
+    // while a tag is being edited it shows what is being typed
+    const typed = noteDraft.trim();
+    return base.map((n) => (n.uid === noteFor && typed ? { ...n, text: typed, suggested: false } : n));
+  }, [items, families, noteFor, noteDraft]);
+  const matchesFor = noteFor ? findProducts(noteDraft) : [];
+
+  /* ---------- Scent View ---------- */
+
+  const feel = useMemo(() => feelingShape(feelings), [feelings]);
+  const flowSources: FlowSource[] = useMemo(
+    () =>
+      notes.flatMap((n) => {
+        const it = items.find((i) => i.uid === n.uid);
+        const def = it ? itemById(it.kind) : undefined;
+        if (!it || !def?.scentType) return [];
+        const p = emitPoint(it, def);
+        return [{ uid: it.uid, type: def.scentType, x: p.x, y: p.y, w: def.w * it.scale, family: n.family }];
+      }),
+    [notes, items],
+  );
+  const toggleFeeling = (id: EmotionId) =>
+    setFeelings((cur) => (cur.includes(id) ? cur.filter((x) => x !== id) : cur.length < 2 ? [...cur, id] : [cur[1], id]));
+  const focus = view === "scent" ? (hover ?? (selected && isScentItem(items.find((i) => i.uid === selected)?.kind ?? "") ? selected : null)) : null;
+
+  const switchView = (v: View) => {
+    setView(v);
+    setHover(null);
+    if (v === "scent") setTray(1);
+  };
+
+  /* ---------- Photo View ---------- */
+
+  const photoKey = entryId ?? DRAFT;
+  const takePhoto = async (file: File | undefined) => {
+    if (!file) return;
+    if (!file.type.startsWith("image/")) { setPhotoNote("Choose a picture file, such as a JPG or PNG."); return; }
+    try {
+      const data = await shrinkPhoto(file, 1100, 0.82);
+      setPhoto(data);
+      setSplit(50);
+      const ok = writePhotos({ ...readPhotos(), [photoKey]: data });
+      setPhotoNote(ok ? null : "This photo is too large to keep in this browser. It stays until you leave the page.");
+    } catch {
+      setPhotoNote("This picture could not be opened. Try a JPG or PNG.");
+    }
+  };
+  const removePhoto = () => {
+    setPhoto(null);
+    setPhotoNote(null);
+    const map = readPhotos();
+    delete map[photoKey];
+    writePhotos(map);
+  };
+  const onDropPhoto = (e: ReactDragEvent<HTMLDivElement>) => {
+    if (view !== "photo") return;
+    e.preventDefault();
+    void takePhoto(e.dataTransfer.files?.[0]);
+  };
+
+  /* ---------- saving ---------- */
 
   const savedRooms = entries.filter((e): e is RoomsEntry => e.type === "rooms");
   const save = (goCard: boolean) => {
@@ -244,6 +422,12 @@ export function RoomEditor() {
       families, sceneId, nickname: nickname.trim(), items, strength, time, windowOpen,
     };
     replace(entry);
+    if (!entryId && photo) {
+      // a new room takes its draft photo along
+      const map = readPhotos();
+      delete map[DRAFT];
+      writePhotos({ ...map, [id]: photo });
+    }
     if (!entryId) track("creation_complete", { mode: "rooms", scene_id: sceneId });
     setEntryId(id); setCreatedAt(entry.createdAt); setLoadedFor(id);
     if (goCard) {
@@ -263,13 +447,48 @@ export function RoomEditor() {
     tray === 0
       ? FURNITURE.map((d) => ({ id: d.id, label: d.label, group: d.group }))
       : tray === 1
-        ? SOURCES.map((d) => ({ id: d.id, label: d.label }))
+        ? SOURCES.map((d) => ({ id: d.id, label: d.label, group: d.scentGroup }))
         : FAMILIES.flatMap((f) => f.materials.map((m) => ({ id: m.id, label: m.label })));
   const selItem = items.find((i) => i.uid === selected);
+  const selIsScent = selItem ? isScentItem(selItem.kind) : false;
+  const roomNoteWords = useMemo(() => noteWords(roomNotes(items, families)), [items, families]);
+
+  const saveButtons = (
+    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      <button type="button" className="btn btn--primary btn--block" onClick={() => save(false)}>{entryId ? "Save changes" : "Save room"}</button>
+      <button type="button" className="btn btn--apricot btn--block" onClick={() => save(true)}>Make a card</button>
+    </div>
+  );
+
+  const strengthField = (
+    <label className="field">
+      Scent strength
+      <input className="range" type="range" min={20} max={100} value={strength} onChange={(e) => setStrength(Number(e.target.value))} />
+      <span className="muted" style={{ display: "flex", justifyContent: "space-between", fontSize: 14, fontWeight: 400 }}><span>barely there</span><span>fills the room</span></span>
+      <span className="field__hint" style={{ fontWeight: 400 }}>Scent strength represents your imagined atmosphere, rather than a measured concentration.</span>
+    </label>
+  );
+
+  const windowSwitch = (
+    <button type="button" role="switch" aria-checked={windowOpen} className="switch" onClick={() => setWindowOpen((v) => !v)}>
+      Window open
+      <span className="switch__track" aria-hidden="true"><span className="switch__knob" /></span>
+    </button>
+  );
+
+  const notesOn = view === "scent" ? scentNotes : showNotes;
+  const notesSwitch = (
+    <button type="button" role="switch" aria-checked={notesOn} className="switch switch--pill" onClick={() => { if (view === "scent") setScentNotes((v) => !v); else setShowNotes((v) => !v); setNoteFor(null); }}>
+      <span className="switch__track" aria-hidden="true"><span className="switch__knob" /></span>
+      Notes
+    </button>
+  );
+
+  const viewIndex = VIEWS.findIndex((v) => v.id === view);
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
-      <section id="editor" aria-label="Room editor" className="editor anchor">
+      <section id="editor" aria-label="Room editor" className={`editor editor--${view} anchor`}>
         <div className={`card editor__tray${drawer ? " is-open" : ""}`}>
           <button type="button" className="editor__handle" aria-expanded={drawer} aria-label={drawer ? "Close the drawer" : "Open the drawer"} onClick={() => setDrawer((v) => !v)}>
             <span aria-hidden="true" />
@@ -283,26 +502,30 @@ export function RoomEditor() {
           <div className="editor__tray-body">
           {(() => {
             const btn = (it: (typeof trayItems)[number]) => (
-              <button key={it.id} type="button" className="tray-item" onClick={() => addItem(it.id)} aria-label={`Add ${it.label}`}>
+              <button key={it.id} type="button" className={`tray-item${tray === 1 ? " tray-item--scent" : ""}`} onClick={() => addItem(it.id)} aria-label={`Add ${it.label}`}>
                 <span className="tray-item__art" style={tray === 2 ? { width: 44, height: 44 } : undefined}>
-                  <span style={{ display: "block", width: tray === 0 ? "100%" : tray === 1 ? "56%" : "100%", height: "100%" }}>
+                  <span style={{ display: "block", width: "100%", height: "100%" }}>
                     <ItemArt kind={it.id} />
                   </span>
                 </span>
                 <span style={{ fontSize: tray === 2 ? 13 : 14 }}>{it.label}</span>
               </button>
             );
-            if (tray !== 0) {
-              return <div className="tray-grid" style={tray === 2 ? { gridTemplateColumns: "repeat(3, minmax(0, 1fr))" } : undefined}>{trayItems.map(btn)}</div>;
+            if (tray === 2) {
+              return <div className="tray-grid" style={{ gridTemplateColumns: "repeat(3, minmax(0, 1fr))" }}>{trayItems.map(btn)}</div>;
             }
+            const groups: string[] =
+              tray === 1
+                ? [...SCENT_GROUPS]
+                : (() => {
+                    // the room's own pieces first, then everything else
+                    const own = SCENES.find((x) => x.id === sceneId)?.group;
+                    const others = SCENES.map((x) => x.group).filter((g) => g && g !== own);
+                    return [...(own ? [own] : []), ...FURNITURE_GROUPS.filter((g) => g !== own && !others.includes(g)), ...others.filter((g): g is NonNullable<typeof g> => !!g)];
+                  })();
             return (
               <div className="tray-groups">
-                {(() => {
-                  // the room's own pieces first, then everything else
-                  const own = SCENES.find((x) => x.id === sceneId)?.group;
-                  const others = SCENES.map((x) => x.group).filter((g) => g && g !== own);
-                  return [...(own ? [own] : []), ...FURNITURE_GROUPS.filter((g) => g !== own && !others.includes(g)), ...others.filter((g): g is NonNullable<typeof g> => !!g)];
-                })().map((g) => {
+                {groups.map((g) => {
                   const list = trayItems.filter((it) => (it.group ?? "Objects") === g);
                   return list.length ? (
                     <div key={g} style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -319,18 +542,44 @@ export function RoomEditor() {
         </div>
 
         <div className="editor__stage">
-          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
-            <div style={{ display: "flex", gap: 8 }}>
-              <button type="button" className="tool" aria-label="Undo" onClick={undo} disabled={!past.length}><Icon name="undo" /></button>
-              <button type="button" className="tool" aria-label="Redo" onClick={redo} disabled={!future.length}><Icon name="redo" /></button>
-            </div>
-            <button type="button" role="switch" aria-checked={snap} className="switch" style={{ width: "auto", fontSize: 15, background: "#fff", borderRadius: 999, padding: "0 16px", minHeight: 44 }} onClick={() => setSnap((v) => !v)}>
-              <span className="switch__track" aria-hidden="true"><span className="switch__knob" /></span>
-              Snap to floor
-            </button>
+          <div role="tablist" aria-label="View" className="seg editor__views">
+            <span className="seg__thumb" aria-hidden="true" style={{ left: `calc(5px + (100% - 10px) * ${viewIndex / 3})`, width: "calc((100% - 10px) / 3)" }} />
+            {VIEWS.map((v) => (
+              <button key={v.id} type="button" role="tab" aria-selected={view === v.id} className="seg__opt" onClick={() => switchView(v.id)}>{v.label}</button>
+            ))}
           </div>
 
-          <div className="stage-box" onKeyDown={onKey}>
+          <div className="editor__tools">
+            {view !== "photo" ? (
+              <div style={{ display: "flex", gap: 8 }}>
+                <button type="button" className="tool" aria-label="Undo" onClick={undo} disabled={!past.length}><Icon name="undo" /></button>
+                <button type="button" className="tool" aria-label="Redo" onClick={redo} disabled={!future.length}><Icon name="redo" /></button>
+                {view === "scent" ? (
+                  <button type="button" className="tool" aria-label={paused ? "Play the scent motion" : "Pause the scent motion"} aria-pressed={paused} onClick={() => setPaused((v) => !v)}>
+                    <Icon name={paused ? "play" : "pause"} />
+                  </button>
+                ) : null}
+              </div>
+            ) : (
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                <button type="button" className="btn btn--ghost btn--sm" onClick={() => fileRef.current?.click()}>
+                  <Icon name="imagePlus" size={18} />{photo ? "Replace photo" : "Add a photo of your room"}
+                </button>
+                {photo ? <button type="button" className="tool" aria-label="Remove the photo" onClick={removePhoto}><Icon name="trash" /></button> : null}
+              </div>
+            )}
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "flex-end" }}>
+              {view !== "photo" ? notesSwitch : null}
+              {view === "room" ? (
+                <button type="button" role="switch" aria-checked={snap} className="switch switch--pill" onClick={() => setSnap((v) => !v)}>
+                  <span className="switch__track" aria-hidden="true"><span className="switch__knob" /></span>
+                  Snap to floor
+                </button>
+              ) : null}
+            </div>
+          </div>
+
+          <div className="stage-box" onKeyDown={onKey} onDragOver={(e) => { if (view === "photo") e.preventDefault(); }} onDrop={onDropPhoto}>
             <ScenePage
               items={items}
               families={families}
@@ -345,93 +594,227 @@ export function RoomEditor() {
               onItemPointerDown={onItemDown}
               onStagePointerMove={onMove}
               onStagePointerUp={onUp}
-              onStageBackgroundDown={() => setSelected(null)}
+              onStageBackgroundDown={() => { setSelected(null); setNoteFor(null); }}
               bloomKey={families.join("-")}
+              view={view === "scent" ? "scent" : "room"}
+              emphasizeScent
+              notes={view === "photo" ? undefined : view === "scent" ? (scentNotes ? notes : notes.filter((n) => n.uid === focus || n.uid === noteFor)) : showNotes ? notes : undefined}
+              stagePx={stagePx}
+              onNoteClick={openNotes}
+              focusUid={focus}
+              onItemHover={view === "scent" ? setHover : undefined}
+              atmosphere={view !== "scent"}
+              overlay={
+                view === "scent" ? (
+                  <ScentFlow sources={flowSources} settings={{ strength, sensory, feel, time, windowOpen, paused, focus }} />
+                ) : view === "photo" && photo ? (
+                  <>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img className="photo-layer" src={photo} alt="Your room" style={{ clipPath: `inset(0 ${100 - split}% 0 0)` }} />
+                    <span className="photo-split" style={{ left: `${split}%` }} aria-hidden="true" />
+                    <span
+                      role="slider"
+                      tabIndex={0}
+                      aria-label="Photo and collage"
+                      aria-valuemin={0}
+                      aria-valuemax={100}
+                      aria-valuenow={Math.round(split)}
+                      className="photo-knob"
+                      style={{ left: `${split}%` }}
+                      onPointerDown={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleDrag.current = true;
+                        try { e.currentTarget.setPointerCapture(e.pointerId); } catch { /* older browsers */ }
+                      }}
+                      onKeyDown={(e) => {
+                        const step = e.shiftKey ? 10 : 4;
+                        if (e.key === "ArrowLeft") { e.preventDefault(); setSplit((v) => clamp(v - step, 0, 100)); }
+                        if (e.key === "ArrowRight") { e.preventDefault(); setSplit((v) => clamp(v + step, 0, 100)); }
+                        if (e.key === "Home") { e.preventDefault(); setSplit(0); }
+                        if (e.key === "End") { e.preventDefault(); setSplit(100); }
+                      }}
+                    >
+                      <Icon name="chevronLeft" size={16} />
+                      <Icon name="chevronRight" size={16} />
+                    </span>
+                  </>
+                ) : view === "photo" ? (
+                  <div className="photo-empty">
+                    <button type="button" className="photo-empty__btn" onClick={() => fileRef.current?.click()}>
+                      <Icon name="imagePlus" size={28} />
+                      <span>Add a photo of your room</span>
+                    </button>
+                  </div>
+                ) : null
+              }
             />
-            <div role="toolbar" aria-label="Selected item" className="glass-pill" style={{ position: "absolute", left: 16, bottom: 16, flexWrap: "wrap", maxWidth: "calc(100% - 32px)", opacity: selItem ? 1 : 0.5 }}>
-              <span className="mono" style={{ fontSize: 13, padding: "0 10px" }}>{selItem ? (itemById(selItem.kind)?.label ?? findMaterial(selItem.kind)?.label ?? "") : "select an item"}</span>
-              <button type="button" className="tool" aria-label="Rotate" disabled={!selItem} onClick={() => patchSel((it) => ({ ...it, rot: (it.rot + 15) % 360 }))}><Icon name="rotateCw" /></button>
-              <button type="button" className="tool" aria-label="Flip" disabled={!selItem} onClick={() => patchSel((it) => ({ ...it, flip: it.flip === 1 ? -1 : 1 }))}><Icon name="flip" /></button>
-              <button type="button" className="tool" aria-label="Increase size" disabled={!selItem} onClick={() => patchSel((it) => ({ ...it, scale: Math.min(2, +(it.scale + 0.1).toFixed(2)) }))}><Icon name="plus" /></button>
-              <button type="button" className="tool" aria-label="Decrease size" disabled={!selItem} onClick={() => patchSel((it) => ({ ...it, scale: Math.max(0.4, +(it.scale - 0.1).toFixed(2)) }))}><Icon name="minus" /></button>
-              <button type="button" className="tool" aria-label="Bring to front" disabled={!selItem} onClick={() => patchSel((it) => ({ ...it, z: topZ() + 1 }))}><Icon name="front" /></button>
-              <button type="button" className="tool" aria-label="Send to back" disabled={!selItem} onClick={() => patchSel((it) => ({ ...it, z: lowZ() - 1 }))}><Icon name="back" /></button>
-              <button type="button" className="tool" aria-label="Delete" disabled={!selItem} onClick={() => patchSel(() => null)}><Icon name="trash" /></button>
-            </div>
+            <input ref={fileRef} type="file" accept="image/*" hidden onChange={(e: ChangeEvent<HTMLInputElement>) => { void takePhoto(e.target.files?.[0]); e.target.value = ""; }} />
+
+            {view !== "photo" ? (
+              <div role="toolbar" aria-label="Selected item" className="glass-pill editor__toolbar" style={{ opacity: selItem ? 1 : 0.5 }}>
+                <span className="mono" style={{ fontSize: 13, padding: "0 10px" }}>{selItem ? (itemById(selItem.kind)?.label ?? findMaterial(selItem.kind)?.label ?? "") : "select an item"}</span>
+                {selIsScent ? (
+                  <button type="button" className="tool" aria-label="Notes" aria-expanded={noteFor === selected} onClick={() => (noteFor ? saveNotes(noteDraft) : selected && openNotes(selected))}><Icon name="tag" /></button>
+                ) : null}
+                <button type="button" className="tool" aria-label="Rotate" disabled={!selItem} onClick={() => patchSel((it) => ({ ...it, rot: (it.rot + 15) % 360 }))}><Icon name="rotateCw" /></button>
+                <button type="button" className="tool" aria-label="Flip" disabled={!selItem} onClick={() => patchSel((it) => ({ ...it, flip: it.flip === 1 ? -1 : 1 }))}><Icon name="flip" /></button>
+                <button type="button" className="tool" aria-label="Increase size" disabled={!selItem} onClick={() => patchSel((it) => ({ ...it, scale: Math.min(2, +(it.scale + 0.1).toFixed(2)) }))}><Icon name="plus" /></button>
+                <button type="button" className="tool" aria-label="Decrease size" disabled={!selItem} onClick={() => patchSel((it) => ({ ...it, scale: Math.max(0.4, +(it.scale - 0.1).toFixed(2)) }))}><Icon name="minus" /></button>
+                <button type="button" className="tool" aria-label="Bring to front" disabled={!selItem} onClick={() => patchSel((it) => ({ ...it, z: topZ() + 1 }))}><Icon name="front" /></button>
+                <button type="button" className="tool" aria-label="Send to back" disabled={!selItem} onClick={() => patchSel((it) => ({ ...it, z: lowZ() - 1 }))}><Icon name="back" /></button>
+                <button type="button" className="tool" aria-label="Delete" disabled={!selItem} onClick={() => patchSel(() => null)}><Icon name="trash" /></button>
+              </div>
+            ) : null}
+
+            {noteFor && view !== "photo" ? (
+              <div
+                className="note-editor glass-pill"
+                role="dialog"
+                aria-label="Notes"
+                onKeyDown={(e) => {
+                  if (e.key === "Escape") { e.preventDefault(); setNoteFor(null); }
+                }}
+              >
+                <label className="note-editor__field">
+                  <span className="note-editor__label">Notes</span>
+                  <input
+                    ref={noteInputRef}
+                    className="input"
+                    type="text"
+                    value={noteDraft}
+                    maxLength={80}
+                    placeholder="Notes or a product name"
+                    onChange={(e) => setNoteDraft(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); saveNotes(matchesFor.length === 1 ? productNotes(matchesFor[0]) : noteDraft); } }}
+                  />
+                </label>
+                {matchesFor.length ? (
+                  <div className="note-editor__matches">
+                    {matchesFor.map((p) => (
+                      <button key={p.id} type="button" className="note-editor__match" onClick={() => saveNotes(productNotes(p))}>
+                        <span className="note-editor__brand">{p.brand} · {p.name}</span>
+                        <span className="note-editor__notes">{productNotes(p)}</span>
+                      </button>
+                    ))}
+                  </div>
+                ) : null}
+                <div className="note-editor__row">
+                  {items.find((i) => i.uid === noteFor)?.notes ? (
+                    <button type="button" className="btn btn--ghost btn--sm" onClick={() => saveNotes("")}>Clear</button>
+                  ) : <span />}
+                  <button type="button" className="btn btn--primary btn--sm" onClick={() => saveNotes(noteDraft)}>Done</button>
+                </div>
+              </div>
+            ) : null}
           </div>
         </div>
 
         <div className="card editor__panel" style={{ padding: 22 }}>
-          <label className="field">
-            Name your room
-            <input className="input hand" style={{ fontSize: 22 }} type="text" value={nickname} maxLength={40} onChange={(e) => setNickname(e.target.value)} placeholder="rain, chapter three" />
-          </label>
-
-          {/* 11/18 (Tiffany): the room is one more setting, below the name and in the same style as Time of day */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            <span style={{ fontSize: 17, fontWeight: 600 }}>Room</span>
-            <div role="radiogroup" aria-label="Room" className="seg seg--wrap">
-              <span className="seg__thumb" aria-hidden="true" style={{ left: `calc(5px + (100% - 10px) * ${Math.max(0, SCENES.findIndex((x) => x.id === sceneId)) / SCENES.length})`, width: `calc((100% - 10px) / ${SCENES.length})` }} />
-              {SCENES.map((x) => (
-                <button key={x.id} type="button" role="radio" aria-checked={sceneId === x.id} className="seg__opt" onClick={() => openScene(x.id)}>{x.name}</button>
-              ))}
+          {view === "photo" ? (
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              <span className="field__hint" style={{ fontSize: 14 }}>Your photo stays in this browser.</span>
+              {photoNote ? <span className="field__error" role="status">{photoNote}</span> : null}
             </div>
-          </div>
+          ) : null}
+          {view !== "scent" ? (
+            <>
+              <label className="field">
+                Name your room
+                <input className="input hand" style={{ fontSize: 22 }} type="text" value={nickname} maxLength={40} onChange={(e) => setNickname(e.target.value)} placeholder="rain, chapter three" />
+              </label>
 
-          <label className="field">
-            Scent strength
-            <input className="range" type="range" min={20} max={100} value={strength} onChange={(e) => setStrength(Number(e.target.value))} />
-            <span className="muted" style={{ display: "flex", justifyContent: "space-between", fontSize: 14, fontWeight: 400 }}><span>barely there</span><span>fills the room</span></span>
-            <span className="field__hint" style={{ fontWeight: 400 }}>Scent strength represents your imagined atmosphere, rather than a measured concentration.</span>
-          </label>
+              {/* 11/18 (Tiffany): the room is one more setting, below the name and in the same style as Time of day */}
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                <span style={{ fontSize: 17, fontWeight: 600 }}>Room</span>
+                <div role="radiogroup" aria-label="Room" className="seg seg--wrap">
+                  <span className="seg__thumb" aria-hidden="true" style={{ left: `calc(5px + (100% - 10px) * ${Math.max(0, SCENES.findIndex((x) => x.id === sceneId)) / SCENES.length})`, width: `calc((100% - 10px) / ${SCENES.length})` }} />
+                  {SCENES.map((x) => (
+                    <button key={x.id} type="button" role="radio" aria-checked={sceneId === x.id} className="seg__opt" onClick={() => openScene(x.id)}>{x.name}</button>
+                  ))}
+                </div>
+              </div>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            <span style={{ fontSize: 17, fontWeight: 600 }}>Time of day</span>
-            <div role="radiogroup" aria-label="Time of day" className="seg">
-              <span className="seg__thumb" aria-hidden="true" style={{ left: `calc(5px + (100% - 10px) * ${TIMES.findIndex((t) => t.id === time) / 3})`, width: "calc((100% - 10px) / 3)" }} />
-              {TIMES.map((t) => (
-                <button key={t.id} type="button" role="radio" aria-checked={time === t.id} className="seg__opt" style={{ padding: 0 }} onClick={() => setTime(t.id)}>{t.label}</button>
-              ))}
-            </div>
-          </div>
+              {strengthField}
 
-          <button type="button" role="switch" aria-checked={windowOpen} className="switch" onClick={() => setWindowOpen((v) => !v)}>
-            Window open
-            <span className="switch__track" aria-hidden="true"><span className="switch__knob" /></span>
-          </button>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                <span style={{ fontSize: 17, fontWeight: 600 }}>Time of day</span>
+                <div role="radiogroup" aria-label="Time of day" className="seg">
+                  <span className="seg__thumb" aria-hidden="true" style={{ left: `calc(5px + (100% - 10px) * ${TIMES.findIndex((t) => t.id === time) / 3})`, width: "calc((100% - 10px) / 3)" }} />
+                  {TIMES.map((t) => (
+                    <button key={t.id} type="button" role="radio" aria-checked={time === t.id} className="seg__opt" style={{ padding: 0 }} onClick={() => setTime(t.id)}>{t.label}</button>
+                  ))}
+                </div>
+              </div>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            <span style={{ fontSize: 17, fontWeight: 600 }}>Scent families <span className="field__hint">Choose up to three</span></span>
-            <div className="chips" style={{ gap: 6 }}>
-              {FAMILIES.map((f) => (
-                <button key={f.id} type="button" className="chip" aria-pressed={families.includes(f.id)} style={{ minHeight: 40, padding: "0 12px 0 8px", fontSize: 14 }} onClick={() => toggleFamily(f.id)}>
-                  <span className="chip__dot" style={{ background: f.hex, width: 13, height: 13 }} />
-                  {f.label}
-                </button>
-              ))}
-            </div>
-            {(() => {
-              // copy v1 (11/24, §4.1): one suggestion, "Explore {family} as an additional scent."; the family is the button
-              const near = FAMILIES.filter((f) => !families.includes(f.id) && families.some((id) => areNeighbours(id, f.id))).slice(0, 1);
-              return near.length && families.length < 3 ? (
-                <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 8, fontSize: 15 }}>
-                  <span className="muted">Explore</span>
-                  {near.map((f) => (
-                    <button key={f.id} type="button" className="chip" style={{ minHeight: 36, padding: "0 12px 0 8px", fontSize: 14, borderStyle: "dashed" }} onClick={() => toggleFamily(f.id)}>
+              {windowSwitch}
+
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                <span style={{ fontSize: 17, fontWeight: 600 }}>Scent families <span className="field__hint">Choose up to three</span></span>
+                <div className="chips" style={{ gap: 6 }}>
+                  {FAMILIES.map((f) => (
+                    <button key={f.id} type="button" className="chip" aria-pressed={families.includes(f.id)} style={{ minHeight: 40, padding: "0 12px 0 8px", fontSize: 14 }} onClick={() => toggleFamily(f.id)}>
                       <span className="chip__dot" style={{ background: f.hex, width: 13, height: 13 }} />
                       {f.label}
                     </button>
                   ))}
-                  <span className="muted">as an additional scent.</span>
                 </div>
-              ) : null;
-            })()}
-          </div>
+                {(() => {
+                  // copy v1 (11/24, §4.1): one suggestion, "Explore {family} as an additional scent."; the family is the button
+                  const near = FAMILIES.filter((f) => !families.includes(f.id) && families.some((id) => areNeighbours(id, f.id))).slice(0, 1);
+                  return near.length && families.length < 3 ? (
+                    <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 8, fontSize: 15 }}>
+                      <span className="muted">Explore</span>
+                      {near.map((f) => (
+                        <button key={f.id} type="button" className="chip" style={{ minHeight: 36, padding: "0 12px 0 8px", fontSize: 14, borderStyle: "dashed" }} onClick={() => toggleFamily(f.id)}>
+                          <span className="chip__dot" style={{ background: f.hex, width: 13, height: 13 }} />
+                          {f.label}
+                        </button>
+                      ))}
+                      <span className="muted">as an additional scent.</span>
+                    </div>
+                  ) : null;
+                })()}
+              </div>
+            </>
+          ) : (
+            <>
+              {strengthField}
 
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            <button type="button" className="btn btn--primary btn--block" onClick={() => save(false)}>{entryId ? "Save changes" : "Save room"}</button>
-            <button type="button" className="btn btn--apricot btn--block" onClick={() => save(true)}>Make a card</button>
-          </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                <span style={{ fontSize: 17, fontWeight: 600 }}>Feelings <span className="field__hint">Choose up to two</span></span>
+                <div className="chips" style={{ gap: 6 }}>
+                  {EMOTION_OPTIONS.map((o) => (
+                    <button key={o.id} type="button" className="chip" aria-pressed={feelings.includes(o.id)} style={{ minHeight: 38, padding: "0 12px", fontSize: 14 }} onClick={() => toggleFeeling(o.id)}>
+                      {o.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="senses">
+                {SENSORY_SLIDERS.map((s) => (
+                  <label key={s.id} className="sense">
+                    <span>{s.from}</span>
+                    <input
+                      className="range"
+                      type="range"
+                      min={0}
+                      max={100}
+                      value={sensory[s.id]}
+                      aria-label={`${s.from} to ${s.to}`}
+                      onChange={(e) => setSensory((cur) => ({ ...cur, [s.id]: Number(e.target.value) }))}
+                    />
+                    <span>{s.to}</span>
+                  </label>
+                ))}
+              </div>
+
+              {windowSwitch}
+            </>
+          )}
+
+          {saveButtons}
         </div>
       </section>
 
@@ -461,7 +844,7 @@ export function RoomEditor() {
 
 
       <section id="products" className="card anchor" style={{ marginTop: 8 }}>
-        <ProductCards families={families} title="Fragrance Matches" lead="Explore products with fragrance families in common with your room. Use the match as a starting point, then consider how the product smells to you." />
+        <ProductCards families={families} roomNotes={roomNoteWords} title="Fragrance Matches" lead="Explore products with fragrance families in common with your room. Use the match as a starting point, then consider how the product smells to you." />
       </section>
 
       <ThirdRoom

@@ -3,7 +3,7 @@
 import {
   ArrowLeft, ArrowRight, BookOpen, Bookmark, BookmarkCheck, CalendarDays, Check, ChevronDown, ChevronLeft, ChevronRight, CircleUserRound, Clock, Compass, Copy, Download,
   DoorOpen, Drama, ExternalLink, Flame, FlaskConical, FlipHorizontal2, Gift, House, Image, ImagePlus, Instagram, Layers, Link2, Mail, Map as MapIcon, MapPin,
-  Menu, Minus, Newspaper, Pause, PenLine, PencilRuler, Pin, Play, Plus, Redo2, RotateCcw, RotateCw, Scroll, SendToBack, Share2, Trash2, Undo2, X,
+  Menu, Minus, Newspaper, Pause, Tag, PenLine, PencilRuler, Pin, Play, Plus, Redo2, RotateCcw, RotateCw, Scroll, SendToBack, Share2, Trash2, Undo2, X,
   Bath, Heart, Laptop, Leaf, Moon, PartyPopper, Sparkles, Sun, Users,
   type LucideIcon,
 } from "lucide-react";
@@ -21,6 +21,7 @@ const ICONS = {
   link: Link2,
   play: Play,
   pause: Pause,
+  tag: Tag,
   arrowRight: ArrowRight,
   arrowLeft: ArrowLeft,
   chevronLeft: ChevronLeft,
