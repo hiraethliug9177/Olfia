@@ -1947,7 +1947,9 @@ span.note-tag { cursor: default; }
 .ws__panel .chip { min-height: 36px; padding: 0 12px 0 9px; font-size: 13px; }
 .ws__panel .chip__dot { width: 12px; height: 12px; }
 .ws__panel .impression { padding-top: 18px; }
-.ws__panel .swatch { width: 64px; height: 64px; }
+.ws__panel .swatch { width: 56px; height: 56px; }
+.ws__panel .impression { gap: 14px; }
+.ws__panel .impression__h { font-size: 14px; white-space: nowrap; }
 .ws-explore { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; font-size: 13px; color: var(--slate); }
 .ws-explore .chip { border-style: dashed; }
 .ws-photo-actions { display: flex; flex-wrap: wrap; gap: 8px; }
