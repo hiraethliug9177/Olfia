@@ -1031,11 +1031,17 @@ body::after {
 /* 11/24 evening (her mockup and mood board): a newspaper masthead. A heavy rule, then her line, the nameplate and a
    date stamp wheel on one row; under them one ruled line: today's family on the left, the day's motto and the week's
    edition on the right. */
-.np-mast { margin-bottom: 0; border-top: 4px solid var(--ink); }
+/* Her note on the preview (11/24 night): the nameplate in proportion with the stamp, as in her mockup, where the stamp
+   is about as tall as the letters. One size drives both: the nameplate's letters stand 0.79 of their font size (T top
+   to the foot of the E), the stamp is 0.88 of it, a little taller so the round shape looks the same height; the
+   nameplate is 63.6% of the row as in her mockup (121 px on a 1200 px row). */
+.np-mast { --np-f: clamp(52px, 9.7vw, 121px); margin-bottom: 0; border-top: 4px solid var(--ink); }
 .np-mast__top { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 24px; padding: 16px 0 14px; border-bottom: 2px solid var(--ink); }
 .np-mast__motto { justify-self: start; margin: 0; font-family: var(--font-display); font-style: italic; font-weight: 600; font-size: clamp(17px, 1.5vw, 22px); line-height: 1.22; text-align: center; color: var(--ink); text-wrap: nowrap; }
-.np-mast__title { margin: 0; font-family: var(--font-display); font-size: clamp(52px, 7vw, 108px); font-weight: 700; line-height: 0.95; letter-spacing: -0.03em; text-align: center; white-space: nowrap; }
-.np-mast__stamp { justify-self: end; width: clamp(128px, 11.6vw, 168px); aspect-ratio: 1; rotate: -4deg; }
+.np-mast__title { margin: 0; font-family: var(--font-display); font-size: var(--np-f); font-weight: 700; line-height: 0.95; letter-spacing: -0.03em; text-align: center; white-space: nowrap; }
+.np-mast__stamp { justify-self: end; width: calc(var(--np-f) * 0.88); aspect-ratio: 1; rotate: -4deg; }
+/* the letters sit 0.13 of their size above the middle of their line, so they are lowered to the stamp's centre */
+@media (min-width: 901px) { .np-mast__title { transform: translateY(0.13em); } }
 .np-mast__bar { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 28px; padding: 9px 0 8px; border-bottom: 2px solid var(--ink); font-size: 14px; font-weight: 600; }
 .np-mast__bar p { margin: 0; }
 .np-mast__pick { white-space: nowrap; }
@@ -1060,13 +1066,15 @@ body::after {
 @keyframes np-breathe { 0%, 100% { stroke: var(--apricot); } 50% { stroke: var(--peri); } }
 @keyframes np-breathe-fill { 0%, 100% { fill: var(--apricot); } 50% { fill: var(--peri); } }
 @media (prefers-reduced-motion: reduce) { .np-wheel__band, .np-wheel__today { animation: none; } }
-.np-mast__lead { margin: 18px 0 36px; color: var(--slate); }
+/* .page-lead (later in this file) sets margin: 14px 0 0, so the space under the description needs the double class
+   (her note 11/24 night: the Scentpedia panel sat too close) */
+.np-mast__lead, .page-lead.np-mast__lead { margin: 18px 0 40px; color: var(--slate); }
 /* narrower screens: the nameplate takes its own row, her line and the stamp share the next */
 @media (max-width: 900px) {
   .np-mast__top { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "title title" "motto stamp"; row-gap: 14px; }
   .np-mast__title { grid-area: title; }
   .np-mast__motto { grid-area: motto; text-align: left; }
-  .np-mast__stamp { grid-area: stamp; }
+  .np-mast__stamp { grid-area: stamp; width: 128px; }
   .np-mast__bar { flex-direction: column; align-items: flex-start; }
   .np-mast__issue { text-align: left; }
 }
@@ -1396,7 +1404,7 @@ body::after {
 .fav__name { font-family: var(--font-display); font-size: 20px; font-weight: 600; }
 .scentprint__prefs { display: flex; flex-direction: column; gap: 14px; }
 .scentprint__tags { display: flex; flex-direction: column; gap: 14px; }
-.gifts-page__lead { margin-bottom: 28px; }
+.gifts-page__lead, .page-lead.gifts-page__lead { margin-bottom: 28px; }
 .gift-card-panel__lead { margin: 0 0 4px; color: var(--slate); }
 .lib-guide-intro { max-width: none; margin: 0 0 20px; }
 .guide-text p { margin: 0 0 12px; max-width: 72ch; }
