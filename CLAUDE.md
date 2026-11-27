@@ -2,6 +2,7 @@
 
 Read `docs/PRD.md`, `docs/DESIGN-SPEC.md`, and `docs/ARCHITECTURE.md` before changing anything. This file is the short version.
 
+- **MVP frozen (2026-11-26):** website editing is closed at her word ("MVP就到这一步，网站编辑截止。"). The live site, `main` at `4de5018`, is the final MVP. Change the site only after she reopens editing in chat; notes in `docs/` may still be added.
 - Stack: Next.js 15 App Router, React 19, TypeScript strict, Tailwind v4 (tokens in `app/globals.css` `@theme`), zustand + localStorage, html-to-image, GA4 via gtag.js (`components/Analytics.tsx`, events in `lib/analytics.ts`). npm. Node 22.
 - Commands: `npm run dev`, `npm run typecheck`, `npm run build`. Type errors fail the build; run typecheck before finishing.
 - Terms, exactly: **Scent Scene**, **Rooms**, **Scent Atlas**, **Scent Card** (renamed from Scene Card on 2026-11-03). Copy v1 (2026-11-24) adds Tiffany's names: **Capture a scent**, **Scent Journal**, **Favorites**, **My Scentprint**, **Fragrance Shelf**, **Fragrance Matches**, **The Olfia Edit**, **Scentpedia**, **For myself / For someone else**, **Join the waitlist**; Rooms' views (Notion 11/23, plans table): **Room View**, **Scent View**, **Photo View**. Never use: Scent Profile, Room Profile, Scent Direction (as a feature name), Experience Record, Tags & profile, My shelf.
